@@ -2,10 +2,6 @@
 #define ELEMENT_HEADER
 
 class Element {
-Private:
-
-Public:
-
 }; // class Element {
 
 #endif

@@ -3,6 +3,7 @@
 
 // Include local header files
 #include "Forward_Declarations.h"
+#include "Array.h"
 #include "Node.h"
 #include "Element.h"
 
