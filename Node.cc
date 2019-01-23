@@ -91,10 +91,21 @@ Array_3<double> Node::Get_Current_Position(void) const {
 // Other methods
 
 void Node::Print(void) {
-  printf(         "Original Position:            [%6.3lf, %6.3flf, %6.3lf]\n", Original_Position[0],  Original_Position[1], Original_Position[2]);
-  printf(         "Current Position :            [%6.3lf, %6.3flf, %6.3lf]\n", Current_Position[0] ,  Current_Position[1] , Current_Position[2] );
-  printf(         "Has BC           :            [%6d, %6d, %6d]\n"          , Has_BC[0]           ,  Has_BC[1]           , Has_BC[2]           );
-  printf(         "BC's             :            [%6.3lf, %6.3flf, %6.3lf]\n", BC[0]               ,  BC[1]               , BC[2]               );
+  printf(         "Original Position:            [%6.3lf, %6.3lf, %6.3lf]\n", Original_Position[0],  Original_Position[1], Original_Position[2]);
+  printf(         "Current Position :            [%6.3lf, %6.3lf, %6.3lf]\n", Current_Position[0] ,  Current_Position[1] , Current_Position[2] );
+  printf(         "BC's             :            [");
+    for(int i = 0; i < 3; i++) {
+      // Print this component's BC
+      if(Has_BC[i] == true)
+        printf("%6.3lf", BC[i]);
+      else
+        printf("None  ");
+
+      // Print comment
+      if(i != 2)
+        printf(", ");
+    }
+    printf("]\n");
 } // void Node::Print(void) {
 
 

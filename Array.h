@@ -40,6 +40,13 @@ public:
     Ar[2] = Ar_In[2];
   } // Array_3(const Type Ar_In[3]) {
 
+  // Initialize using a 3 component array
+  Array_3(const Type a, const Type b, const Type c) {
+    Ar[0] = a;
+    Ar[1] = b;
+    Ar[2] = c;
+  } // Array_3(const Type Ar_In[3]) {
+
 
   // Destructor
   ~Array_3(void) {}
