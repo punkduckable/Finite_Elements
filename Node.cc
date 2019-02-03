@@ -1,6 +1,9 @@
 #if !defined(NODE_SOURCE)
 #define NODE_SOURCE
 
+#include "Node.h"
+#include <stdio.h>
+
 ////////////////////////////////////////////////////////////////////////////////
 // Private methods
 

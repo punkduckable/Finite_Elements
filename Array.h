@@ -1,6 +1,8 @@
 #if !defined(ARRAY_HEADER)
 #define ARRAY_HEADER
 
+#include <stdio.h>
+
 template <typename Type>
 class Array_3 {
 
@@ -34,47 +36,26 @@ public:
   Array_3(void) {}
 
   // Initialize using a 3 component array
-  Array_3(const Type Ar_In[3]) {
-    Ar[0] = Ar_In[0];
-    Ar[1] = Ar_In[1];
-    Ar[2] = Ar_In[2];
-  } // Array_3(const Type Ar_In[3]) {
+  Array_3(const Type Ar_In[3]);
 
   // Initialize using a 3 component array
-  Array_3(const Type a, const Type b, const Type c) {
-    Ar[0] = a;
-    Ar[1] = b;
-    Ar[2] = c;
-  } // Array_3(const Type Ar_In[3]) {
-
+  Array_3(const Type a, const Type b, const Type c);
 
   // Destructor
   ~Array_3(void) {}
-
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Operator overloading
 
   /* Used to read an element of the Array. */
-  Type operator()(const unsigned int Index) const {
-    // Check if index is out of bounds
-    if(Index >= 3)
-      printf("Error! Requested index is out of bounds\n");
-
-    return Ar[Index];
-  } // Type operator()(const unsigned int Index) cosnt {
-
-
+  Type operator()(const unsigned int Index) const;
 
   /* Used to write to an element of the Array. */
-  Type & operator()(const unsigned int Index) {
-    // Check if index is out of bounds
-    if(Index >= 3)
-      printf("Error! Requested index is out of bounds\n");
-
-    return Ar[Index];
-  } // Type & operator()(const unsigned int Index) {
+  Type & operator()(const unsigned int Index);
 };  // class Array_3 {
+
+// Needed because of weird junk with templates
+#include "Array.cc"
 
 #endif

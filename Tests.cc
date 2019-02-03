@@ -1,6 +1,10 @@
 #if !defined(TESTS_SOURCE)
 #define TESTS_SOURCE
 
+#include "Node.h"
+#include "Tests.h"
+#include <stdio.h>
+
 void Test::Node(void) {
   /* In this test, we create a rectangular prism of nodes, set them up such that
   the bottom row of the nodes has a fixed y coordinate, and then check

@@ -1,6 +1,9 @@
 #if !defined(NODE_HEADER)
 #define NODE_HEADER
 
+#include "Forward_Declarations.h"
+#include "Array.h"
+
 class Node {
 // Elements need to be able to access the private Node members.
 friend class Element;
