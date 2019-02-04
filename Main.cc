@@ -3,6 +3,7 @@
 
 int main() {
   // Run node tests.
+  Test::Node_Errors();
   Test::Node();
 
   return 0;

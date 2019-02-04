@@ -4,40 +4,43 @@
 #include "Node.h"
 #include <stdio.h>
 
+using namespace Node_Errors;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Private methods
 
 void Node::Set_Current_Position(void) {
-  for(int i = 0; i < 3; i++)
-    if(Has_BC[i] == true)
-      Current_Position[i] = BC[i];
+  for(int i = 0; i < 3; i++) {
+    if(Has_BCs[i] == true)
+      Current_Position[i] = BCs[i];
     else
       Current_Position[i] = Original_Position[i];
+  } // for(int i = 0; i < 3; i++) {
 } // void Node::Set_Current_Position(void) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Setter methods
 
-void Node::Update_Position(const double New_Position_Component, const unsigned int component) {
+Errors Node::Update_Position(const double New_Position_Component, const unsigned int component) {
   // First, check that the component is 0, 1, or 2
   if(component > 2) {
-    printf("Error! The component index must be 0, 1, or 2\n");
-    return;
+    return INDEX_OUT_OF_BOUNDS;
   } // if(component > 2) {
 
   // Next, check if this component has a BC
-  if(Has_BC[component] == true) {
-    printf("Error! This node has a precribed boundary condition in the e%d direction\n", component+1);
-    return;
-  } // if(Has_BC[component] == true) {
+  if(Has_BCs[component] == true) {
+    printf("Precribed boundary condition in the e%d direction\n", component+1);
+    return BC_FIXED_POS;
+  } // if(Has_BCs[component] == true) {
 
   // If both checks pass then update the current position
   Current_Position[component] = New_Position_Component;
-} // void Node::Update_Position(const double New_Position_Component, const unsigned int component) {
+  return SUCCESS;
+} // Errors Node::Update_Position(const double New_Position_Component, const unsigned int component) {
 
 
-void Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
+Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
   /* Check if the Origional Position has already been set. This should only be
   set once (when the node is first being created */
   if(Original_Position_Has_Been_Set == false) {
@@ -50,20 +53,22 @@ void Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
     // Now, check if we're ready to set the Current_Position
     if(Original_Position_Has_Been_Set == true && BCs_Have_Been_Set == true)
       Set_Current_Position();
+
+    return SUCCESS;
   } // if(Original_Position_Has_Been_Set == false) {
   else
-    printf("Error! This node already had its Original position set\n");
-} // void Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
+    return ORIGINAL_POSITION_SET;
+} // Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
 
 
 
-void Node::Set_BCs(const Array_3<bool> Has_BC_In, const Array_3<double> BC_In) {
+Errors Node::Set_BCs(const Array_3<bool> Has_BCs_In, const Array_3<double> BCs_In) {
   /* Check if the Node's Boundary Conditions have already been set. They should
   only be set once when the Node is first being created. */
   if(BCs_Have_Been_Set == false) {
     // Set the Has_BC boolean array and the BC array using the inputs
-    Has_BC = Has_BC_In;
-    BC = BC_In;
+    Has_BCs = Has_BCs_In;
+    BCs = BCs_In;
 
     // The BC's have been set.
     BCs_Have_Been_Set = true;
@@ -71,10 +76,12 @@ void Node::Set_BCs(const Array_3<bool> Has_BC_In, const Array_3<double> BC_In) {
     // Now, check if we're ready to set the Current_Position
     if(Original_Position_Has_Been_Set == true && BCs_Have_Been_Set == true)
       Set_Current_Position();
+
+    return SUCCESS;
   } // if(BCs_Have_Been_Set == false) {
   else
-    printf("Error! This node's BCs have already been set!\n");
-} // void Node::Set_BCs(const Array_3<bool> Has_BC_In, const Array_3<double> BC_In) {
+    return BC_SET;
+} // Errors Node::Set_BCs(const Array_3<bool> Has_BCs_In, const Array_3<double> BCs_In) {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Getter methods
@@ -99,10 +106,10 @@ void Node::Print(void) {
   printf(         "BC's             :            [");
     for(int i = 0; i < 3; i++) {
       // Print this component's BC
-      if(Has_BC[i] == true)
-        printf("%6.3lf", BC[i]);
+      if(Has_BCs[i] == true)
+        printf("%6.3lf", BCs[i]);
       else
-        printf("None  ");
+        printf(" None ");
 
       // Print comment
       if(i != 2)

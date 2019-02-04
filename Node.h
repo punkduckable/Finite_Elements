@@ -1,7 +1,7 @@
 #if !defined(NODE_HEADER)
 #define NODE_HEADER
 
-#include "Forward_Declarations.h"
+#include "Errors.h"
 #include "Array.h"
 
 class Node {
@@ -12,8 +12,8 @@ private:
   // Core members of the Node class
   Array_3<double> Original_Position;        // Material position of the node    Units : M
   Array_3<double> Current_Position;         // Spatial position of the node     Units : M
-  Array_3<bool> Has_BC;                     // Has_BC[i] is true if the ith component of this node has a prescribed displacement BC
-  Array_3<double> BC;                       // The Prescribed displacement BC's
+  Array_3<bool> Has_BCs;                    // Has_BCs[i] is true if the ith component of this node has a prescribed displacement BC
+  Array_3<double> BCs;                      // The Prescribed displacement BC's
 
 
   /* Flags. These are used so that the Original_Position, Has_BC, and BC variables
@@ -38,11 +38,11 @@ public:
   // Setter methods
 
   // Updates the current (spatial) position of the node
-  void Update_Position(const double New_Position_Component, const unsigned int component);
+  Node_Errors::Errors Update_Position(const double New_Position_Component, const unsigned int component);
 
   // Set internal variables
-  void Set_Original_Position(const Array_3<double> Original_Position_In);
-  void Set_BCs(const Array_3<bool> Has_BC_In, const Array_3<double> BC_In);
+  Node_Errors::Errors Set_Original_Position(const Array_3<double> Original_Position_In);
+  Node_Errors::Errors Set_BCs(const Array_3<bool> Has_BC_In, const Array_3<double> BC_In);
 
 
   //////////////////////////////////////////////////////////////////////////////

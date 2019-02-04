@@ -145,7 +145,7 @@ void Element::Set_Nodes(const unsigned Node0_ID,
 
     for(int Component = 0; Component < 3; Component++) {
       // Check the current node has a Precribed BC in the Component direction
-      if(Node_Array[Global_Node_Number].Has_BC[Component] == false)
+      if(Node_Array[Global_Node_Number].Has_BCs[Component] == false)
         Num_Local_Eq++;
     } // for(int Component = 0; Component < 3; Component++) {
   } // for(int Node = 0; Node < 8; Node++) {
@@ -166,7 +166,7 @@ void Element::Set_Nodes(const unsigned Node0_ID,
     const unsigned Global_Node_Number = Node_List[Node];
 
     for(int Component = 0; Component < 3; Component++) {
-      if(Node_Array[Global_Node_Number].Has_BC[Component] == false) {
+      if(Node_Array[Global_Node_Number].Has_BCs[Component] == false) {
         // Set Local_Eq_Num_To_Global_Eq_Num
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = ID[3*Global_Node_Number + Component];
 
@@ -176,7 +176,7 @@ void Element::Set_Nodes(const unsigned Node0_ID,
 
         // Increment equation number
         Eq_Num++;
-      } // if(Node_Array[Node_List[Node]].Has_BC[Component] == false) {
+      } // if(Node_Array[Node_List[Node]].Has_BCs[Component] == false) {
     } // for(int Component = 0; Component < 3 Component++) {
   } // for(int Node = 0; Node < 8; Node++) {
 } // void Element::Set_Nodes(const unsigned Node1_ID,
