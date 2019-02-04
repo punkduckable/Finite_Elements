@@ -138,14 +138,14 @@ void Element::Set_Nodes(const unsigned Node0_ID,
   //////////////////////////////////////////////////////////////////////////////
   /* Determine the number of local equations. To do this, we cycle through
   each node in the node list. We access the actual node using the Node_Array
-  For each node, we check if it has prescribed BC's in each component. */
+  For each node, we check if it has a fixed component of position */
   Num_Local_Eq = 0;
   for(int Node = 0; Node < 8; Node++) {
     const unsigned Global_Node_Number = Node_List[Node];
 
     for(int Component = 0; Component < 3; Component++) {
-      // Check the current node has a Precribed BC in the Component direction
-      if(Node_Array[Global_Node_Number].Has_BCs[Component] == false)
+      // Check the current node has a fixed component of position in the Component direction
+      if(Node_Array[Global_Node_Number].Fixed_Pos[Component] == false)
         Num_Local_Eq++;
     } // for(int Component = 0; Component < 3; Component++) {
   } // for(int Node = 0; Node < 8; Node++) {
@@ -166,7 +166,7 @@ void Element::Set_Nodes(const unsigned Node0_ID,
     const unsigned Global_Node_Number = Node_List[Node];
 
     for(int Component = 0; Component < 3; Component++) {
-      if(Node_Array[Global_Node_Number].Has_BCs[Component] == false) {
+      if(Node_Array[Global_Node_Number].Fixed_Pos[Component] == false) {
         // Set Local_Eq_Num_To_Global_Eq_Num
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = ID[3*Global_Node_Number + Component];
 
@@ -176,7 +176,7 @@ void Element::Set_Nodes(const unsigned Node0_ID,
 
         // Increment equation number
         Eq_Num++;
-      } // if(Node_Array[Node_List[Node]].Has_BCs[Component] == false) {
+      } // if(Node_Array[Node_List[Node]].Fixed_Pos[Component] == false) {
     } // for(int Component = 0; Component < 3 Component++) {
   } // for(int Node = 0; Node < 8; Node++) {
 } // void Element::Set_Nodes(const unsigned Node1_ID,

@@ -53,6 +53,9 @@ public:
 
   /* Used to write to an element of the Array. */
   Type & operator()(const unsigned int Index);
+
+  /* Used to set one Array equal to another */
+  Array_3<Type> & operator=(Array_3<Type> Ar_In);
 };  // class Array_3 {
 
 // Needed because of weird junk with templates

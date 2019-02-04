@@ -16,11 +16,8 @@ void Test::Node_Errors(void) {
   // Declare an Node_Error type variable
   Node_Errors::Errors Er;
 
-  // Set it's BC's, and original position
-  Er = N.Set_Original_Position({0,0,0});
-  Node_Errors::Handle_Error(Er);
-
-  Er = N.Set_BCs({0,1,0},{0,5,0});
+  // Set the Node's BC's, and original position
+  Er = N.Set_Original_Position({0,0,0},{false, true, false});
   Node_Errors::Handle_Error(Er);
 
   // Print out Node information
@@ -30,10 +27,7 @@ void Test::Node_Errors(void) {
 
 
   // Try setting BC's and Original Position again.
-  Er = N.Set_Original_Position({0,0,0});
-  Node_Errors::Handle_Error(Er);
-
-  Er = N.Set_BCs({1,0,1},{6, 0, 57});
+  Er = N.Set_Original_Position({1,2,3},{true, false, true});
   Node_Errors::Handle_Error(Er);
 
   // Print out current Node information
@@ -102,11 +96,10 @@ void Test::Node(void) {
       for(int j = 0; j < Ny; j++) {
         double y_pos = j*Intra_Nodal_Spacing;
 
-        Nodes[j + i*Ny + k*Nx*Ny].Set_Original_Position({x_pos, y_pos, z_pos});
-
-        // Check if we're on the bottom layer. If so then apply BCs
-        if(j == 0)
-          Nodes[j + i*Ny + k*Nx*Ny].Set_BCs({false, true, false}, {0, .5, 0});
+        if(j == 0 )
+          Nodes[j + i*Ny + k*Nx*Ny].Set_Original_Position({x_pos, y_pos, z_pos},{0, false, 0});
+        else
+          Nodes[j + i*Ny + k*Nx*Ny].Set_Original_Position({x_pos, .5, z_pos},{0, true, 0});
       } // for(int j = 0; j < Ny; j++) {
     } // for(int i = 0; i < Nx; i++) {
   } // for(int k = 0; k < Nz; k++) {

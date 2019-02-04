@@ -50,4 +50,13 @@ Type & Array_3<Type>::operator()(const unsigned int Index) {
   return Ar[Index];
 } // Type & Array_3<Type>::operator()(const unsigned int Index) {
 
+
+template<typename Type>
+Array_3<Type> & Array_3<Type>::operator=(const Array_3<Type> Ar_In) {
+  for(int i = 0; i < 3; i++)
+    Ar[i] = Ar_In.Ar[i];
+
+  return *this;
+} // Array_3<Type> & Array_3<type>::operator=(const Array_3<Type> Ar_In) {
+
 #endif
