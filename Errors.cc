@@ -11,6 +11,10 @@ void Node_Errors::Handle_Error(const Node_Errors::Errors Error) {
       printf("No Node Errors!\n");
       break;
 
+    case NODE_NOT_SET_UP:
+      printf("Node Error! This node has not has its position/BC's set up!\n");
+      break;
+
     case ORIGINAL_POSITION_SET:
       printf("Node Error! You tried to modify a Node's origional position!\n");
       break;

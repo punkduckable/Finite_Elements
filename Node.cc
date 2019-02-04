@@ -10,10 +10,13 @@ using namespace Node_Errors;
 // Setter methods
 
 Errors Node::Update_Position(const double New_Position_Component, const unsigned int component) {
-  // First, check that the component is 0, 1, or 2
-  if(component > 2) {
+  // Make sure that the node has been set up. If not, throw an error
+  if(Original_Position_Has_Been_Set == false)
+    return NODE_NOT_SET_UP;
+
+  // Check that the component is 0, 1, or 2
+  if(component > 2)
     return INDEX_OUT_OF_BOUNDS;
-  } // if(component > 2) {
 
   // Next, check if this component is fixed (prescribed BC)
   if(Fixed_Pos[component] == true) {

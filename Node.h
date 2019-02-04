@@ -34,7 +34,7 @@ public:
   Node_Errors::Errors Update_Position(const double New_Position_Component, const unsigned int component);
 
   // Set internal variables
-  Node_Errors::Errors Set_Original_Position(const Array_3<double> Original_Position_In, const Array_3<bool> Fixed_Pos_In);
+  Node_Errors::Errors Set_Original_Position(const Array_3<double> Original_Position_In, const Array_3<bool> Fixed_Pos_In = Array_3<bool>(false, false, false));
 
 
   //////////////////////////////////////////////////////////////////////////////
