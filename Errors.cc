@@ -33,4 +33,31 @@ void Node_Errors::Handle_Error(const Node_Errors::Errors Error) {
   } //   switch(Error) {
 } // void Node_Errors::Handle_Error(const Node_Errors::Errors Error) {
 
+
+
+// Element errors
+void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
+  switch(Error) {
+    case SUCCESS:
+      printf("No Element errors!\n");
+      break;
+
+    case STATIC_MEMBERS_NOT_SET:
+      printf("Element Error! Static members have not been set.\n");
+      break;
+
+    case STATIC_MEMBERS_ALREADY_SET:
+      printf("Element Error! This element's static members have already been set!\n");
+      break;
+
+    case INDEX_OUT_OF_BOUNDS:
+      printf("Element Error! Index out of bounds!\n");
+      break;
+
+    default:
+      printf("Element Error! Unknown Error\n");
+      break;
+  } // switch(Error) {
+} // void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
+  
 #endif

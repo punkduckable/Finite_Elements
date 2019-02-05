@@ -2,6 +2,9 @@
 #define ELEMENT_HEADER
 
 #include "Node.h"
+#include "Errors.h"
+
+using namespace Element_Errors;
 
 class Element {
 private:
@@ -60,7 +63,7 @@ public:
 
   Local_Eq_Num_To_Node and Local_Eq_Num_To_Global_Eq_Num are set after being
   allocated. */
-  void Set_Nodes(const unsigned Node0_ID,
+  Errors Set_Nodes(const unsigned Node0_ID,
                  const unsigned Node1_ID,
                  const unsigned Node2_ID,
                  const unsigned Node3_ID,
@@ -70,11 +73,11 @@ public:
                  const unsigned Node7_ID);
 
 
-  unsigned Node_ID(const unsigned i) const;      // Returns the ID of the ith Node in the Node list
+  Errors Node_ID(const unsigned i, unsigned & ID_Out) const;     // Returns the ID of the ith Node in the Node list
 
-  friend void Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr);
+  friend Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr);
 }; // class Element {
 
-void Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr);
+Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr);
 
 #endif

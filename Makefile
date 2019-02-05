@@ -10,13 +10,13 @@ All: Element.o Array.o Main.o Node.o Tests.o Errors.o
 Array.o: Array.h Array.cc
 	$(Comp) $(Flags) Array.cc
 
-Element.o: Element.cc Element.h Node.h
+Element.o: Element.cc Element.h Node.h Errors.h
 	$(Comp) $(Flags) Element.cc
 
 Main.o: Main.cc Tests.h
 	$(Comp) $(Flags) Main.cc
 
-Node.o: Node.cc Node.h Array.h
+Node.o: Node.cc Node.h Array.h Errors.h
 	$(Comp) $(Flags) Node.cc
 
 Errors.o: Errors.cc Errors.h

@@ -89,14 +89,14 @@ Element & Element::operator=(const Element & El) {
 
 
 // Set nodes
-void Element::Set_Nodes(const unsigned Node0_ID,
-                        const unsigned Node1_ID,
-                        const unsigned Node2_ID,
-                        const unsigned Node3_ID,
-                        const unsigned Node4_ID,
-                        const unsigned Node5_ID,
-                        const unsigned Node6_ID,
-                        const unsigned Node7_ID) {
+Errors Element::Set_Nodes(const unsigned Node0_ID,
+                          const unsigned Node1_ID,
+                          const unsigned Node2_ID,
+                          const unsigned Node3_ID,
+                          const unsigned Node4_ID,
+                          const unsigned Node5_ID,
+                          const unsigned Node6_ID,
+                          const unsigned Node7_ID) {
 
   /* First, check if the Element class has been set up.
   The element class contains a few static members. One of these, the ID array,
@@ -113,9 +113,9 @@ void Element::Set_Nodes(const unsigned Node0_ID,
   if(ID == NULL || Node_Array == NULL) {
     printf("Error in void Element::Set_Nodes!\n");
     printf("To set up an element, the ID and Node_Array static members must be set\n");
-    printf("Currently, ID = %p and Node_Array = %p. They are not set up. Aborting\n", ID, Node_Array);
+    printf("Currently, ID = %p and Node_Array = %p.\n", ID, Node_Array);
 
-    return;
+    return STATIC_MEMBERS_NOT_SET;
   } // if(ID == NULL || Node_Array == NULL) {
 
 
@@ -179,21 +179,22 @@ void Element::Set_Nodes(const unsigned Node0_ID,
       } // if(Node_Array[Node_List[Node]].Fixed_Pos[Component] == false) {
     } // for(int Component = 0; Component < 3 Component++) {
   } // for(int Node = 0; Node < 8; Node++) {
-} // void Element::Set_Nodes(const unsigned Node1_ID,
+
+  return SUCCESS;
+} // Errors Element::Set_Nodes(const unsigned Node1_ID,
 
 
 
 // Get Node ID
-unsigned Element::Node_ID(const unsigned i) const {
+Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
   // Check that i is within the bounds of the Node_List
-  if(i >= 8) {
-    printf("Error in unsigned Element::Node(const unsigned i)\n");
-    printf("You tried to access the %uth node but elements only have 8 nodes (indicies 0-7)\n", i);
-    return 0;
-  } // if(i >= 8) {
+  if(i >= 8)
+    return INDEX_OUT_OF_BOUNDS;
 
-  return Node_List[i];
-} // unsigned Element::Node_ID(const unsigned i) const {
+  ID_Out = Node_List[i];
+
+  return SUCCESS;
+} // Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 
 
 
@@ -202,7 +203,7 @@ unsigned Element::Node_ID(const unsigned i) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-void Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr) {
+Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr) {
   /* This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
 
@@ -211,15 +212,14 @@ void Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr) {
 
   Therefore, we can use the value of these pointers to determine if the element
   class has been set up already. If it has, then we return an error */
-  if(Element::Node_Array != NULL || Element::ID != NULL) {
-    printf("Error in Set_Element_Static_Members(const Node * Node_Array_Ptr, const unsigned * ID)\n");
-    printf("The element class has already been set up!!!!!\n");
-    return;
-  } // if(Element::Node_Array != NULL || Element::ID != NULL) {
+  if(Element::Node_Array != NULL || Element::ID != NULL)
+    return STATIC_MEMBERS_ALREADY_SET;
 
   // Set Static members
   Element::Node_Array = Node_Array_Ptr;
   Element::ID = ID_Ptr;
-} // void Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr) {
+
+  return SUCCESS;
+} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr) {
 
 #endif
