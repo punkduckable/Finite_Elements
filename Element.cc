@@ -4,12 +4,15 @@
 #include "Element.h"
 #include <stdio.h>
 
+using namespace Element_Errors;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Set Elements static members
 
 unsigned Element::Num_Elements = 0;
 Node * Element::Node_Array = NULL;
 unsigned * Element::ID = NULL;
+double (*Element::F)(unsigned, unsigned, unsigned, unsigned);
 
 
 
@@ -203,7 +206,7 @@ Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr) {
+Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
   /* This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
 
@@ -218,8 +221,9 @@ Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr) {
   // Set Static members
   Element::Node_Array = Node_Array_Ptr;
   Element::ID = ID_Ptr;
+  Element::F = Integrating_Function;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr) {
+} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
 
 #endif

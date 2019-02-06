@@ -14,9 +14,10 @@ private:
   Array_3<double> Current_Position;         // Spatial position of the node     Units : M
   Array_3<bool> Fixed_Pos;                  // if Fixed_Pos[i] is true then the ith component of the original position is fixed/cannot be updated (prescribed position BC).
 
-  /* Flags. These are used so that the Original_Position, Fixed_Pos variables
-  Can only be set once */
-  bool Original_Position_Has_Been_Set = false;
+  /* this is a flag that prevents the Fixed_Pos and Origional position variables
+  from being overwritten once set. Basically, this makes it so that the node
+  can only be set up once. */
+  bool Node_Set_Up = false;
 public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor
@@ -31,22 +32,24 @@ public:
   // Setter methods
 
   // Updates the current (spatial) position of the node
-  Node_Errors::Errors Update_Position(const double New_Position_Component, const unsigned int component);
+  Node_Errors::Errors Update_Position(const double New_Position_Component,     // Intent: Read
+                                      const unsigned int component);           // Intent: Read
 
   // Set internal variables
-  Node_Errors::Errors Set_Original_Position(const Array_3<double> Original_Position_In, const Array_3<bool> Fixed_Pos_In = Array_3<bool>(false, false, false));
+  Node_Errors::Errors Set_Original_Position(const Array_3<double> Original_Position_In,                                // Intent: Read
+                                            const Array_3<bool> Fixed_Pos_In = Array_3<bool>(false, false, false));    // Intent: Read
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods
 
-  Array_3<double> Get_Original_Position(void) const;
-  Array_3<double> Get_Current_Position(void) const;
+  Node_Errors::Errors Get_Original_Position( Array_3<double> & Original_Position_Out ) const;      // Intent: Write
+  Node_Errors::Errors Get_Current_Position( Array_3<double> & Current_Position_Out ) const;        // Intent: Write
 
   //////////////////////////////////////////////////////////////////////////////
   // Other public methods
 
-  void Print(void);
+  Node_Errors::Errors Print(void) const;
 }; // class Node {
 
 #endif

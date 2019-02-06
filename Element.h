@@ -4,15 +4,15 @@
 #include "Node.h"
 #include "Errors.h"
 
-using namespace Element_Errors;
 
 class Element {
 private:
   //////////////////////////////////////////////////////////////////////////////
   // Static members
-  static unsigned Num_Elements;                  // Number of elements created
-  static Node * Node_Array;                      // Points to the Array of all the Nodes for the object being simulated
-  static unsigned * ID;                          // Points to the ID array
+  static unsigned Num_Elements;                                      // Number of elements created
+  static Node * Node_Array;                                          // Points to the Array of all the Nodes for the object being simulated
+  static unsigned * ID;                                              // Points to the ID array
+  static double (*F)(unsigned, unsigned, unsigned, unsigned);        // Given Node/component, this Calculates an element of Ke
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ public:
   Element(void) { Num_Elements++; };
 
   // Deep copy constructor
-  Element(const Element & El);
+  Element(const Element & El);                                                 // Intent: Read
 
   // Destructor
   ~Element(void);
@@ -54,7 +54,7 @@ public:
   dynamically allocated members. Copying member-by-member would involve a
   shallow copy. This could lead to disaster. Thus, I explicitly defined
   this method to basically disable element equality. */
-  Element & operator=(const Element & El);
+  Element & operator=(const Element & El);                                     // Intent: Read
 
   /* Set nodes.
 
@@ -63,21 +63,24 @@ public:
 
   Local_Eq_Num_To_Node and Local_Eq_Num_To_Global_Eq_Num are set after being
   allocated. */
-  Errors Set_Nodes(const unsigned Node0_ID,
-                 const unsigned Node1_ID,
-                 const unsigned Node2_ID,
-                 const unsigned Node3_ID,
-                 const unsigned Node4_ID,
-                 const unsigned Node5_ID,
-                 const unsigned Node6_ID,
-                 const unsigned Node7_ID);
+  Element_Errors::Errors Set_Nodes(const unsigned Node0_ID,                    // Intent: Read
+                                   const unsigned Node1_ID,                    // Intent: Read
+                                   const unsigned Node2_ID,                    // Intent: Read
+                                   const unsigned Node3_ID,                    // Intent: Read
+                                   const unsigned Node4_ID,                    // Intent: Read
+                                   const unsigned Node5_ID,                    // Intent: Read
+                                   const unsigned Node6_ID,                    // Intent: Read
+                                   const unsigned Node7_ID);                   // Intent: Read
 
+  // Sets ID_Out to the ID of the ith Node in the Node list
+  Element_Errors::Errors Node_ID(const unsigned i,                             // Intent: Read
+                                 unsigned & ID_Out) const;                     // Intent: Write
 
-  Errors Node_ID(const unsigned i, unsigned & ID_Out) const;     // Returns the ID of the ith Node in the Node list
-
-  friend Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr);
+  friend Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));
 }; // class Element {
 
-Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr);
+Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,       // Intent: Read
+                                                  unsigned * ID_Ptr,           // Intent: Read
+                                                  double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));       // Intent: Read
 
 #endif
