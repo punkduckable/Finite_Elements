@@ -20,7 +20,7 @@ private:
   // Object specific private members
 
   // The Global node numbers for the nodes associated with this Element.
-  bool Nodes_Set = false;
+  bool Element_Set_Up = false;
   unsigned int Node_List[8];
 
   // Number of local equations
@@ -73,9 +73,14 @@ public:
                                    const unsigned Node6_ID,                    // Intent: Read
                                    const unsigned Node7_ID);                   // Intent: Read
 
+  /* Populate Ke.
+  This function populates the Ke matrix for this Element */
+  Element_Errors::Errors Populate_Ke(void);
+
   // Sets ID_Out to the ID of the ith Node in the Node list
   Element_Errors::Errors Node_ID(const unsigned i,                             // Intent: Read
                                  unsigned & ID_Out) const;                     // Intent: Write
+
 
   friend Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,   // Intent: Read
                                                            unsigned * ID_Ptr,       // Intent: Read

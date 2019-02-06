@@ -54,10 +54,14 @@ void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
       printf("Element Error! Index out of bounds!\n");
       break;
 
+    case ELEMENT_NOT_SET_UP:
+      printf("Element Error! This element has not been set up (Node list not set!)\n");
+      break;
+
     default:
       printf("Element Error! Unknown Error\n");
       break;
   } // switch(Error) {
 } // void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
-  
+
 #endif

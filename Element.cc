@@ -25,14 +25,14 @@ Element::Element(const Element & El) {
   // Increment number of elements
   Num_Elements++;
 
-  /* Check if El has its nodes set. If so, then deep copy Local_Eq_Num_To_Node,
+  /* Check if El has been set up. If so, then deep copy Local_Eq_Num_To_Node,
   Local_Eq_Num_To_Global_Eq_Num and Ke */
-  if(El.Nodes_Set == true) {
+  if(El.Element_Set_Up == true) {
     // Copy over non-dynamic members
     for(int i = 0; i < 8; i++)
       Node_List[i] = El.Node_List[i];
 
-    Nodes_Set = true;
+    Element_Set_Up = true;
     Num_Local_Eq = El.Num_Local_Eq;
 
 
@@ -54,9 +54,9 @@ Element::Element(const Element & El) {
     Ke = new double[Num_Local_Eq_Squared];
     for(int i = 0; i < Num_Local_Eq_Squared; i++)
       Ke[i] = El.Ke[i];
-  } // if(El.Nodes_Set == true) {
+  } // if(El.Element_Set_Up == true) {
   else
-    Nodes_Set = false;
+    Element_Set_Up = false;
 } // Element::Element(const Element & El) {
 
 
@@ -66,11 +66,11 @@ Element::~Element(void) {
   /* Check if nodes are set. If so then this element dynamically allocated
   memory for Local_Eq_Num_To_Node, Local_Eq_Num_To_Global_Eq_Num, and Ke. We
   need to free this memory before deleting the object. */
-  if(Nodes_Set) {
+  if(Element_Set_Up) {
     delete [] Local_Eq_Num_To_Node;
     delete [] Local_Eq_Num_To_Global_Eq_Num;
     delete [] Ke;
-  } // if(Nodes_Set) {
+  } // if(Element_Set_Up) {
 
   // Decrememnt number of elements
   Num_Elements--;
@@ -136,7 +136,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   Node_List[7] = Node7_ID;
 
   // Nodes are now set
-  Nodes_Set = true;
+  Element_Set_Up = true;
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -189,8 +189,58 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
 
 
+// Populate Ke
+Errors Element::Populate_Ke(void) {
+  /* Assumptions:
+  This function assumes that this Element has been set up. More specificially,
+  this function assumes that the node list has been set, that Ke has been
+  allocated, that Local_Eq_Num_To_Node has been allocated and set up, and that
+  Local_Eq_Num_To_Global_Eq_Num has been allocated and set up.
+
+  This function also assumes that the Element class has been set up. More
+  specitically, this function assumes that the F (integrating function) has
+  been set.
+
+  Importantly, however, the Element can not be set up until the static members
+  are set. Therefore, if the Element is set up then both assumptions must be
+  valid. */
+  if(Element_Set_Up == false)
+    return ELEMENT_NOT_SET_UP;
+
+  // Populate the diagional + lower triangular elements of Ke
+  for(int Col = 0; Col < Num_Local_Eq; Col++) {
+    /* Get ID and Component associated with the Col'th local equation. It should
+    be noted that this array is stored in Row major order and that its
+    dimensions are Num_Local_Eq x 2. Therefore, the ID for the ith Node is at
+    2*i while the component is at 2*i + 1 */
+    const unsigned Node_A_ID = Local_Eq_Num_To_Node[2*Col + 0];
+    const unsigned Node_A_Component = Local_Eq_Num_To_Node[2*Col + 1];
+
+    for(int Row = Col; Row < Num_Local_Eq; Row++) {
+      /* Get ID and Component associated with the Row'th local equation. */
+      const unsigned Node_B_ID = Local_Eq_Num_To_Node[2*Row + 0];
+      const unsigned Node_B_Component = Local_Eq_Num_To_Node[2*Row + 1];
+
+      // Populate Ke
+      Ke[Row + Num_Local_Eq*Col] = F(Node_A_ID, Node_A_Component, Node_B_ID, Node_B_Component);
+    } // for(int Row = Col; Row < Num_Local_Eq; Row++) {
+  } // for(int Col = 0; Col < Num_Local_Eq; Col++) {
+
+  // Now populate the Upper triangular elements of Ke
+  for(int Col = 1; Col < Num_Local_Eq; Col++)
+    for(int Row = 0; Row < Col; Row++)
+      Ke[Row + Col*Num_Local_Eq] = Ke[Col + Num_Local_Eq*Row];                 // Ke[i,j] = Ke[j,i];
+
+  return SUCCESS;
+} // Errors Element::Populate_Ke(void) {
+
+
+
 // Get Node ID
 Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
+  if(Element_Set_Up == false)
+    return ELEMENT_NOT_SET_UP;
+
   // Check that i is within the bounds of the Node_List
   if(i >= 8)
     return INDEX_OUT_OF_BOUNDS;
