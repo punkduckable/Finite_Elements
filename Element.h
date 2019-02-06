@@ -13,6 +13,7 @@ private:
   static Node * Node_Array;                                          // Points to the Array of all the Nodes for the object being simulated
   static unsigned * ID;                                              // Points to the ID array
   static double (*F)(unsigned, unsigned, unsigned, unsigned);        // Given Node/component, this Calculates an element of Ke
+  static double * K;                                                 // Points to the Stiffness matrix
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -76,11 +77,15 @@ public:
   Element_Errors::Errors Node_ID(const unsigned i,                             // Intent: Read
                                  unsigned & ID_Out) const;                     // Intent: Write
 
-  friend Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));
+  friend Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,   // Intent: Read
+                                                           unsigned * ID_Ptr,       // Intent: Read
+                                                           double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned),    // Intent: Read
+                                                           double * K_Ptr);         // Intent: Read
 }; // class Element {
 
 Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,       // Intent: Read
                                                   unsigned * ID_Ptr,           // Intent: Read
-                                                  double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));       // Intent: Read
+                                                  double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned),        // Intent: Read
+                                                  double * K_Ptr);             // Intent: Read
 
 #endif

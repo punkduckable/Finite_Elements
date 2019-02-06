@@ -13,6 +13,7 @@ unsigned Element::Num_Elements = 0;
 Node * Element::Node_Array = NULL;
 unsigned * Element::ID = NULL;
 double (*Element::F)(unsigned, unsigned, unsigned, unsigned);
+double * Element::K = NULL;
 
 
 
@@ -206,7 +207,7 @@ Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned), double * K_Ptr) {
   /* This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
 
@@ -215,15 +216,16 @@ Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, doub
 
   Therefore, we can use the value of these pointers to determine if the element
   class has been set up already. If it has, then we return an error */
-  if(Element::Node_Array != NULL || Element::ID != NULL)
+  if(Element::Node_Array != NULL || Element::ID != NULL || Element::K != NULL)
     return STATIC_MEMBERS_ALREADY_SET;
 
   // Set Static members
   Element::Node_Array = Node_Array_Ptr;
   Element::ID = ID_Ptr;
   Element::F = Integrating_Function;
+  Element::K = K_Ptr;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned), double * K_Ptr) {
 
 #endif
