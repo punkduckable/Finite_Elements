@@ -9,18 +9,23 @@ class Element {
 private:
   //////////////////////////////////////////////////////////////////////////////
   // Static members
+  static bool Static_Members_Set;                                    // True if the static members have been set
   static unsigned Num_Elements;                                      // Number of elements created
   static Node * Node_Array;                                          // Points to the Array of all the Nodes for the object being simulated
   static unsigned * ID;                                              // Points to the ID array
   static double (*F)(unsigned, unsigned, unsigned, unsigned);        // Given Node/component, this Calculates an element of Ke
   static double * K;                                                 // Points to the Stiffness matrix
+  static unsigned Num_Global_Eq;                                     // Number of global equations.
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Object specific private members
 
-  // The Global node numbers for the nodes associated with this Element.
+  // Flags
   bool Element_Set_Up = false;
+  bool Ke_Set_Up = false;
+
+  // The Global node numbers for the nodes associated with this Element.
   unsigned int Node_List[8];
 
   // Number of local equations
@@ -77,6 +82,11 @@ public:
   This function populates the Ke matrix for this Element */
   Element_Errors::Errors Populate_Ke(void);
 
+  /* Move Ke into K */
+  Element_Errors::Errors Move_Ke_To_K(void) const;
+
+  /* Move Ke into K */
+
   // Sets ID_Out to the ID of the ith Node in the Node list
   Element_Errors::Errors Node_ID(const unsigned i,                             // Intent: Read
                                  unsigned & ID_Out) const;                     // Intent: Write
@@ -85,12 +95,14 @@ public:
   friend Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,   // Intent: Read
                                                            unsigned * ID_Ptr,       // Intent: Read
                                                            double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned),    // Intent: Read
-                                                           double * K_Ptr);         // Intent: Read
+                                                           double * K_Ptr,          // Intent: Read
+                                                           const unsigned Num_Global_Eq);     // Intent: Read
 }; // class Element {
 
 Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,       // Intent: Read
                                                   unsigned * ID_Ptr,           // Intent: Read
                                                   double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned),        // Intent: Read
-                                                  double * K_Ptr);             // Intent: Read
+                                                  double * K_Ptr,              // Intent: Read
+                                                  const unsigned Num_Global_Eq);    // Intent: Read
 
 #endif

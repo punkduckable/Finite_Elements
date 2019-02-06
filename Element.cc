@@ -9,11 +9,13 @@ using namespace Element_Errors;
 ////////////////////////////////////////////////////////////////////////////////
 // Set Elements static members
 
+bool Element::Static_Members_Set = false;
 unsigned Element::Num_Elements = 0;
 Node * Element::Node_Array = NULL;
 unsigned * Element::ID = NULL;
 double (*Element::F)(unsigned, unsigned, unsigned, unsigned);
 double * Element::K = NULL;
+unsigned Element::Num_Global_Eq = 0;
 
 
 
@@ -114,7 +116,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   program begins (see the start of this file). Therefore, we can determine
   if the Element class has been set up by checking if either of these static
   members is NULL */
-  if(ID == NULL || Node_Array == NULL) {
+  if(Static_Members_Set == false) {
     printf("Error in void Element::Set_Nodes!\n");
     printf("To set up an element, the ID and Node_Array static members must be set\n");
     printf("Currently, ID = %p and Node_Array = %p.\n", ID, Node_Array);
@@ -203,9 +205,14 @@ Errors Element::Populate_Ke(void) {
 
   Importantly, however, the Element can not be set up until the static members
   are set. Therefore, if the Element is set up then both assumptions must be
-  valid. */
+  valid.
+
+  Finally, this function assumes that Ke has not been set already. */
   if(Element_Set_Up == false)
     return ELEMENT_NOT_SET_UP;
+
+  if(Ke_Set_Up == true)
+    return KE_ALREADY_SET;
 
   // Populate the diagional + lower triangular elements of Ke
   for(int Col = 0; Col < Num_Local_Eq; Col++) {
@@ -231,8 +238,49 @@ Errors Element::Populate_Ke(void) {
     for(int Row = 0; Row < Col; Row++)
       Ke[Row + Col*Num_Local_Eq] = Ke[Col + Num_Local_Eq*Row];                 // Ke[i,j] = Ke[j,i];
 
+  // Ke has now been set
+  Ke_Set_Up = true;
+
   return SUCCESS;
 } // Errors Element::Populate_Ke(void) {
+
+
+
+Errors Element::Move_Ke_To_K(void) const {
+  /* Assumptions:
+  This function assumes that the element stiffness matrix, Ke, has been set.
+
+  This function also assumes that the Element class static members, namely K,
+  has been set. It is not possible, however, to set up Ke without having the
+  Static members set. Therefore, if Ke is set then both assumptions must be
+  valid */
+  if(Ke_Set_Up == false)
+    return KE_NOT_SET_UP;
+
+  // First, move the diagional cells of Ke to K
+  for(int i = 0; i < Num_Local_Eq; i++) {
+    const int I = Local_Eq_Num_To_Global_Eq_Num[i];
+    K[I + I*Num_Global_Eq] = Ke[i + i*Num_Local_Eq];
+  } // for(int i = 0; i < Num_Local_Eq; i++) {
+
+  // Now, move the off diagional cells of Ke to K
+  for(int Row = 0; Row < Num_Local_Eq; Row++) {
+    // Get Global Row number, I, associated with the local row number "Row"
+    const int I = Local_Eq_Num_To_Global_Eq_Num[Row];
+
+    for(int Col = Row; Col < Num_Local_Eq; Col++) {
+      // Get Global column number, J, associated with the local column number "Col"
+      const int J = Local_Eq_Num_To_Global_Eq_Num[Col];
+
+
+      const double Ke_Row_Col = Ke[Row + Col*Num_Local_Eq];
+      K[I + J*Num_Global_Eq] += Ke_Row_Col;
+      K[J + I*Num_Global_Eq] += Ke_Row_Col;
+    } // for(int Col = Row; Col < Num_Local_Eq; Col++) {
+  } // for(int Row = 0; Row < Num_Local_Eq; Row++) {
+
+  return SUCCESS;
+} // Errors Element::Move_Ke_To_K(void) const {
 
 
 
@@ -243,7 +291,7 @@ Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 
   // Check that i is within the bounds of the Node_List
   if(i >= 8)
-    return INDEX_OUT_OF_BOUNDS;
+    return NODE_INDEX_OUT_OF_BOUNDS;
 
   ID_Out = Node_List[i];
 
@@ -257,16 +305,12 @@ Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned), double * K_Ptr) {
+Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned), double * K_Ptr, const unsigned Num_Global_Eq) {
   /* This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
 
-  The Node_Array and ID array static members are initialized to NULL (see
-  the top of this file). After being set, they will not be NULL.
-
-  Therefore, we can use the value of these pointers to determine if the element
-  class has been set up already. If it has, then we return an error */
-  if(Element::Node_Array != NULL || Element::ID != NULL || Element::K != NULL)
+  If the Element static members have alreayd been set then we return an error */
+  if(Element::Static_Members_Set == true)
     return STATIC_MEMBERS_ALREADY_SET;
 
   // Set Static members
@@ -274,8 +318,10 @@ Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, doub
   Element::ID = ID_Ptr;
   Element::F = Integrating_Function;
   Element::K = K_Ptr;
+  Element::Num_Global_Eq = Num_Global_Eq;
+  Element::Static_Members_Set = true;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned), double * K_Ptr) {
+} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned), double * K_Ptr, const unsigned Num_Global_Eq) {
 
 #endif

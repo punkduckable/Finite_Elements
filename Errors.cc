@@ -50,12 +50,20 @@ void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
       printf("Element Error! This element's static members have already been set!\n");
       break;
 
-    case INDEX_OUT_OF_BOUNDS:
-      printf("Element Error! Index out of bounds!\n");
-      break;
-
     case ELEMENT_NOT_SET_UP:
       printf("Element Error! This element has not been set up (Node list not set!)\n");
+      break;
+
+    case KE_ALREADY_SET:
+      printf("Element Error! This element's stiffness matrix (Ke) has already been set!\n");
+      break;
+
+    case KE_NOT_SET_UP:
+      printf("Element Error! This element's stiffness matirx (Ke) has not been set!\n");
+      break;
+
+    case NODE_INDEX_OUT_OF_BOUNDS:
+      printf("Element Error! Invalid Node ID Index! Valid indices are 0-7\n");
       break;
 
     default:
