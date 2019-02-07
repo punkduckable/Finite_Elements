@@ -10,31 +10,39 @@ using namespace Node_Errors;
 // Setter methods
 
 Errors Node::Update_Position(const double New_Position_Component, const unsigned int component) {
-  // Make sure that the node has been set up. If not, throw an error
+  /* Assumption 1:
+
+  This function assumes that this specific Node has been set up. */
   if(Node_Set_Up == false)
     return NODE_NOT_SET_UP;
 
-  // Check that the component is 0, 1, or 2
+  /* Assumption 2:
+  This functions also assumes that the specified index is either 0, 1, or 2
+  since the Position array only has 3 components.*/
   if(component > 2)
     return INDEX_OUT_OF_BOUNDS;
 
-  // Next, check if this component is fixed (prescribed BC)
+  /* Assumption 3:
+  This function also assumes that the requested component is not fixed (a component of
+  position with a prescribed displacement BC) since these components can not
+  be modified. */
   if(Fixed_Pos[component] == true) {
     printf("Precribed boundary condition in the %d direction\n", component);
     return FIXED_POSITION_COMPONENT;
   } // if(Fixed_Pos[component] == true) {
 
-  // If both checks pass then update the current position
+  // If if all of the assumptions have been satisified then update the current position
   Current_Position[component] = New_Position_Component;
   return SUCCESS;
 } // Errors Node::Update_Position(const double New_Position_Component, const unsigned int component) {
 
 
 Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In, const Array_3<bool> Fixed_Pos_In) {
-  /* Check if the Origional Position has already been set. This should only be
-  set once (when the node is first being created */
+  /* Assumption 1:
+
+  This function assumes that the node has not been set up already. */
   if(Node_Set_Up == true)
-    return ORIGINAL_POSITION_SET;
+    return NODE_ALREADY_SET_UP;
 
   // Set the Original Position using the passed Array
   Original_Position = Original_Position_In;
@@ -57,7 +65,10 @@ Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In, c
 // Getter methods
 
 Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) const {
-  // First, make sure that the node has actually been set up
+  /* Assumption 1:
+
+  This function assumes that this node has already been set up. If it hasn't,
+  then there is no "Original position" to report. */
   if(Node_Set_Up == false)
     return NODE_NOT_SET_UP;
 
@@ -71,7 +82,10 @@ Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) cons
 
 
 Errors Node::Get_Current_Position(Array_3<double> & Current_Position_Out) const {
-  // Make sure that the node has been set up
+  /* Assumption 1:
+
+  This function assumes that this node has already been set up. IF it hasn't,
+  then there's no current position to report. */
   if(Node_Set_Up == false)
     return NODE_NOT_SET_UP;
 
@@ -86,7 +100,10 @@ Errors Node::Get_Current_Position(Array_3<double> & Current_Position_Out) const 
 // Other methods
 
 Errors Node::Print(void) const {
-  // Make sure that the node has been set up
+  /* Assumption 1:
+
+  This function assumes that this node has already been set up. IF it hasn't,
+  then there's nothing to print. */
   if(Node_Set_Up == false)
     return NODE_NOT_SET_UP;
 

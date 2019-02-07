@@ -15,8 +15,8 @@ void Node_Errors::Handle_Error(const Node_Errors::Errors Error) {
       printf("Node Error! This node has not has its position/BC's set up!\n");
       break;
 
-    case ORIGINAL_POSITION_SET:
-      printf("Node Error! You tried to modify a Node's origional position!\n");
+    case NODE_ALREADY_SET_UP:
+      printf("Node Error! You tried to set up a Node that has already been set up!\n");
       break;
 
     case FIXED_POSITION_COMPONENT:
@@ -50,11 +50,15 @@ void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
       printf("Element Error! This element's static members have already been set!\n");
       break;
 
+    case ELEMENT_ALREADY_SET_UP:
+      printf("Element Error! This element has already been set up! You can't set up an element twice!\n");
+      break;
+
     case ELEMENT_NOT_SET_UP:
       printf("Element Error! This element has not been set up (Node list not set!)\n");
       break;
 
-    case KE_ALREADY_SET:
+    case KE_ALREADY_SET_UP:
       printf("Element Error! This element's stiffness matrix (Ke) has already been set!\n");
       break;
 
@@ -62,7 +66,7 @@ void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
       printf("Element Error! This element's stiffness matirx (Ke) has not been set!\n");
       break;
 
-    case NODE_INDEX_OUT_OF_BOUNDS:
+    case NODE_ID_INDEX_OUT_OF_BOUNDS:
       printf("Element Error! Invalid Node ID Index! Valid indices are 0-7\n");
       break;
 

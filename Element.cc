@@ -104,7 +104,8 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
                           const unsigned Node6_ID,
                           const unsigned Node7_ID) {
 
-  /* First, check if the Element class has been set up.
+  /* Assumption 1:
+  This function assumes that the Element class has been set up.
   The element class contains a few static members. One of these, the ID array,
   points to the global ID array. Another, Node_Array, points to the
   array of nodes used in this simulation. We need to have access to both of
@@ -112,10 +113,9 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   members have not been set and the user is trying to set this Element's nodes
   then we need to thrown an error.
 
-  The Node_Array and ID array members are set to point to NULL when the
-  program begins (see the start of this file). Therefore, we can determine
-  if the Element class has been set up by checking if either of these static
-  members is NULL */
+  When the static members are set, a flag called "Static_Members_Set" gets
+  flipped to true. Therefore, if this flag is true then the assumption is
+  satisified.  */
   if(Static_Members_Set == false) {
     printf("Error in void Element::Set_Nodes!\n");
     printf("To set up an element, the ID and Node_Array static members must be set\n");
@@ -123,6 +123,12 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
     return STATIC_MEMBERS_NOT_SET;
   } // if(ID == NULL || Node_Array == NULL) {
+
+  /* Assumptions 2:
+  This function also assumes that this specific element has not has its nodes
+  set already. */
+  if(Element_Set_Up == true)
+    return ELEMENT_ALREADY_SET_UP;
 
 
   /* If we've made it this far then the Element class has been set up. We can
@@ -136,9 +142,6 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   Node_List[5] = Node5_ID;
   Node_List[6] = Node6_ID;
   Node_List[7] = Node7_ID;
-
-  // Nodes are now set
-  Element_Set_Up = true;
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -186,6 +189,9 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
     } // for(int Component = 0; Component < 3 Component++) {
   } // for(int Node = 0; Node < 8; Node++) {
 
+  // The element is now set up
+  Element_Set_Up = true;
+
   return SUCCESS;
 } // Errors Element::Set_Nodes(const unsigned Node1_ID,
 
@@ -193,7 +199,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
 // Populate Ke
 Errors Element::Populate_Ke(void) {
-  /* Assumptions:
+  /* Assumption 1:
   This function assumes that this Element has been set up. More specificially,
   this function assumes that the node list has been set, that Ke has been
   allocated, that Local_Eq_Num_To_Node has been allocated and set up, and that
@@ -205,14 +211,14 @@ Errors Element::Populate_Ke(void) {
 
   Importantly, however, the Element can not be set up until the static members
   are set. Therefore, if the Element is set up then both assumptions must be
-  valid.
-
-  Finally, this function assumes that Ke has not been set already. */
+  valid. */
   if(Element_Set_Up == false)
     return ELEMENT_NOT_SET_UP;
 
+  /* Assumption 2:
+  This function also assumes that Ke has not been set already. */
   if(Ke_Set_Up == true)
-    return KE_ALREADY_SET;
+    return KE_ALREADY_SET_UP;
 
   // Populate the diagional + lower triangular elements of Ke
   for(int Col = 0; Col < Num_Local_Eq; Col++) {
@@ -247,7 +253,7 @@ Errors Element::Populate_Ke(void) {
 
 
 Errors Element::Move_Ke_To_K(void) const {
-  /* Assumptions:
+  /* Assumption 1:
   This function assumes that the element stiffness matrix, Ke, has been set.
 
   This function also assumes that the Element class static members, namely K,
@@ -286,12 +292,17 @@ Errors Element::Move_Ke_To_K(void) const {
 
 // Get Node ID
 Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
+  /* Assumption 1:
+  This function assumes that this element has been set up. If it hasn't then
+  there is no node ID to report.*/
   if(Element_Set_Up == false)
     return ELEMENT_NOT_SET_UP;
 
-  // Check that i is within the bounds of the Node_List
+  /* Assumption 2:
+  This function also assumes that the requested index is within the bounds of
+  the node List. This means that i = 0,1,2... 7*/
   if(i >= 8)
-    return NODE_INDEX_OUT_OF_BOUNDS;
+    return NODE_ID_INDEX_OUT_OF_BOUNDS;
 
   ID_Out = Node_List[i];
 
@@ -306,10 +317,11 @@ Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 // Friend functions
 
 Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned), double * K_Ptr, const unsigned Num_Global_Eq) {
-  /* This function is used to set up the Element class. We really only want to be
+  /* Assumption 1:
+  This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
 
-  If the Element static members have alreayd been set then we return an error */
+  If the Element static members have already been set then we return an error */
   if(Element::Static_Members_Set == true)
     return STATIC_MEMBERS_ALREADY_SET;
 
