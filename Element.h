@@ -3,6 +3,7 @@
 
 #include "Node.h"
 #include "Errors.h"
+#include "Matrix.h"
 
 
 class Element {

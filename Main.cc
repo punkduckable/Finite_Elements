@@ -3,8 +3,7 @@
 
 int main() {
   // Run node tests.
-  Test::Node_Errors();
-  Test::Node();
+  Test::Matrix_Tests();
 
   return 0;
 } // int main() {
