@@ -11,12 +11,10 @@ private:
   //////////////////////////////////////////////////////////////////////////////
   // Static members
   static bool Static_Members_Set;                                    // True if the static members have been set
-  static unsigned Num_Elements;                                      // Number of elements created
   static Node * Node_Array;                                          // Points to the Array of all the Nodes for the object being simulated
-  static unsigned * ID;                                              // Points to the ID array
+  static Matrix<unsigned> * ID;                                      // Points to the ID Matrix
+  static Matrix<double> * K;                                         // Points to the global stiffness matrix
   static double (*F)(unsigned, unsigned, unsigned, unsigned);        // Given Node/component, this Calculates an element of Ke
-  static double * K;                                                 // Points to the Stiffness matrix
-  static unsigned Num_Global_Eq;                                     // Number of global equations.
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -34,34 +32,25 @@ private:
 
   /* Assembly arrays. Local_Eq_Num_To_Node is used to construct Ke while
   Local_Eq_Num_To_Global_Eq_Num is used to map Ke into K. */
-  unsigned int * Local_Eq_Num_To_Node;                     // Stores the global node # and component associated with each local equation
-  unsigned int * Local_Eq_Num_To_Global_Eq_Num;            // Stores the global equation # associated with each local eqiation
+  unsigned * Local_Eq_Num_To_Node;                     // Stores the global node # and component associated with each local equation
+  unsigned * Local_Eq_Num_To_Global_Eq_Num;            // Stores the global equation # associated with each local eqiation
 
   // Local element stiffness matrix;
-  double * Ke;
+  Matrix<double> Ke;
 
 public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor
 
   // Default do nothing constructor
-  Element(void) { Num_Elements++; };
-
-  // Deep copy constructor
-  Element(const Element & El);                                                 // Intent: Read
+  Element(void) { };
 
   // Destructor
   ~Element(void);
 
+
   //////////////////////////////////////////////////////////////////////////////
   // Class methods
-
-  /* Explicit = operator method. C++ implicitly defines this method to simply
-  perform an member-by-member copy. The issue is that the Element class has
-  dynamically allocated members. Copying member-by-member would involve a
-  shallow copy. This could lead to disaster. Thus, I explicitly defined
-  this method to basically disable element equality. */
-  Element & operator=(const Element & El);                                     // Intent: Read
 
   /* Set nodes.
 
@@ -93,17 +82,32 @@ public:
                                  unsigned & ID_Out) const;                     // Intent: Write
 
 
-  friend Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,   // Intent: Read
-                                                           unsigned * ID_Ptr,       // Intent: Read
-                                                           double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned),    // Intent: Read
-                                                           double * K_Ptr,          // Intent: Read
-                                                           const unsigned Num_Global_Eq);     // Intent: Read
+  friend Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,        // Intent: Read
+                                                           Matrix<unsigned> * ID_Ptr,    // Intent: Read
+                                                           Matrix<double> * K_Ptr,       // Intent: Read
+                                                           double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));   // Intent: Read
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Disable Implicit methods
+  /* C++ implicitly defines the = operator and the copy construct for all
+  classes. Both of these methods work by member-by-member copying the members of
+  one object into another. The issue is that the Element class has dynamically
+  allocated members. Copying member-by-member is a shallow copy. This could lead
+  to disaster. Thus, I explicitly define these this method to basically disable
+  the implicit ones. All that these methods do is yell at the user for using
+  then. */
+
+  // Disabled copy constructor
+  Element(const Element & El);
+
+  // disabled = operator.
+  Element & operator=(const Element & El);
 }; // class Element {
 
 Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,       // Intent: Read
-                                                  unsigned * ID_Ptr,           // Intent: Read
-                                                  double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned),        // Intent: Read
-                                                  double * K_Ptr,              // Intent: Read
-                                                  const unsigned Num_Global_Eq);    // Intent: Read
+                                                  Matrix<unsigned> * ID_Ptr,   // Intent: Read
+                                                  Matrix<double> * K_Ptr,      // Intent: Read
+                                                  double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));  // Intent: Read
 
 #endif

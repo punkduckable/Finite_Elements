@@ -2,19 +2,18 @@
 #define MATRIX_SOURCE
 
 #include "Matrix.h"
+#include <stdio.h>
+
+////////////////////////////////////////////////////////////////////////////////
+// Constructor, destructor
 
 // Constructor
 template <typename Type>
-Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Dominance_In) {
-  // Allocate the matrix
-  Ar = new Type[Rows_In*Cols_In];
-
-  Num_Rows = Rows_In;
-  Num_Cols = Cols_In;
-
-  // Set the dominance (this is used to access elements of the matrix)
-  Dominance = Dominance_In;
-} // Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Dominace_In) {
+Matrix<Type>::Matrix(void) {
+  Ar = NULL;
+  Num_Rows = 0;
+  Num_Cols = 0;
+} // Matrix<Type>::Matrix(void) {
 
 
 
@@ -26,6 +25,26 @@ Matrix<Type>::~Matrix(void) {
 
 
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Class methods
+
+// Set up method
+template <typename Type>
+void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Dominance_In) {
+  // Allocate the matrix
+  Ar = new Type[Rows_In*Cols_In];
+
+  Num_Rows = Rows_In;
+  Num_Cols = Cols_In;
+
+  // Set the dominance (this is used to access elements of the matrix)
+  Dominance = Dominance_In;
+} // void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Dominace_In) {
+
+
+
 // Write to an element of the matrix
 template <typename Type>
 Type & Matrix<Type>::operator()(const unsigned i, const unsigned j) {
@@ -34,9 +53,9 @@ Type & Matrix<Type>::operator()(const unsigned i, const unsigned j) {
   no way of handeling errors (like the Element, Node classes do). Therefore,
   we can't really do anything if these assumptions are not  met. Therefore,
   we simply assume that the user does not try to go out of bounds. */
-  if(Dominance == Memory::ROW_DOMINANT)
+  if(Dominance == Memory::ROW_MAJOR)
     return Ar[Num_Cols*i + j];
-  else // (Dominance == Memory::COLUMN_DOMINANT)
+  else // (Dominance == Memory::COLUMN_MAJOR)
     return Ar[i + j*Num_Rows];
 } // Type & Matrix<Type>::operator()(const unsigned i, const unsigned j) {
 
@@ -50,10 +69,30 @@ Type Matrix<Type>::operator()(const unsigned i, const unsigned j) const {
   no way of handeling errors (like the Element, Node classes do). Therefore,
   we can't really do anything if these assumptions are not  met. Therefore,
   we simply assume that the user does not try to go out of bounds. */
-  if(Dominance == Memory::ROW_DOMINANT)
+  if(Dominance == Memory::ROW_MAJOR)
     return Ar[Num_Cols*i + j];
-  else // (Dominance == Memory::COLUMN_DOMINANT)
+  else // (Dominance == Memory::COLUMN_MAJOR)
     return Ar[i + j*Num_Rows];
 } // Type Matrix<Type>::operator()(const unsigned i, const unsigned j) const {
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Disabled implicit methods
+
+template <typename Type>
+Matrix<Type>::Matrix(const Matrix<Type> & M_In) {
+  printf("The copy constructor is disabled for the Matrix class! BAD!\n");
+} // Matrix<type>::Matrix(const Matrix<Type> & M_In) {
+
+
+
+template <typename Type>
+Matrix<Type> & Matrix<Type>::operator=(const Matrix<Type> & M_In) {
+  printf("Matrix equality is not defined! BAD!\n");
+  return *this;
+} // Matrix<Type> & Matrix<Type>::operator=(const Matrix<Type> & M_In) {
 
 #endif

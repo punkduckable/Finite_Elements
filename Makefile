@@ -4,13 +4,13 @@ Flags = -c -Wall -O3
 
 
 # Rules
-All: Element.o Errors.o Array.o Main.o Matrix.o Node.o Tests.o
-	$(Comp) -o FEM Element.o Main.o Node.o Tests.o Errors.o
+All: Array.o Element.o Errors.o Main.o Matrix.o Node.o Tests.o
+	$(Comp) -o FEM Array.o Element.o Errors.o Main.o Matrix.o Node.o Tests.o
 
 Array.o: Array.cc Array.h
 	$(Comp) $(Flags) Array.cc
 
-Element.o: Element.cc Element.h Node.h Errors.h
+Element.o: Element.cc Element.h Node.h Errors.h Matrix.h
 	$(Comp) $(Flags) Element.cc
 
 Errors.o: Errors.cc Errors.h
@@ -20,7 +20,7 @@ Main.o: Main.cc Tests.h
 	$(Comp) $(Flags) Main.cc
 
 Matrix.o: Matrix.cc Matrix.h
-	$(Comp) $(Flags) Array.cc
+	$(Comp) $(Flags) Matrix.cc
 
 Node.o: Node.cc Node.h Array.h Errors.h
 	$(Comp) $(Flags) Node.cc

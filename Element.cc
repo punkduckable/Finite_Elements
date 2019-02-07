@@ -10,60 +10,18 @@ using namespace Element_Errors;
 // Set Elements static members
 
 bool Element::Static_Members_Set = false;
-unsigned Element::Num_Elements = 0;
 Node * Element::Node_Array = NULL;
-unsigned * Element::ID = NULL;
+Matrix<unsigned> * Element::ID;
+Matrix<double> * Element::K;
 double (*Element::F)(unsigned, unsigned, unsigned, unsigned);
-double * Element::K = NULL;
-unsigned Element::Num_Global_Eq = 0;
+
+
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Constructors, destructor
-
-// Deep copy constructor
-Element::Element(const Element & El) {
-  // Increment number of elements
-  Num_Elements++;
-
-  /* Check if El has been set up. If so, then deep copy Local_Eq_Num_To_Node,
-  Local_Eq_Num_To_Global_Eq_Num and Ke */
-  if(El.Element_Set_Up == true) {
-    // Copy over non-dynamic members
-    for(int i = 0; i < 8; i++)
-      Node_List[i] = El.Node_List[i];
-
-    Element_Set_Up = true;
-    Num_Local_Eq = El.Num_Local_Eq;
-
-
-    // Deep copy Local_Eq_Num_To_Node.
-    const unsigned int Twice_Num_Local_Eq = Num_Local_Eq*2;
-    Local_Eq_Num_To_Node = new unsigned[Twice_Num_Local_Eq];
-    for(int i = 0; i < Twice_Num_Local_Eq; i++)
-      Local_Eq_Num_To_Node[i] = El.Local_Eq_Num_To_Node[i];
-
-
-    // Deep copy Local_Eq_Num_To_Global_Eq_Num
-    Local_Eq_Num_To_Global_Eq_Num = new unsigned[Num_Local_Eq];
-    for(int i = 0; i < Num_Local_Eq; i++)
-      Local_Eq_Num_To_Global_Eq_Num[i] = El.Local_Eq_Num_To_Global_Eq_Num[i];
-
-
-    // Deep copy Ke
-    const unsigned int Num_Local_Eq_Squared = Num_Local_Eq*Num_Local_Eq;
-    Ke = new double[Num_Local_Eq_Squared];
-    for(int i = 0; i < Num_Local_Eq_Squared; i++)
-      Ke[i] = El.Ke[i];
-  } // if(El.Element_Set_Up == true) {
-  else
-    Element_Set_Up = false;
-} // Element::Element(const Element & El) {
-
-
-
 // Destructor
+
 Element::~Element(void) {
   /* Check if nodes are set. If so then this element dynamically allocated
   memory for Local_Eq_Num_To_Node, Local_Eq_Num_To_Global_Eq_Num, and Ke. We
@@ -71,11 +29,7 @@ Element::~Element(void) {
   if(Element_Set_Up) {
     delete [] Local_Eq_Num_To_Node;
     delete [] Local_Eq_Num_To_Global_Eq_Num;
-    delete [] Ke;
   } // if(Element_Set_Up) {
-
-  // Decrememnt number of elements
-  Num_Elements--;
 } // Element::~Element(void) {
 
 
@@ -84,15 +38,6 @@ Element::~Element(void) {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Other Element methods
-
-// Disabled = operator.
-Element & Element::operator=(const Element & El) {
-  printf("Error in Element & Element::operator=(const Element & El)\n");
-  printf("Element equality is not defined! Returning *this\n");
-  return *this;
-} // Element & Element::operator=(const Element & El) {
-
-
 
 // Set nodes
 Errors Element::Set_Nodes(const unsigned Node0_ID,
@@ -165,7 +110,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
   Local_Eq_Num_To_Node = new unsigned[2*Num_Local_Eq];
   Local_Eq_Num_To_Global_Eq_Num = new unsigned[Num_Local_Eq];
-  Ke = new double[Num_Local_Eq*Num_Local_Eq];
+  Ke.Set_Up(Num_Local_Eq, Num_Local_Eq, Memory::COLUMN_MAJOR);
 
   //////////////////////////////////////////////////////////////////////////////
   // Set up Local_Eq_Num_To_Node, Local_Eq_Num_To_Global_Eq_Num
@@ -177,7 +122,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
     for(int Component = 0; Component < 3; Component++) {
       if(Node_Array[Global_Node_Number].Fixed_Pos[Component] == false) {
         // Set Local_Eq_Num_To_Global_Eq_Num
-        Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = ID[3*Global_Node_Number + Component];
+        Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = (*ID)(Component, Global_Node_Number);
 
         // Set Local_Eq_Num_To_Node
         Local_Eq_Num_To_Node[2*Eq_Num + 0] = Global_Node_Number;
@@ -235,14 +180,14 @@ Errors Element::Populate_Ke(void) {
       const unsigned Node_B_Component = Local_Eq_Num_To_Node[2*Row + 1];
 
       // Populate Ke
-      Ke[Row + Num_Local_Eq*Col] = F(Node_A_ID, Node_A_Component, Node_B_ID, Node_B_Component);
+      Ke(Row, Col) = F(Node_A_ID, Node_A_Component, Node_B_ID, Node_B_Component);
     } // for(int Row = Col; Row < Num_Local_Eq; Row++) {
   } // for(int Col = 0; Col < Num_Local_Eq; Col++) {
 
   // Now populate the Upper triangular elements of Ke
   for(int Col = 1; Col < Num_Local_Eq; Col++)
     for(int Row = 0; Row < Col; Row++)
-      Ke[Row + Col*Num_Local_Eq] = Ke[Col + Num_Local_Eq*Row];                 // Ke[i,j] = Ke[j,i];
+      Ke(Row, Col) = Ke(Col, Row);
 
   // Ke has now been set
   Ke_Set_Up = true;
@@ -266,7 +211,7 @@ Errors Element::Move_Ke_To_K(void) const {
   // First, move the diagional cells of Ke to K
   for(int i = 0; i < Num_Local_Eq; i++) {
     const int I = Local_Eq_Num_To_Global_Eq_Num[i];
-    K[I + I*Num_Global_Eq] = Ke[i + i*Num_Local_Eq];
+    (*K)(I, I) = Ke(i,i);
   } // for(int i = 0; i < Num_Local_Eq; i++) {
 
   // Now, move the off diagional cells of Ke to K
@@ -279,9 +224,9 @@ Errors Element::Move_Ke_To_K(void) const {
       const int J = Local_Eq_Num_To_Global_Eq_Num[Col];
 
 
-      const double Ke_Row_Col = Ke[Row + Col*Num_Local_Eq];
-      K[I + J*Num_Global_Eq] += Ke_Row_Col;
-      K[J + I*Num_Global_Eq] += Ke_Row_Col;
+      const double Ke_Row_Col = Ke(Row, Col);
+      (*K)(I,J) += Ke_Row_Col;
+      (*K)(J,I) += Ke_Row_Col;
     } // for(int Col = Row; Col < Num_Local_Eq; Col++) {
   } // for(int Row = 0; Row < Num_Local_Eq; Row++) {
 
@@ -316,7 +261,7 @@ Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned), double * K_Ptr, const unsigned Num_Global_Eq) {
+Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
   /* Assumption 1:
   This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
@@ -330,10 +275,34 @@ Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, doub
   Element::ID = ID_Ptr;
   Element::F = Integrating_Function;
   Element::K = K_Ptr;
-  Element::Num_Global_Eq = Num_Global_Eq;
+
+  // Static members are now set.
   Element::Static_Members_Set = true;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, unsigned * ID_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned), double * K_Ptr, const unsigned Num_Global_Eq) {
+} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Disabled Implicit methods
+
+// Disabled copy constructor
+Element::Element(const Element & El) {
+  // Yell at the user if they try to use the copy Constructor
+  printf("Element Error! You tried using the copy construct for the Element class\n");
+  printf("The copy constructor is disabled! \n");
+} // Element::Element(const Element & El) {
+
+
+
+// Disabled = operator
+Element & Element::operator=(const Element & El) {
+  printf("Error in Element & Element::operator=(const Element & El)\n");
+  printf("Element equality is not defined! Returning *this\n");
+  return *this;
+} // Element & operator=(const Element & El) {
 
 #endif
