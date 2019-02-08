@@ -20,6 +20,22 @@ void Test::Node_Errors(void) {
   Er = Node.Update_Position(37, 1);
   Node_Errors::Handle_Error(Er);
 
+  // Try Using the getter methods before the node has been set up.
+  printf("Trying to get Fixed_Componsnt information...\n");
+  bool Is_Fixed;
+  Er = Node.Get_Is_Fixed(3, Is_Fixed);
+  Node_Errors::Handle_Error(Er);
+
+  printf("Trying to get Original position...\n");
+  Array_3<double> Ar;
+  Er = Node.Get_Original_Position(Ar);
+  Node_Errors::Handle_Error(Er);
+
+  printf("Trying to get Current position...\n");
+  Er = Node.Get_Current_Position(Ar);
+  Node_Errors::Handle_Error(Er);
+
+
   // Set the Node's BC's, and original position
   printf("Setting node Poisition, BC's: ");
   Er = Node.Set_Original_Position({0,0,0},{false, true, false});
@@ -45,7 +61,7 @@ void Test::Node_Errors(void) {
 
   // Modifiying current position
   printf("Updating current position: ");
-  Er = Node.Update_Position(37, 0);
+  Er = Node.Update_Position(0, 37);
   Node_Errors::Handle_Error(Er);
 
   // Print new Node information
@@ -54,12 +70,17 @@ void Test::Node_Errors(void) {
   printf("\n");
 
   // Try modifying a protected Component of the position
-  Er = Node.Update_Position(37, 1);
+  Er = Node.Update_Position(1, 37);
   Node_Errors::Handle_Error(Er);
 
   // Try setting an out of bounds component of position
   printf("Trying to set out of bounds component of position...\n");
-  Er = Node.Update_Position(37, 3);
+  Er = Node.Update_Position(3,37);
+  Node_Errors::Handle_Error(Er);
+
+  // Try getting out of bounds Fixed_Component information
+  printf("Trying to get out of bounds Fixed_Component info\n");
+  Er = Node.Get_Is_Fixed( 5, Is_Fixed );
   Node_Errors::Handle_Error(Er);
 
   // Print Node's information
@@ -186,5 +207,105 @@ void Test::Matrix_Tests(void) {
     printf(" |\n");
   } // for(int i = 0; i < Num_Rows; i++) {
 } // void Test::Matrix_Tests(void) {
+
+
+
+
+void Test::Element(void) {
+  // First, lets create some elements.
+  class Element El[4];
+  Element_Errors::Errors El_Err;
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Let's check that the "ELEMENT_NOT_SET_UP" Error is handled correctly
+
+  printf("Trying to get Node ID\n");
+  unsigned ID_Out = 0;
+  El_Err = El[0].Node_ID(3, ID_Out);
+  Element_Errors::Handle_Error(El_Err);
+
+  printf("\nTrying to set nodes\n");
+  El_Err = El[1].Set_Nodes(0,1,2,3,4,5,6,7);
+  Element_Errors::Handle_Error(El_Err);
+
+  printf("\nTruing to populate Ke\n");
+  El_Err = El[2].Populate_Ke();
+  Element_Errors::Handle_Error(El_Err);
+
+  printf("\nTrying to move Ke to K\n");
+  El_Err = El[3].Move_Ke_To_K();
+  Element_Errors::Handle_Error(El_Err);
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Now set Static members
+
+  /* Before we can actually set the static members, we need to set
+  Up an ID array, K matrix, Node Array, and F */
+  const unsigned N_x = 3;
+  const unsigned N_y = 3;
+  const unsigned N_z = 3;
+  const unsigned Num_Nodes = N_x*N_y*N_z;
+  const double IPS = .1;
+
+  class Node Nodes[Num_Nodes];
+
+  class Matrix<unsigned> ID(Num_Nodes, 3, Memory::ROW_MAJOR);
+  unsigned Num_Global_Eq = 0;
+
+  for(int i = 0; i < 3; i++) {
+    for(int j = 0; j < 3; j++) {
+      for(int k = 0; k < 3; k++) {
+        unsigned Node_Index = k + j*N_z + i*N_z*N_y;
+        // Set the Node's original position + BC's
+        if(k == 0)
+          Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, false, true});
+        else
+          Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, false, true});
+
+        /* Now cycle through the components of the current node. Use this info
+        to populate ID */
+        for(int Comp = 0; Comp < 3; Comp++) {
+          bool Is_Fixed;
+          Nodes[Node_Index].Get_Is_Fixed(Comp, Is_Fixed);
+
+          if(Is_Fixed == false) {
+            Num_Global_Eq++;
+            ID(Node_Index, Comp) = Num_Global_Eq;
+          } // for(int Comp = 0; Comp < 3; Comp++) {
+          else
+            ID(Node_Index, Comp) = 0;
+        } // for(int Comp = 0; Comp < 3; Comp++) {
+      } // for(int k = 0; k < 3; k++) {
+    } // for(int j = 0; j < 3; j++) {
+  } // for(int i = 0; i < 3; i++) {
+
+  // Print out the ID array (make sure it was set up correctly)
+  printf("\nID array: \n");
+  for(int i = 0; i < Num_Nodes; i++) {
+    printf("| ");
+    for(int j = 0; j < 3; j++)
+      printf(" %3u ", ID(i,j));
+    printf("|\n");
+  } // for(int i = 0; i < Num_Nodes; i++) {
+
+  // Now that we know the # of Global equations, allocate K
+  class Matrix<double> K(Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR);
+
+  // Set the elements of K to zero
+  for(int i = 0; i < Num_Global_Eq; i++)
+    for(int j = 0; j < Num_Global_Eq; j++)
+      K(i,j) = 0;
+
+  // We are now ready to set the static members of the Element class
+  printf("Setting static members of the Element class\n");
+  Set_Element_Static_Members(Nodes, &ID, &K, Simulation::F);
+} // void Test::Element(void) {
+
+
+
+double Simulation::F(unsigned Na, unsigned ei, unsigned Nb, unsigned ej) {
+  return 1.0;
+} // double Simulation::F(unsigned Na, unsigned ei, unsigned Nb, unsigned ej) {
 
 #endif

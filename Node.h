@@ -33,8 +33,8 @@ public:
   // Setter methods
 
   // Updates the current (spatial) position of the node
-  Node_Errors::Errors Update_Position(const double New_Position_Component,     // Intent: Read
-                                      const unsigned int component);           // Intent: Read
+  Node_Errors::Errors Update_Position(const unsigned int component,            // Intent: Read
+                                      const double New_Position);              // Intent: Read
 
   // Set internal variables
   Node_Errors::Errors Set_Original_Position(const Array_3<double> Original_Position_In,                                // Intent: Read
@@ -44,6 +44,8 @@ public:
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods
 
+  Node_Errors::Errors Get_Is_Fixed(const unsigned index,                       // Intent: Read
+                                   bool & Fixed_Pos_Out ) const;               // Intent: Write
   Node_Errors::Errors Get_Original_Position( Array_3<double> & Original_Position_Out ) const;      // Intent: Write
   Node_Errors::Errors Get_Current_Position( Array_3<double> & Current_Position_Out ) const;        // Intent: Write
 

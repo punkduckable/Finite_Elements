@@ -76,4 +76,17 @@ void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
   } // switch(Error) {
 } // void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
 
+
+
+void Simulation_Errors::Handle_Error(const Simulation_Errors::Errors Error) {
+  switch(Error) {
+    case SUCCESS:
+      printf("No Simulation Errors!\n");
+      break;
+
+    default:
+      printf("Simulation Error! Unknown Error\n");
+      break;
+  } // switch(Error) {
+} // void Simulation_Errors::Handle_Error(const Simulation_Errors::Errors Error) {
 #endif

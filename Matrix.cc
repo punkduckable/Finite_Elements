@@ -17,6 +17,13 @@ Matrix<Type>::Matrix(void) {
 
 
 
+template<typename Type>
+Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Layout_In) {
+  (*this).Set_Up(Rows_In, Cols_In, Layout_In);
+} // Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Layout_In) {
+
+
+
 // Destructor
 template <typename Type>
 Matrix<Type>::~Matrix(void) {
@@ -32,15 +39,15 @@ Matrix<Type>::~Matrix(void) {
 
 // Set up method
 template <typename Type>
-void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Dominance_In) {
+void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Layout_In) {
   // Allocate the matrix
   Ar = new Type[Rows_In*Cols_In];
 
   Num_Rows = Rows_In;
   Num_Cols = Cols_In;
 
-  // Set the dominance (this is used to access elements of the matrix)
-  Dominance = Dominance_In;
+  // Set the Layout (this is used to access elements of the matrix)
+  Memory_Layout = Layout_In;
 } // void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Dominace_In) {
 
 
@@ -53,9 +60,9 @@ Type & Matrix<Type>::operator()(const unsigned i, const unsigned j) {
   no way of handeling errors (like the Element, Node classes do). Therefore,
   we can't really do anything if these assumptions are not  met. Therefore,
   we simply assume that the user does not try to go out of bounds. */
-  if(Dominance == Memory::ROW_MAJOR)
+  if(Memory_Layout == Memory::ROW_MAJOR)
     return Ar[Num_Cols*i + j];
-  else // (Dominance == Memory::COLUMN_MAJOR)
+  else // (Memory_Layout == Memory::COLUMN_MAJOR)
     return Ar[i + j*Num_Rows];
 } // Type & Matrix<Type>::operator()(const unsigned i, const unsigned j) {
 
@@ -69,9 +76,9 @@ Type Matrix<Type>::operator()(const unsigned i, const unsigned j) const {
   no way of handeling errors (like the Element, Node classes do). Therefore,
   we can't really do anything if these assumptions are not  met. Therefore,
   we simply assume that the user does not try to go out of bounds. */
-  if(Dominance == Memory::ROW_MAJOR)
+  if(Memory_Layout == Memory::ROW_MAJOR)
     return Ar[Num_Cols*i + j];
-  else // (Dominance == Memory::COLUMN_MAJOR)
+  else // (Memory_Layout == Memory::COLUMN_MAJOR)
     return Ar[i + j*Num_Rows];
 } // Type Matrix<Type>::operator()(const unsigned i, const unsigned j) const {
 

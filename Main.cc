@@ -2,8 +2,8 @@
 #include "Tests.h"
 
 int main() {
-  // Run node tests.
-  Test::Matrix_Tests();
+  Test::Node_Errors();
+  Test::Element();
 
   return 0;
 } // int main() {

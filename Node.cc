@@ -9,7 +9,7 @@ using namespace Node_Errors;
 ////////////////////////////////////////////////////////////////////////////////
 // Setter methods
 
-Errors Node::Update_Position(const double New_Position_Component, const unsigned int component) {
+Errors Node::Update_Position(const unsigned component, const double New_Position) {
   /* Assumption 1:
 
   This function assumes that this specific Node has been set up. */
@@ -32,9 +32,10 @@ Errors Node::Update_Position(const double New_Position_Component, const unsigned
   } // if(Fixed_Pos[component] == true) {
 
   // If if all of the assumptions have been satisified then update the current position
-  Current_Position[component] = New_Position_Component;
+  Current_Position[component] = New_Position;
   return SUCCESS;
-} // Errors Node::Update_Position(const double New_Position_Component, const unsigned int component) {
+} // Errors Node::Update_Position(const unsigned component, const double New_Position) {
+
 
 
 Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In, const Array_3<bool> Fixed_Pos_In) {
@@ -63,6 +64,26 @@ Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In, c
 
 ////////////////////////////////////////////////////////////////////////////////
 // Getter methods
+
+Errors Node::Get_Is_Fixed(const unsigned index, bool & Is_Fixed_Out) const {
+  /* Assumption 1:
+  This function assumes that the Node has been set up. Otherwise, there's
+  nothing to report */
+  if(Node_Set_Up == false)
+    return NODE_NOT_SET_UP;
+
+  /* Assumption 2:
+  This function assumes that the Index is either 0, 1, or 2. The Fixed_Pos
+  array only has 3 elements, so anything with index > 2 is undefined */
+  if(index > 2)
+    return INDEX_OUT_OF_BOUNDS;
+
+  Is_Fixed_Out = Fixed_Pos[index];
+
+  return SUCCESS;
+} // Errors Node::Get_Is_Fixed(const unsigned index, bool & Is_Fixed_Out) const {
+
+
 
 Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) const {
   /* Assumption 1:

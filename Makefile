@@ -25,7 +25,7 @@ Matrix.o: Matrix.cc Matrix.h
 Node.o: Node.cc Node.h Array.h Errors.h
 	$(Comp) $(Flags) Node.cc
 
-Tests.o: Tests.cc Tests.h Node.h Matrix.h
+Tests.o: Tests.cc Tests.h Node.h Matrix.h Element.h Errors.h
 	$(Comp) $(Flags) Tests.cc
 
 Clean:

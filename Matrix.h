@@ -15,11 +15,16 @@ private:
   unsigned Num_Rows;
   unsigned Num_Cols;
 
-  // Specify row or column dominant storage scheme
-  Memory::Layout Dominance;
+  // Specify row or column major storage scheme
+  Memory::Layout Memory_Layout;
 public:
-  // Constructor
+  // Default constructor
   Matrix(void);
+
+  // Set up Constructor
+  Matrix(const unsigned Rows_In,                                               // Intent: Read
+         const unsigned Cols_In,                                               // Intent: Read
+         const Memory::Layout Layout_In);                                      // Intent: Read
 
   // Destructor
   ~Matrix(void);
@@ -31,7 +36,7 @@ public:
   // Set up matrix method
   void Set_Up(const unsigned Rows_In,                                          // Intent: Read
               const unsigned Cols_In,                                          // Intent: Read
-              const Memory::Layout Dominance_In);                              // Intent: Read
+              const Memory::Layout Layout_In);                                 // Intent: Read
 
   // Write to an element of the matrix
   Type & operator()(const unsigned i,                                          // Intent: Read
@@ -40,6 +45,14 @@ public:
   // Read an eleent of the matrix
   Type operator()(const unsigned i,                                            // Intent: Read
                   const unsigned j) const;                                     // Intent: Read
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Getter methods
+
+  unsigned Get_Num_Rows(void) const { return Num_Rows; }
+  unsigned Get_Num_Cols(void) const { return Num_Cols; }
+  Memory::Layout Get_Memory_Layout(void) const { return Memory_Layout; }
 
 
   //////////////////////////////////////////////////////////////////////////////
