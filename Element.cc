@@ -11,7 +11,7 @@ using namespace Element_Errors;
 
 bool Element::Static_Members_Set = false;
 Node * Element::Node_Array = NULL;
-Matrix<unsigned> * Element::ID;
+Matrix<int> * Element::ID;
 Matrix<double> * Element::K;
 double (*Element::F)(unsigned, unsigned, unsigned, unsigned);
 
@@ -120,9 +120,21 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
     const unsigned Global_Node_Number = Node_List[Node];
 
     for(int Component = 0; Component < 3; Component++) {
-      if(Node_Array[Global_Node_Number].Fixed_Pos[Component] == false) {
+      /* If a particular component of a node's position is fixed then that
+      component of position is already known. Therefore, there is no equation
+      for that component. Therefore, that component should not enter Ke.
+
+      If a node's component is fixed, then its corresponding cell in ID will
+      be -1. If not, then we need this component's global equation number
+      (which, luckily, is also stored in ID). Therefore, we can use the ID array
+      to determine if we should skip this component. */
+      int Global_Eq_Number = (*ID)(Global_Node_Number, Component);
+
+      /* if the equation number that we got is -1, then this component is fixed,
+      skip it */
+      if(Global_Eq_Number != -1) {
         // Set Local_Eq_Num_To_Global_Eq_Num
-        Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = (*ID)(Component, Global_Node_Number);
+        Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = Global_Eq_Number;
 
         // Set Local_Eq_Num_To_Node
         Local_Eq_Num_To_Node[2*Eq_Num + 0] = Global_Node_Number;
@@ -130,7 +142,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
         // Increment equation number
         Eq_Num++;
-      } // if(Node_Array[Node_List[Node]].Fixed_Pos[Component] == false) {
+      } // if(Global_Eq_Number != -1) {
     } // for(int Component = 0; Component < 3 Component++) {
   } // for(int Node = 0; Node < 8; Node++) {
 
@@ -215,20 +227,20 @@ Errors Element::Move_Ke_To_K(void) const {
   } // for(int i = 0; i < Num_Local_Eq; i++) {
 
   // Now, move the off diagional cells of Ke to K
-  for(int Row = 0; Row < Num_Local_Eq; Row++) {
-    // Get Global Row number, I, associated with the local row number "Row"
-    const int I = Local_Eq_Num_To_Global_Eq_Num[Row];
+  for(int Col = 0; Col < Num_Local_Eq; Col++) {
+    // Get Global column number, J, associated with the local column number "Col"
+    const int J = Local_Eq_Num_To_Global_Eq_Num[Col];
 
-    for(int Col = Row; Col < Num_Local_Eq; Col++) {
-      // Get Global column number, J, associated with the local column number "Col"
-      const int J = Local_Eq_Num_To_Global_Eq_Num[Col];
+    for(int Row = Col+1; Row < Num_Local_Eq; Row++) {
+      // Get Global Row number, I, associated with the local row number "Row"
+      const int I = Local_Eq_Num_To_Global_Eq_Num[Row];
 
 
       const double Ke_Row_Col = Ke(Row, Col);
       (*K)(I,J) += Ke_Row_Col;
       (*K)(J,I) += Ke_Row_Col;
-    } // for(int Col = Row; Col < Num_Local_Eq; Col++) {
-  } // for(int Row = 0; Row < Num_Local_Eq; Row++) {
+    } // for(int Row = Col+1; Row < Num_Local_Eq; Row++) {
+  } // for(int Col = 0; Col < Num_Local_Eq; Col++) {
 
   return SUCCESS;
 } // Errors Element::Move_Ke_To_K(void) const {
@@ -261,7 +273,7 @@ Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
   /* Assumption 1:
   This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
@@ -280,7 +292,7 @@ Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<unsigned> * ID_P
   Element::Static_Members_Set = true;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
 
 
 

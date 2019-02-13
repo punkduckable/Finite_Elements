@@ -242,43 +242,46 @@ void Test::Element(void) {
 
   /* Before we can actually set the static members, we need to set
   Up an ID array, K matrix, Node Array, and F */
-  const unsigned N_x = 3;
-  const unsigned N_y = 3;
-  const unsigned N_z = 3;
-  const unsigned Num_Nodes = N_x*N_y*N_z;
+  const unsigned Nx = 2;
+  const unsigned Ny = 2;
+  const unsigned Nz = 2;
+  const unsigned Num_Nodes = Nx*Ny*Nz;
   const double IPS = .1;
 
   class Node Nodes[Num_Nodes];
 
-  class Matrix<unsigned> ID(Num_Nodes, 3, Memory::ROW_MAJOR);
+  class Matrix<int> ID(Num_Nodes, 3, Memory::ROW_MAJOR);
   unsigned Num_Global_Eq = 0;
 
-  for(int i = 0; i < 3; i++) {
-    for(int j = 0; j < 3; j++) {
-      for(int k = 0; k < 3; k++) {
-        unsigned Node_Index = k + j*N_z + i*N_z*N_y;
+  for(int i = 0; i < Nx; i++) {
+    for(int j = 0; j < Ny; j++) {
+      for(int k = 0; k < Nz; k++) {
+        unsigned Node_Index = k + j*Nz + i*Nz*Ny;
         // Set the Node's original position + BC's
         if(k == 0)
-          Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, false, true});
+          Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, false, false});
         else
-          Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, false, true});
+          Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, false, false});
 
         /* Now cycle through the components of the current node. Use this info
-        to populate ID */
+        to populate ID. If the current component is not being used, fill that
+        cell of ID with a -1 */
         for(int Comp = 0; Comp < 3; Comp++) {
           bool Is_Fixed;
           Nodes[Node_Index].Get_Is_Fixed(Comp, Is_Fixed);
 
           if(Is_Fixed == false) {
-            Num_Global_Eq++;
             ID(Node_Index, Comp) = Num_Global_Eq;
+
+            // Increment number of equations by 1.
+            Num_Global_Eq++;
           } // for(int Comp = 0; Comp < 3; Comp++) {
           else
-            ID(Node_Index, Comp) = 0;
+            ID(Node_Index, Comp) = -1;
         } // for(int Comp = 0; Comp < 3; Comp++) {
-      } // for(int k = 0; k < 3; k++) {
-    } // for(int j = 0; j < 3; j++) {
-  } // for(int i = 0; i < 3; i++) {
+      } // for(int k = 0; k < Nz; k++) {
+    } // for(int j = 0; j < Ny; j++) {
+  } // for(int i = 0; i < Nx; i++) {
 
   // Print out the ID array (make sure it was set up correctly)
   printf("\nID array: \n");
@@ -300,6 +303,39 @@ void Test::Element(void) {
   // We are now ready to set the static members of the Element class
   printf("Setting static members of the Element class\n");
   Set_Element_Static_Members(Nodes, &ID, &K, Simulation::F);
+
+  // Now, create an array of elements.
+  class Element Elements[(Nx-1)*(Ny-1)*(Nz-1)];
+
+  /* Set up Node list, Popuatle Ke, and then move Ke to K for each element. */
+  for(int i = 0; i < Nx-1; i++) {
+    for(int j = 0; j < Ny-1; j++) {
+      for(int k = 0; k < Nz-1; k++) {
+        /* Note: The node list is set in such a way that the ID's are in ascendeing
+        order. This should improve memory access */
+        Elements[i + (Nx-1)*j + (Nx-1)*(Ny-1)*k].Set_Nodes(i + Nx*j + Nx*Ny*k,
+                                                           i+1 + Nx*j + Nx*Ny*k,
+                                                           i + Nx*(j+1) + Nx*Ny*k,
+                                                           i+1 + Nx*(j+1) + Nx*Ny*k,
+                                                           i + Nx*j + Nx*Ny*(k+1),
+                                                           i+1 + Nx*j + Nx*Ny*(k+1),
+                                                           i + Nx*(j+1) + Nx*Ny*(k+1),
+                                                           i+1 + Nx*(j+1) + Nx*Ny*(k+1));
+
+        Elements[i + (Nx-1)*j + (Nx-1)*(Ny-1)*k].Populate_Ke();
+        Elements[i + (Nx-1)*j + (Nx-1)*(Ny-1)*k].Move_Ke_To_K();
+      } // for(int k = 0; k < Nz-1; k++) {
+    } // for(int j = 0; j < Ny-1; j++) {
+  } // for(int i = 0; i < Nx-1; i++) {
+
+  // In theory, K should now be set. Let's check
+  for(int i = 0; i < Num_Global_Eq; i++) {
+    printf("| ");
+    for(int j = 0; j < Num_Global_Eq; j++)
+      printf(" %4.1lf ", K(i,j));
+
+    printf("|\n");
+  } // for(int i = 0; i < Num_Global_Eq; i++) {
 } // void Test::Element(void) {
 
 

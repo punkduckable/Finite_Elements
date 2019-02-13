@@ -12,7 +12,7 @@ private:
   // Static members
   static bool Static_Members_Set;                                    // True if the static members have been set
   static Node * Node_Array;                                          // Points to the Array of all the Nodes for the object being simulated
-  static Matrix<unsigned> * ID;                                      // Points to the ID Matrix
+  static Matrix<int> * ID;                                           // Points to the ID Matrix
   static Matrix<double> * K;                                         // Points to the global stiffness matrix
   static double (*F)(unsigned, unsigned, unsigned, unsigned);        // Given Node/component, this Calculates an element of Ke
 
@@ -83,7 +83,7 @@ public:
 
 
   friend Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,        // Intent: Read
-                                                           Matrix<unsigned> * ID_Ptr,    // Intent: Read
+                                                           Matrix<int> * ID_Ptr,         // Intent: Read
                                                            Matrix<double> * K_Ptr,       // Intent: Read
                                                            double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));   // Intent: Read
 
@@ -106,7 +106,7 @@ public:
 }; // class Element {
 
 Element_Errors::Errors Set_Element_Static_Members(Node * Node_Array_Ptr,       // Intent: Read
-                                                  Matrix<unsigned> * ID_Ptr,   // Intent: Read
+                                                  Matrix<int> * ID_Ptr,        // Intent: Read
                                                   Matrix<double> * K_Ptr,      // Intent: Read
                                                   double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));  // Intent: Read
 
