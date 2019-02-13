@@ -11,7 +11,6 @@ using namespace Element_Errors;
 // Set Elements static members
 
 bool Element::Static_Members_Set = false;
-Node * Element::Node_Array = NULL;
 Matrix<int> * Element::ID;
 Matrix<double> * Element::K;
 double (*Element::F)(unsigned, unsigned, unsigned, unsigned);
@@ -53,22 +52,17 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   /* Assumption 1:
   This function assumes that the Element class has been set up.
   The element class contains a few static members. One of these, the ID array,
-  points to the global ID array. Another, Node_Array, points to the
-  array of nodes used in this simulation. We need to have access to both of
-  these arrays to be able to set up the Element. Therefore, if these static
-  members have not been set and the user is trying to set this Element's nodes
-  then we need to thrown an error.
+  points to the global ID array. We need to have access to this array to set
+  up the Element. Therefore, if these static members have not been set and the
+  user is trying to set this Element's nodes then we need to thrown an error.
 
   When the static members are set, a flag called "Static_Members_Set" gets
   flipped to true. Therefore, if this flag is true then the assumption is
   satisified.  */
   if(Static_Members_Set == false) {
     printf("Error in void Element::Set_Nodes!\n");
-    printf("To set up an element, the ID and Node_Array static members must be set\n");
-    printf("Currently, ID = %p and Node_Array = %p.\n", ID, Node_Array);
-
     return STATIC_MEMBERS_NOT_SET;
-  } // if(ID == NULL || Node_Array == NULL) {
+  } // if(Static_Members_Set == false) {
 
   /* Assumptions 2:
   This function also assumes that this specific element has not has its nodes
@@ -92,15 +86,21 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
   //////////////////////////////////////////////////////////////////////////////
   /* Determine the number of local equations. To do this, we cycle through
-  each node in the node list. We access the actual node using the Node_Array
-  For each node, we check if it has a fixed component of position */
+  each node in the node list. For each node, we use the corresponding position
+  in the ID array to check which component of that node's position are fixed
+  and which are free */
   Num_Local_Eq = 0;
   for(int Node = 0; Node < 8; Node++) {
     const unsigned Global_Node_Number = Node_List[Node];
 
     for(int Component = 0; Component < 3; Component++) {
-      // Check the current node has a fixed component of position in the Component direction
-      if(Node_Array[Global_Node_Number].Fixed_Pos[Component] == false)
+      /* Check if this Node's component is free or fixed.
+
+      The component is fixed if the corresponding cell in ID array is -1.
+      Therefore, if ID(Global_Node_Number, Component) != -1 then the current
+      Node's componet is an unknown that we need to solve for, increment
+      Num_Local_Eq. */
+      if((*ID)(Global_Node_Number, Component) != -1)
         Num_Local_Eq++;
     } // for(int Component = 0; Component < 3; Component++) {
   } // for(int Node = 0; Node < 8; Node++) {
@@ -175,8 +175,6 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
       printf("|\n");
     } // for(int j = 0; j < 2; j++) {
   #endif
-
-
 
   return SUCCESS;
 } // Errors Element::Set_Nodes(const unsigned Node1_ID,
@@ -314,7 +312,7 @@ Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+Errors Set_Element_Static_Members(Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
   /* Assumption 1:
   This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
@@ -324,7 +322,6 @@ Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<int> * ID_Ptr, M
     return STATIC_MEMBERS_ALREADY_SET;
 
   // Set Static members
-  Element::Node_Array = Node_Array_Ptr;
   Element::ID = ID_Ptr;
   Element::F = Integrating_Function;
   Element::K = K_Ptr;
@@ -333,7 +330,7 @@ Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<int> * ID_Ptr, M
   Element::Static_Members_Set = true;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Node * Node_Array_Ptr, Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+} // Errors Set_Element_Static_Members(Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
 
 
 

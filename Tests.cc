@@ -302,7 +302,7 @@ void Test::Element(void) {
 
   // We are now ready to set the static members of the Element class
   printf("Setting static members of the Element class\n");
-  Set_Element_Static_Members(Nodes, &ID, &K, Simulation::F);
+  Set_Element_Static_Members(&ID, &K, Simulation::F);
 
   // Now, create an array of elements.
   class Element Elements[(Nx-1)*(Ny-1)*(Nz-1)];
