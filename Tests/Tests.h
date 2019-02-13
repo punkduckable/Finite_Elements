@@ -1,10 +1,10 @@
 #if !defined(TESTS_HEADER)
 #define TESTS_HEADER
 
-#include "Node.h"
-#include "Element.h"
-#include "Matrix.h"
-#include "Errors.h"
+#include "../Node.h"
+#include "../Element.h"
+#include "../Matrix.h"
+#include "../Errors.h"
 
 namespace Test {
   void Node_Errors(void);

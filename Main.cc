@@ -1,5 +1,5 @@
 // Needed to run the tests.
-#include "Tests.h"
+#include "Tests/Tests.h"
 
 int main() {
   Test::Node_Errors();
