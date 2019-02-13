@@ -3,6 +3,7 @@
 
 #include "Element.h"
 #include <stdio.h>
+#define ELEMENT_MONITOR
 
 using namespace Element_Errors;
 
@@ -137,8 +138,8 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = Global_Eq_Number;
 
         // Set Local_Eq_Num_To_Node
-        Local_Eq_Num_To_Node[2*Eq_Num + 0] = Global_Node_Number;
-        Local_Eq_Num_To_Node[2*Eq_Num + 1] = Component;
+        Local_Eq_Num_To_Node[0 + Eq_Num*2] = Global_Node_Number;
+        Local_Eq_Num_To_Node[1 + Eq_Num*2] = Component;
 
         // Increment equation number
         Eq_Num++;
@@ -148,6 +149,34 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
   // The element is now set up
   Element_Set_Up = true;
+
+
+  #if defined(ELEMENT_MONITOR)
+    printf("Node list: ");
+    for(int i = 0; i < 8; i++)
+      printf("%u ", Node_List[i]);
+
+    printf("\n");
+
+
+    printf("Local_Eq_Num_To_Global_Eq_Num: ");
+    for(int i = 0; i < Num_Local_Eq; i++)
+      printf("%u ", Local_Eq_Num_To_Global_Eq_Num[i]);
+
+    printf("\n");
+
+
+    printf("Local_Eq_Num_To_Node:\n");
+    for(int j = 0; j < 2; j++) {
+      printf("| ");
+      for(int i = 0; i < Num_Local_Eq; i++)
+        printf("%3u ", Local_Eq_Num_To_Node[i*2 + j]);
+
+      printf("|\n");
+    } // for(int j = 0; j < 2; j++) {
+  #endif
+
+
 
   return SUCCESS;
 } // Errors Element::Set_Nodes(const unsigned Node1_ID,
@@ -183,13 +212,13 @@ Errors Element::Populate_Ke(void) {
     be noted that this array is stored in Row major order and that its
     dimensions are Num_Local_Eq x 2. Therefore, the ID for the ith Node is at
     2*i while the component is at 2*i + 1 */
-    const unsigned Node_A_ID = Local_Eq_Num_To_Node[2*Col + 0];
-    const unsigned Node_A_Component = Local_Eq_Num_To_Node[2*Col + 1];
+    const unsigned Node_A_ID = Local_Eq_Num_To_Node[Col*2 + 0];
+    const unsigned Node_A_Component = Local_Eq_Num_To_Node[Col*2 + 1];
 
     for(int Row = Col; Row < Num_Local_Eq; Row++) {
       /* Get ID and Component associated with the Row'th local equation. */
-      const unsigned Node_B_ID = Local_Eq_Num_To_Node[2*Row + 0];
-      const unsigned Node_B_Component = Local_Eq_Num_To_Node[2*Row + 1];
+      const unsigned Node_B_ID = Local_Eq_Num_To_Node[Row*2 + 0];
+      const unsigned Node_B_Component = Local_Eq_Num_To_Node[Row*2 + 1];
 
       // Populate Ke
       Ke(Row, Col) = F(Node_A_ID, Node_A_Component, Node_B_ID, Node_B_Component);
@@ -203,6 +232,18 @@ Errors Element::Populate_Ke(void) {
 
   // Ke has now been set
   Ke_Set_Up = true;
+
+  #if defined(ELEMENT_MONITOR)
+    printf("Element stiffness matrix:\n");
+    for(int i = 0; i < Num_Local_Eq; i++) {
+      printf("| ");
+
+      for(int j = 0; j < Num_Local_Eq; j++)
+        printf("%6.2lf ", Ke(i,j));
+
+      printf("|\n");
+    } // for(int i = 0; i < Num_Local_Eq, i++) {
+  #endif
 
   return SUCCESS;
 } // Errors Element::Populate_Ke(void) {
@@ -223,7 +264,7 @@ Errors Element::Move_Ke_To_K(void) const {
   // First, move the diagional cells of Ke to K
   for(int i = 0; i < Num_Local_Eq; i++) {
     const int I = Local_Eq_Num_To_Global_Eq_Num[i];
-    (*K)(I, I) = Ke(i,i);
+    (*K)(I, I) += Ke(i,i);
   } // for(int i = 0; i < Num_Local_Eq; i++) {
 
   // Now, move the off diagional cells of Ke to K

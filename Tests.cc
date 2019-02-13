@@ -242,9 +242,9 @@ void Test::Element(void) {
 
   /* Before we can actually set the static members, we need to set
   Up an ID array, K matrix, Node Array, and F */
-  const unsigned Nx = 2;
-  const unsigned Ny = 2;
-  const unsigned Nz = 2;
+  const unsigned Nx = 3;
+  const unsigned Ny = 3;
+  const unsigned Nz = 3;
   const unsigned Num_Nodes = Nx*Ny*Nz;
   const double IPS = .1;
 
@@ -328,14 +328,8 @@ void Test::Element(void) {
     } // for(int j = 0; j < Ny-1; j++) {
   } // for(int i = 0; i < Nx-1; i++) {
 
-  // In theory, K should now be set. Let's check
-  for(int i = 0; i < Num_Global_Eq; i++) {
-    printf("| ");
-    for(int j = 0; j < Num_Global_Eq; j++)
-      printf(" %4.1lf ", K(i,j));
-
-    printf("|\n");
-  } // for(int i = 0; i < Num_Global_Eq; i++) {
+  // In theory, K should now be set. Let's check. Print K to a file
+  Simulation::Print_K_To_File(K);
 } // void Test::Element(void) {
 
 
@@ -343,5 +337,28 @@ void Test::Element(void) {
 double Simulation::F(unsigned Na, unsigned ei, unsigned Nb, unsigned ej) {
   return 1.0;
 } // double Simulation::F(unsigned Na, unsigned ei, unsigned Nb, unsigned ej) {
+
+
+
+void Simulation::Print_K_To_File(const Matrix<double> & K) {
+  // First, open a new file
+  FILE * File = fopen("K.txt","w");
+
+  // Get the number of Rows, Columns for K
+  const unsigned Num_Rows = K.Get_Num_Rows();
+  const unsigned Num_Cols = K.Get_Num_Cols();
+
+  /* Note, this is not a very fast way to print K, since K is a column major
+  matrix and we're printing it it in row major order. Oh well, this only runs
+  once anyway */
+  for(int i = 0; i < Num_Rows; i++) {
+    fprintf(File,"| ");
+    for(int j = 0; j < Num_Cols; j++) {
+      fprintf(File,"%2.0lf ", K(i,j));
+    } // for(int j = 0; j < Num_Cols; j++) {
+
+    fprintf(File,"|\n");
+  } // for(int i = 0; i < Num_Rows; i++) {
+} // void Simulation::Print_K_To_File(const Matrix<double> & K) {
 
 #endif
