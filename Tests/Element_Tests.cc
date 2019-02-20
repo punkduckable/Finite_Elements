@@ -21,7 +21,7 @@ void Test::Element(void) {
   El_Err = El[1].Set_Nodes(0,1,2,3,4,5,6,7);
   Element_Errors::Handle_Error(El_Err);
 
-  printf("\nTruing to populate Ke\n");
+  printf("\nTrying to populate Ke\n");
   El_Err = El[2].Populate_Ke();
   Element_Errors::Handle_Error(El_Err);
 
@@ -43,7 +43,7 @@ void Test::Element(void) {
 
   class Node Nodes[Num_Nodes];
 
-  class Matrix<int> ID(Num_Nodes, 3, Memory::ROW_MAJOR);
+  class Matrix<unsigned> ID(Num_Nodes, 3, Memory::ROW_MAJOR);
   unsigned Num_Global_Eq = 0;
 
   for(int i = 0; i < Nx; i++) {
@@ -52,7 +52,7 @@ void Test::Element(void) {
         unsigned Node_Index = k + j*Nz + i*Nz*Ny;
         // Set the Node's original position + BC's
         if(k == 0)
-          Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, false, false});
+          Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, true, false});
         else
           Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, false, false});
 
@@ -70,7 +70,7 @@ void Test::Element(void) {
             Num_Global_Eq++;
           } // for(int Comp = 0; Comp < 3; Comp++) {
           else
-            ID(Node_Index, Comp) = -1;
+            ID(Node_Index, Comp) = -1;           // Note: ID is an unsigned matrix. (unsigned)-1 is the largest possible unsigned integer
         } // for(int Comp = 0; Comp < 3; Comp++) {
       } // for(int k = 0; k < Nz; k++) {
     } // for(int j = 0; j < Ny; j++) {
@@ -81,7 +81,10 @@ void Test::Element(void) {
   for(int i = 0; i < Num_Nodes; i++) {
     printf("| ");
     for(int j = 0; j < 3; j++)
-      printf(" %3u ", ID(i,j));
+      /* Note, even though ID is a matrix of unsigned integers, I print ID(i,j)
+      as a signed integer so that any components set to -1 show up as -1 rather
+      than some nonsense large number. */
+      printf(" %3d ", ID(i,j));
     printf("|\n");
   } // for(int i = 0; i < Num_Nodes; i++) {
 

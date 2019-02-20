@@ -11,9 +11,10 @@ private:
   //////////////////////////////////////////////////////////////////////////////
   // Static members
   static bool Static_Members_Set;                                    // True if the static members have been set
-  static Matrix<int> * ID;                                           // Points to the ID Matrix
+  static Matrix<unsigned> * ID;                                      // Points to the ID Matrix
   static Matrix<double> * K;                                         // Points to the global stiffness matrix
   static double (*F)(unsigned, unsigned, unsigned, unsigned);        // Given Node/component, this Calculates an element of Ke
+  const static unsigned FIXED_COMPONENT = -1;                        // Used to indicate that a particular component of a node's displacement is fixed
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -26,16 +27,13 @@ private:
   // The Global node numbers for the nodes associated with this Element.
   unsigned int Node_List[8];
 
-  // Number of local equations
-  unsigned int Num_Local_Eq;
-
   /* Assembly arrays. Local_Eq_Num_To_Node is used to construct Ke while
   Local_Eq_Num_To_Global_Eq_Num is used to map Ke into K. */
-  unsigned * Local_Eq_Num_To_Node;                     // Stores the global node # and component associated with each local equation
-  unsigned * Local_Eq_Num_To_Global_Eq_Num;            // Stores the global equation # associated with each local eqiation
+  unsigned Local_Eq_Num_To_Node[24*2];                     // Stores the global node # and component associated with each local equation
+  unsigned Local_Eq_Num_To_Global_Eq_Num[24];              // Stores the global equation # associated with each local eqiation
 
   // Local element stiffness matrix;
-  Matrix<double> Ke;
+  Matrix<double> Ke = Matrix<double>(24, 24, Memory::COLUMN_MAJOR);
 
 public:
   //////////////////////////////////////////////////////////////////////////////
@@ -81,7 +79,7 @@ public:
                                  unsigned & ID_Out) const;                     // Intent: Write
 
 
-  friend Element_Errors::Errors Set_Element_Static_Members(Matrix<int> * ID_Ptr,         // Intent: Read
+  friend Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,    // Intent: Read
                                                            Matrix<double> * K_Ptr,       // Intent: Read
                                                            double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));   // Intent: Read
 
@@ -103,7 +101,7 @@ public:
   Element & operator=(const Element & El);
 }; // class Element {
 
-Element_Errors::Errors Set_Element_Static_Members(Matrix<int> * ID_Ptr,        // Intent: Read
+Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,   // Intent: Read
                                                   Matrix<double> * K_Ptr,      // Intent: Read
                                                   double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));  // Intent: Read
 

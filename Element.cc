@@ -11,7 +11,7 @@ using namespace Element_Errors;
 // Set Elements static members
 
 bool Element::Static_Members_Set = false;
-Matrix<int> * Element::ID;
+Matrix<unsigned> * Element::ID;
 Matrix<double> * Element::K;
 double (*Element::F)(unsigned, unsigned, unsigned, unsigned);
 
@@ -23,13 +23,6 @@ double (*Element::F)(unsigned, unsigned, unsigned, unsigned);
 // Destructor
 
 Element::~Element(void) {
-  /* Check if nodes are set. If so then this element dynamically allocated
-  memory for Local_Eq_Num_To_Node, Local_Eq_Num_To_Global_Eq_Num, and Ke. We
-  need to free this memory before deleting the object. */
-  if(Element_Set_Up) {
-    delete [] Local_Eq_Num_To_Node;
-    delete [] Local_Eq_Num_To_Global_Eq_Num;
-  } // if(Element_Set_Up) {
 } // Element::~Element(void) {
 
 
@@ -84,34 +77,6 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   Node_List[7] = Node7_ID;
 
 
-  //////////////////////////////////////////////////////////////////////////////
-  /* Determine the number of local equations. To do this, we cycle through
-  each node in the node list. For each node, we use the corresponding position
-  in the ID array to check which component of that node's position are fixed
-  and which are free */
-  Num_Local_Eq = 0;
-  for(int Node = 0; Node < 8; Node++) {
-    const unsigned Global_Node_Number = Node_List[Node];
-
-    for(int Component = 0; Component < 3; Component++) {
-      /* Check if this Node's component is free or fixed.
-
-      The component is fixed if the corresponding cell in ID array is -1.
-      Therefore, if ID(Global_Node_Number, Component) != -1 then the current
-      Node's componet is an unknown that we need to solve for, increment
-      Num_Local_Eq. */
-      if((*ID)(Global_Node_Number, Component) != -1)
-        Num_Local_Eq++;
-    } // for(int Component = 0; Component < 3; Component++) {
-  } // for(int Node = 0; Node < 8; Node++) {
-
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Allocate Local_Eq_Num_To_Node, Local_Eq_Num_To_Global_Eq_Num, and Ke
-
-  Local_Eq_Num_To_Node = new unsigned[2*Num_Local_Eq];
-  Local_Eq_Num_To_Global_Eq_Num = new unsigned[Num_Local_Eq];
-  Ke.Set_Up(Num_Local_Eq, Num_Local_Eq, Memory::COLUMN_MAJOR);
 
   //////////////////////////////////////////////////////////////////////////////
   // Set up Local_Eq_Num_To_Node, Local_Eq_Num_To_Global_Eq_Num
@@ -121,29 +86,31 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
     const unsigned Global_Node_Number = Node_List[Node];
 
     for(int Component = 0; Component < 3; Component++) {
-      /* If a particular component of a node's position is fixed then that
-      component of position is already known. Therefore, there is no equation
-      for that component. Therefore, that component should not enter Ke.
+      // Set Local_Eq_Num_To_Node
+      Local_Eq_Num_To_Node[0 + Eq_Num*2] = Global_Node_Number;
+      Local_Eq_Num_To_Node[1 + Eq_Num*2] = Component;
 
-      If a node's component is fixed, then its corresponding cell in ID will
-      be -1. If not, then we need this component's global equation number
-      (which, luckily, is also stored in ID). Therefore, we can use the ID array
-      to determine if we should skip this component. */
+      /* If a particular component of a node's position is fixed then there is
+      no global equation for that component. Therefore, we don't want to map the
+      corresponding component of Ke to K.
+
+      The issue is, the Element doesn't have any way of knowing which nodes have
+      fixed components and which ones don't based just on the global node ID's
+      (which is what was passed to this function). Luckily, however, if a node's
+      component is fixed, then that component's corresponding cell in ID array
+      will be set to -1. Therefore, we can check if ID(Node, Component) == -1.
+      If this is the case, then we set the corresponding cell in
+      Local_Eq_Num_To_Global_Eq_Num to the constant FIXED_COMPONENT, which
+      indiciates that the corresponding component is fixed (this is important
+      for mapping Ke to K) */
       int Global_Eq_Number = (*ID)(Global_Node_Number, Component);
-
-      /* if the equation number that we got is -1, then this component is fixed,
-      skip it */
-      if(Global_Eq_Number != -1) {
-        // Set Local_Eq_Num_To_Global_Eq_Num
+      if(Global_Eq_Number == -1)
+        Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = FIXED_COMPONENT;
+      else
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = Global_Eq_Number;
 
-        // Set Local_Eq_Num_To_Node
-        Local_Eq_Num_To_Node[0 + Eq_Num*2] = Global_Node_Number;
-        Local_Eq_Num_To_Node[1 + Eq_Num*2] = Component;
-
-        // Increment equation number
-        Eq_Num++;
-      } // if(Global_Eq_Number != -1) {
+      // Increment equation number
+      Eq_Num++;
     } // for(int Component = 0; Component < 3 Component++) {
   } // for(int Node = 0; Node < 8; Node++) {
 
@@ -160,8 +127,11 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
 
     printf("Local_Eq_Num_To_Global_Eq_Num: ");
-    for(int i = 0; i < Num_Local_Eq; i++)
-      printf("%u ", Local_Eq_Num_To_Global_Eq_Num[i]);
+    for(int i = 0; i < 24; i++)
+      /* Note, even though Local_Eq_Num_To_Global_Eq_Num is an array of unsigned
+      integers, I print it as an array of signed integers so that FIXED_COMPONENT
+      shows up as -1 and not some nonsense large number. */
+      printf("%d ", Local_Eq_Num_To_Global_Eq_Num[i]);
 
     printf("\n");
 
@@ -169,11 +139,11 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
     printf("Local_Eq_Num_To_Node:\n");
     for(int j = 0; j < 2; j++) {
       printf("| ");
-      for(int i = 0; i < Num_Local_Eq; i++)
+      for(int i = 0; i < 24; i++)
         printf("%3u ", Local_Eq_Num_To_Node[i*2 + j]);
 
       printf("|\n");
-    } // for(int j = 0; j < 2; j++) {
+    } // for(int j = 0; j < 24; j++) {
   #endif
 
   return SUCCESS;
@@ -185,9 +155,8 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 Errors Element::Populate_Ke(void) {
   /* Assumption 1:
   This function assumes that this Element has been set up. More specificially,
-  this function assumes that the node list has been set, that Ke has been
-  allocated, that Local_Eq_Num_To_Node has been allocated and set up, and that
-  Local_Eq_Num_To_Global_Eq_Num has been allocated and set up.
+  this function assumes that the node list has been set, and that
+  Local_Eq_Num_To_Node has been set up.
 
   This function also assumes that the Element class has been set up. More
   specitically, this function assumes that the F (integrating function) has
@@ -205,26 +174,26 @@ Errors Element::Populate_Ke(void) {
     return KE_ALREADY_SET_UP;
 
   // Populate the diagional + lower triangular elements of Ke
-  for(int Col = 0; Col < Num_Local_Eq; Col++) {
+  for(int Col = 0; Col < 24; Col++) {
     /* Get ID and Component associated with the Col'th local equation. It should
-    be noted that this array is stored in Row major order and that its
-    dimensions are Num_Local_Eq x 2. Therefore, the ID for the ith Node is at
-    2*i while the component is at 2*i + 1 */
-    const unsigned Node_A_ID = Local_Eq_Num_To_Node[Col*2 + 0];
+    be noted that Local_Eq_Num_To_Node is stored in Row major order and that its
+    dimensions are 24 x 2. Therefore, the ID for the Colth Node is at
+    2*Col while the component is at 2*Col + 1 */
+    const unsigned Node_A_ID        = Local_Eq_Num_To_Node[Col*2 + 0];
     const unsigned Node_A_Component = Local_Eq_Num_To_Node[Col*2 + 1];
 
-    for(int Row = Col; Row < Num_Local_Eq; Row++) {
+    for(int Row = Col; Row < 24; Row++) {
       /* Get ID and Component associated with the Row'th local equation. */
-      const unsigned Node_B_ID = Local_Eq_Num_To_Node[Row*2 + 0];
+      const unsigned Node_B_ID        = Local_Eq_Num_To_Node[Row*2 + 0];
       const unsigned Node_B_Component = Local_Eq_Num_To_Node[Row*2 + 1];
 
       // Populate Ke
       Ke(Row, Col) = F(Node_A_ID, Node_A_Component, Node_B_ID, Node_B_Component);
-    } // for(int Row = Col; Row < Num_Local_Eq; Row++) {
-  } // for(int Col = 0; Col < Num_Local_Eq; Col++) {
+    } // for(int Row = Col; Row < 24; Row++) {
+  } // for(int Col = 0; Col < 24; Col++) {
 
   // Now populate the Upper triangular elements of Ke
-  for(int Col = 1; Col < Num_Local_Eq; Col++)
+  for(int Col = 1; Col < 24; Col++)
     for(int Row = 0; Row < Col; Row++)
       Ke(Row, Col) = Ke(Col, Row);
 
@@ -233,14 +202,14 @@ Errors Element::Populate_Ke(void) {
 
   #if defined(ELEMENT_MONITOR)
     printf("Element stiffness matrix:\n");
-    for(int i = 0; i < Num_Local_Eq; i++) {
+    for(int i = 0; i < 24; i++) {
       printf("| ");
 
-      for(int j = 0; j < Num_Local_Eq; j++)
+      for(int j = 0; j < 24; j++)
         printf("%6.2lf ", Ke(i,j));
 
       printf("|\n");
-    } // for(int i = 0; i < Num_Local_Eq, i++) {
+    } // for(int i = 0; i < 24, i++) {
   #endif
 
   return SUCCESS;
@@ -253,33 +222,50 @@ Errors Element::Move_Ke_To_K(void) const {
   This function assumes that the element stiffness matrix, Ke, has been set.
 
   This function also assumes that the Element class static members, namely K,
-  has been set. It is not possible, however, to set up Ke without having the
-  Static members set. Therefore, if Ke is set then both assumptions must be
-  valid */
+  has been set.
+
+  It is not possible, however, to set up Ke without having the Static members
+  set. Therefore, if Ke is set then both assumptions must be satisified */
   if(Ke_Set_Up == false)
     return KE_NOT_SET_UP;
 
-  // First, move the diagional cells of Ke to K
-  for(int i = 0; i < Num_Local_Eq; i++) {
+  /* First, move the diagional cells of Ke to K. We only move the components
+  that correspond to a global equation. Recall that Ke has a row for each
+  component of each of the 8 nodes in this Element's Node list, even though
+  some of those components may be fixed. We kept track of this with the
+  "FIXED_COMPONENT" constant wen we set up Local_Eq_Num_To_Global_Eq_Num */
+  for(int i = 0; i < 24; i++) {
     const int I = Local_Eq_Num_To_Global_Eq_Num[i];
-    (*K)(I, I) += Ke(i,i);
-  } // for(int i = 0; i < Num_Local_Eq; i++) {
+    if(I == FIXED_COMPONENT)
+      continue;
+    else
+      (*K)(I, I) += Ke(i,i);
+  } // for(int i = 0; i < 24; i++) {
 
-  // Now, move the off diagional cells of Ke to K
-  for(int Col = 0; Col < Num_Local_Eq; Col++) {
+  /* Now, move the off-diagional cells of Ke to K. Again, We only move the
+  components that correspond to a global equation (see previous comment) */
+  for(int Col = 0; Col < 24; Col++) {
     // Get Global column number, J, associated with the local column number "Col"
     const int J = Local_Eq_Num_To_Global_Eq_Num[Col];
 
-    for(int Row = Col+1; Row < Num_Local_Eq; Row++) {
-      // Get Global Row number, I, associated with the local row number "Row"
-      const int I = Local_Eq_Num_To_Global_Eq_Num[Row];
+    // Check if J corresponds to a fixed component
+    if(J == FIXED_COMPONENT)
+      continue;
+    else
+      for(int Row = Col+1; Row < 24; Row++) {
+        // Get Global Row number, I, associated with the local row number "Row"
+        const int I = Local_Eq_Num_To_Global_Eq_Num[Row];
 
+        // Check if I corresponds to a fixed component
+        if(I == FIXED_COMPONENT)
+          continue;
 
-      const double Ke_Row_Col = Ke(Row, Col);
-      (*K)(I,J) += Ke_Row_Col;
-      (*K)(J,I) += Ke_Row_Col;
-    } // for(int Row = Col+1; Row < Num_Local_Eq; Row++) {
-  } // for(int Col = 0; Col < Num_Local_Eq; Col++) {
+        // If not, move Ke(Row, Col) to the corresponding position in K.
+        const double Ke_Row_Col = Ke(Row, Col);
+        (*K)(I,J) += Ke_Row_Col;
+        (*K)(J,I) += Ke_Row_Col;
+      } // for(int Row = Col+1; Row < 24; Row++) {
+  } // for(int Col = 0; Col < 24; Col++) {
 
   return SUCCESS;
 } // Errors Element::Move_Ke_To_K(void) const {
@@ -312,7 +298,7 @@ Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-Errors Set_Element_Static_Members(Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
   /* Assumption 1:
   This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
@@ -330,7 +316,7 @@ Errors Set_Element_Static_Members(Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, 
   Element::Static_Members_Set = true;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+} // Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
 
 
 
