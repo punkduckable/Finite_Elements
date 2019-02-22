@@ -13,7 +13,6 @@ using namespace Element_Errors;
 bool Element::Static_Members_Set = false;
 Matrix<unsigned> * Element::ID;
 Matrix<double> * Element::K;
-double (*Element::F)(unsigned, unsigned, unsigned, unsigned);
 
 
 
@@ -32,7 +31,6 @@ Element::~Element(void) {
 ////////////////////////////////////////////////////////////////////////////////
 // Other Element methods
 
-// Set nodes
 Errors Element::Set_Nodes(const unsigned Node0_ID,
                           const unsigned Node1_ID,
                           const unsigned Node2_ID,
@@ -41,8 +39,21 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
                           const unsigned Node5_ID,
                           const unsigned Node6_ID,
                           const unsigned Node7_ID) {
+  /* Function description:
+  This function is used to set set up the Element. The passed Node ID's are
+  moved into the Node_List, which then uses the ID array to populate the
+  Local_Eq_Num_To_Global_Eq_Num array (which is used for mapping Ke to K) */
 
   /* Assumption 1:
+  This function assumes that the passed nodes are in a particular order.
+  In particular, we assume that the nodes are in the order described on page
+  123 of Hughes' book.
+
+  Unfortuneatly, there is no way to verrify this assumption. Therefore, we
+  simply assume that the user has supplied the nodes in the correct order */
+
+
+  /* Assumption 2:
   This function assumes that the Element class has been set up.
   The element class contains a few static members. One of these, the ID array,
   points to the global ID array. We need to have access to this array to set
@@ -57,7 +68,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
     return STATIC_MEMBERS_NOT_SET;
   } // if(Static_Members_Set == false) {
 
-  /* Assumptions 2:
+  /* Assumptions 3:
   This function also assumes that this specific element has not has its nodes
   set already. */
   if(Element_Set_Up == true)
@@ -151,9 +162,20 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
 
 
-// Populate Ke
 Errors Element::Populate_Ke(void) {
+  /* Function description:
+  This method is used to populate Ke, the element stiffness matrix. Once
+  this method has run, Ke can be mapped to K and F. */
+
   /* Assumption 1:
+  This function assumes that the nodes in the Node_List are in a particular
+  order. Specifically, we assume that the passed nodes are in the same order
+  as the figure on page 123 of Hughes' book.
+
+  We have no way of testing and/or verrifying this assumption. Therefore, we
+  simply assume that the user set up the node list in the correct order. */
+
+  /* Assumption 2:
   This function assumes that this Element has been set up. More specificially,
   this function assumes that the node list has been set, and that
   Local_Eq_Num_To_Node has been set up.
@@ -168,34 +190,11 @@ Errors Element::Populate_Ke(void) {
   if(Element_Set_Up == false)
     return ELEMENT_NOT_SET_UP;
 
-  /* Assumption 2:
+  /* Assumption 3:
   This function also assumes that Ke has not been set already. */
   if(Ke_Set_Up == true)
     return KE_ALREADY_SET_UP;
 
-  // Populate the diagional + lower triangular elements of Ke
-  for(int Col = 0; Col < 24; Col++) {
-    /* Get ID and Component associated with the Col'th local equation. It should
-    be noted that Local_Eq_Num_To_Node is stored in Row major order and that its
-    dimensions are 24 x 2. Therefore, the ID for the Colth Node is at
-    2*Col while the component is at 2*Col + 1 */
-    const unsigned Node_A_ID        = Local_Eq_Num_To_Node[Col*2 + 0];
-    const unsigned Node_A_Component = Local_Eq_Num_To_Node[Col*2 + 1];
-
-    for(int Row = Col; Row < 24; Row++) {
-      /* Get ID and Component associated with the Row'th local equation. */
-      const unsigned Node_B_ID        = Local_Eq_Num_To_Node[Row*2 + 0];
-      const unsigned Node_B_Component = Local_Eq_Num_To_Node[Row*2 + 1];
-
-      // Populate Ke
-      Ke(Row, Col) = F(Node_A_ID, Node_A_Component, Node_B_ID, Node_B_Component);
-    } // for(int Row = Col; Row < 24; Row++) {
-  } // for(int Col = 0; Col < 24; Col++) {
-
-  // Now populate the Upper triangular elements of Ke
-  for(int Col = 1; Col < 24; Col++)
-    for(int Row = 0; Row < Col; Row++)
-      Ke(Row, Col) = Ke(Col, Row);
 
   // Ke has now been set
   Ke_Set_Up = true;
@@ -217,7 +216,63 @@ Errors Element::Populate_Ke(void) {
 
 
 
+Errors Element::Fill_Ke_With_1s(void) {
+  /* Function description:
+  This function is used for testing purposes. It sets every element of Ke to 1.
+  Once this has been done, Ke can be mapped to K. This is used to test that
+  the assembly proceedure is working correctly */
+
+  /* Assumption 1:
+  This function assumes that this Element has been set up. More specificially,
+  this function assumes that the node list has been set, and that
+  Local_Eq_Num_To_Node has been set up.
+
+  This function also assumes that the Element class has been set up. More
+  specitically, this function assumes that the F (integrating function) has
+  been set.
+
+  Importantly, however, the Element can not be set up until the static members
+  are set. Therefore, if the Element is set up then both assumptions must be
+  valid. */
+  if(Element_Set_Up == false)
+    return ELEMENT_NOT_SET_UP;
+
+  /* Assumption 2:
+  This function also assumes that Ke has not been set already. */
+  if(Ke_Set_Up == true)
+    return KE_ALREADY_SET_UP;
+
+  // Fill Ke's with 1's
+  for(int i = 0; i < 24; i++)
+    for(int j = 0; j < 24; j++)
+      Ke(i,j) = 1;
+
+  // Ke has now been set
+  Ke_Set_Up = true;
+
+  #if defined(ELEMENT_MONITOR)
+    printf("Element stiffness matrix:\n");
+    for(int i = 0; i < 24; i++) {
+      printf("| ");
+
+      for(int j = 0; j < 24; j++)
+        printf("%6.2lf ", Ke(i,j));
+
+      printf("|\n");
+    } // for(int i = 0; i < 24, i++) {
+  #endif
+
+  return SUCCESS;
+} // Errors Element::Fill_Ke_With_1s(void) {
+
+
+
+
 Errors Element::Move_Ke_To_K(void) const {
+  /* Function description:
+  This fucntion is used to map the element stiffness matrix, Ke, to the global
+  stiffness matrix, K. */
+
   /* Assumption 1:
   This function assumes that the element stiffness matrix, Ke, has been set.
 
@@ -272,33 +327,15 @@ Errors Element::Move_Ke_To_K(void) const {
 
 
 
-// Get Node ID
-Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
-  /* Assumption 1:
-  This function assumes that this element has been set up. If it hasn't then
-  there is no node ID to report.*/
-  if(Element_Set_Up == false)
-    return ELEMENT_NOT_SET_UP;
-
-  /* Assumption 2:
-  This function also assumes that the requested index is within the bounds of
-  the node List. This means that i = 0,1,2... 7*/
-  if(i >= 8)
-    return NODE_ID_INDEX_OUT_OF_BOUNDS;
-
-  ID_Out = Node_List[i];
-
-  return SUCCESS;
-} // Errors Element::Node_ID(const unsigned i, unsigned & ID_Out) const {
-
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr) {
+  /* Function description:
+  This function is used to set the static members for the Element class. */
+
   /* Assumption 1:
   This function is used to set up the Element class. We really only want to be
   able to do this once. (doing so multiple times would lead to disaster).
@@ -309,14 +346,13 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
 
   // Set Static members
   Element::ID = ID_Ptr;
-  Element::F = Integrating_Function;
   Element::K = K_Ptr;
 
   // Static members are now set.
   Element::Static_Members_Set = true;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned)) {
+} // Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr) {
 
 
 

@@ -13,7 +13,6 @@ private:
   static bool Static_Members_Set;                                    // True if the static members have been set
   static Matrix<unsigned> * ID;                                      // Points to the ID Matrix
   static Matrix<double> * K;                                         // Points to the global stiffness matrix
-  static double (*F)(unsigned, unsigned, unsigned, unsigned);        // Given Node/component, this Calculates an element of Ke
   const static unsigned FIXED_COMPONENT = -1;                        // Used to indicate that a particular component of a node's displacement is fixed
 
 
@@ -68,20 +67,14 @@ public:
   /* Populate Ke.
   This function populates the Ke matrix for this Element */
   Element_Errors::Errors Populate_Ke(void);
+  Element_Errors::Errors Fill_Ke_With_1s(void);                                // A function to test the assembly procedure
 
   /* Move Ke into K */
   Element_Errors::Errors Move_Ke_To_K(void) const;
 
-  /* Move Ke into K */
-
-  // Sets ID_Out to the ID of the ith Node in the Node list
-  Element_Errors::Errors Node_ID(const unsigned i,                             // Intent: Read
-                                 unsigned & ID_Out) const;                     // Intent: Write
-
 
   friend Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,    // Intent: Read
-                                                           Matrix<double> * K_Ptr,       // Intent: Read
-                                                           double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));   // Intent: Read
+                                                           Matrix<double> * K_Ptr);      // Intent: Read
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -102,7 +95,6 @@ public:
 }; // class Element {
 
 Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,   // Intent: Read
-                                                  Matrix<double> * K_Ptr,      // Intent: Read
-                                                  double (*Integrating_Function)(unsigned, unsigned, unsigned, unsigned));  // Intent: Read
+                                                  Matrix<double> * K_Ptr);     // Intent: Read
 
 #endif

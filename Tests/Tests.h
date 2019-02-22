@@ -17,7 +17,6 @@ namespace Test {
 
 
 namespace Simulation {
-  double F(unsigned, unsigned, unsigned, unsigned);
   void Print_K_To_File(const Matrix<double> & K);
 } // namespace Simulation {
 

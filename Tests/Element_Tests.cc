@@ -12,11 +12,6 @@ void Test::Element(void) {
   //////////////////////////////////////////////////////////////////////////////
   // Let's check that the "ELEMENT_NOT_SET_UP" Error is handled correctly
 
-  printf("Trying to get Node ID\n");
-  unsigned ID_Out = 0;
-  El_Err = El[0].Node_ID(3, ID_Out);
-  Element_Errors::Handle_Error(El_Err);
-
   printf("\nTrying to set nodes\n");
   El_Err = El[1].Set_Nodes(0,1,2,3,4,5,6,7);
   Element_Errors::Handle_Error(El_Err);
@@ -98,7 +93,7 @@ void Test::Element(void) {
 
   // We are now ready to set the static members of the Element class
   printf("Setting static members of the Element class\n");
-  Set_Element_Static_Members(&ID, &K, Simulation::F);
+  Set_Element_Static_Members(&ID, &K);
 
   // Now, create an array of elements.
   class Element Elements[(Nx-1)*(Ny-1)*(Nz-1)];
@@ -118,7 +113,7 @@ void Test::Element(void) {
                                                            i + Nx*(j+1) + Nx*Ny*(k+1),
                                                            i+1 + Nx*(j+1) + Nx*Ny*(k+1));
 
-        Elements[i + (Nx-1)*j + (Nx-1)*(Ny-1)*k].Populate_Ke();
+        Elements[i + (Nx-1)*j + (Nx-1)*(Ny-1)*k].Fill_Ke_With_1s();
         Elements[i + (Nx-1)*j + (Nx-1)*(Ny-1)*k].Move_Ke_To_K();
       } // for(int k = 0; k < Nz-1; k++) {
     } // for(int j = 0; j < Ny-1; j++) {
@@ -127,12 +122,6 @@ void Test::Element(void) {
   // In theory, K should now be set. Let's check. Print K to a file
   Simulation::Print_K_To_File(K);
 } // void Test::Element(void) {
-
-
-
-double Simulation::F(unsigned Na, unsigned ei, unsigned Nb, unsigned ej) {
-  return 1.0;
-} // double Simulation::F(unsigned Na, unsigned ei, unsigned Nb, unsigned ej) {
 
 
 
