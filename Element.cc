@@ -3,7 +3,7 @@
 
 #include "Element.h"
 #include <stdio.h>
-#define ELEMENT_MONITOR
+//#define ELEMENT_MONITOR
 
 using namespace Element_Errors;
 
@@ -178,15 +178,7 @@ Errors Element::Populate_Ke(void) {
   /* Assumption 2:
   This function assumes that this Element has been set up. More specificially,
   this function assumes that the node list has been set, and that
-  Local_Eq_Num_To_Node has been set up.
-
-  This function also assumes that the Element class has been set up. More
-  specitically, this function assumes that the F (integrating function) has
-  been set.
-
-  Importantly, however, the Element can not be set up until the static members
-  are set. Therefore, if the Element is set up then both assumptions must be
-  valid. */
+  Local_Eq_Num_To_Node has been set up. */
   if(Element_Set_Up == false)
     return ELEMENT_NOT_SET_UP;
 
@@ -225,15 +217,7 @@ Errors Element::Fill_Ke_With_1s(void) {
   /* Assumption 1:
   This function assumes that this Element has been set up. More specificially,
   this function assumes that the node list has been set, and that
-  Local_Eq_Num_To_Node has been set up.
-
-  This function also assumes that the Element class has been set up. More
-  specitically, this function assumes that the F (integrating function) has
-  been set.
-
-  Importantly, however, the Element can not be set up until the static members
-  are set. Therefore, if the Element is set up then both assumptions must be
-  valid. */
+  Local_Eq_Num_To_Node has been set up. */
   if(Element_Set_Up == false)
     return ELEMENT_NOT_SET_UP;
 

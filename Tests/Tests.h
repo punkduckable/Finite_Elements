@@ -12,6 +12,7 @@ namespace Test {
 
   void Matrix_Tests(void);
 
+  void Element_Errors(void);
   void Element(void);
 } // namespace Test
 
