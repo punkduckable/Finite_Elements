@@ -13,7 +13,12 @@ private:
   static bool Static_Members_Set;                                    // True if the static members have been set
   static Matrix<unsigned> * ID;                                      // Points to the ID Matrix
   static Matrix<double> * K;                                         // Points to the global stiffness matrix
+  static Matrix<double> Na;                                          // Value of each shape function at each integrating point
+  static Matrix<double> Na_Xi;                                       // Zeta-partial of each shape function at each integrating point
+  static Matrix<double> Na_Eta;                                      // Eta-partial of each shape function at each integrating point
+  static Matrix<double> Na_Zeta;                                     // Zeta-partial of each shape function at each integrating point
   const static unsigned FIXED_COMPONENT = -1;                        // Used to indicate that a particular component of a node's displacement is fixed
+
 
 
   //////////////////////////////////////////////////////////////////////////////

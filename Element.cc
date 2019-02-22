@@ -8,11 +8,15 @@
 using namespace Element_Errors;
 
 ////////////////////////////////////////////////////////////////////////////////
-// Set Elements static members
+// Declare Elements static members
 
 bool Element::Static_Members_Set = false;
 Matrix<unsigned> * Element::ID;
 Matrix<double> * Element::K;
+Matrix<double> Na      = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Na_Xi   = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Na_Eta  = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Na_Zeta = Matrix<double>(8, 8, Memory::ROW_MAJOR);
 
 
 
@@ -318,7 +322,9 @@ Errors Element::Move_Ke_To_K(void) const {
 
 Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr) {
   /* Function description:
-  This function is used to set the static members for the Element class. */
+  This function is used to set the static members for the Element class. This
+  function also calculates the value of the shape functions (for the master
+  element) along with their partial derivatives at each integration point. */
 
   /* Assumption 1:
   This function is used to set up the Element class. We really only want to be
@@ -328,9 +334,93 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
   if(Element::Static_Members_Set == true)
     return STATIC_MEMBERS_ALREADY_SET;
 
+  //////////////////////////////////////////////////////////////////////////////
   // Set Static members
   Element::ID = ID_Ptr;
   Element::K = K_Ptr;
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Set up Na, Na_xi, Na_eta, Na_zeta
+
+  /* First, let's set up node positions in the master element. This is just an
+  implementation of the table on page 124 of Hughes' book. The ordering of
+  these coordinates is very important since the ordering of the nodes is
+  very important.  */
+  double Xi_a[8]   = {-1,  1,  1, -1, -1,  1,  1, -1};
+  double Eta_a[8]  = {-1, -1,  1,  1, -1, -1,  1,  1};
+  double Zeta_a[8] = {-1, -1, -1, -1,  1,  1,  1,  1};
+
+  /* Next, set up the integration points. It should be noted that the order of
+  these points is irrelivent.
+
+  Column X1 = Xi coordinate, Column 2 = Eta coordinate, Column 3 = Zeta coordinate */
+  double Xi_Int[8];
+  double Eta_Int[8];
+  double Zeta_Int[8];
+  for(int i = 0; i < 8; i++) {
+    Xi_Int[i]   = 0.57735026919*Xi_a[i];
+    Eta_Int[i]  = 0.57735026919*Eta_a[i];
+    Zeta_Int[i] = 0.57735026919*Zeta_a[i];
+  } // for(int i = 0; i < 8; i++) {
+
+  /* Now, calculate Na, Na_Xi, Na_Eta, and Na_Zeta at each integration point for
+  each node */
+  for(int Node = 0; Node < 8; Node++) {
+    for(int Point = 0; Point < 8; Point++) {
+      Na(Node, Point)      = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
+                                     (1. + Eta_a[Node]*Eta_Int[Point])*
+                                     (1. + Zeta_a[Node]*Zeta_Int[Point]);
+
+      Na_Xi(Node, Point)   = (1./8.)*(Xi_a[Node])*
+                                     (1. + Eta_a[Node]*Eta_Int[Point])*
+                                     (1. + Zeta_a[Node]*Zeta_Int[Point]);
+
+      Na_Eta(Node, Point)  = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
+                                     (Eta_a[Node])*
+                                     (1. + Zeta_a[Node]*Zeta_Int[Point]);
+
+      Na_Zeta(Node, Point) = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
+                                     (1. + Eta_a[Node]*Eta_Int[Point])*
+                                     (Zeta_a[Node]);
+    } // for(int Point = 0; Point < 8; Point++) {
+  } // for(int Node = 0; Node < 8; Node++) {
+
+  #if defined(ELEMENT_MONITOR)
+    printf("Integration points:\n");
+    for(int i = 0; i < 8; i++)
+      printf("| %6.3lf %6.3lf %6.3lf |\n", Xi_Int[i], Eta_Int[i], Zeta_Int[i]);
+
+    printf("\nNa:\n");
+    for(int i = 0; i < 8; i++) {
+      printf("| ");
+      for(int j = 0; j < 8; j++) printf("%6.3lf ", Na(i,j));
+      printf("|\n");
+    } // for(int i = 0; i < 8; i++) {
+
+    printf("\nNa_Xi:\n");
+    for(int i = 0; i < 8; i++) {
+      printf("| ");
+      for(int j = 0; j < 8; j++) printf("%6.3lf ", Na_Xi(i,j));
+      printf("|\n");
+    } // for(int i = 0; i < 8; i++) {
+
+    printf("\nNa_Eta:\n");
+    for(int i = 0; i < 8; i++) {
+      printf("| ");
+      for(int j = 0; j < 8; j++)
+        printf("%6.3lf ", Na_Eta(i,j));
+      printf("|\n");
+    } // for(int i = 0; i < 8; i++) {
+
+    printf("\nNa_Zeta:\n");
+    for(int i = 0; i < 8; i++) {
+      printf("| ");
+      for(int j = 0; j < 8; j++) printf("%6.3lf ", Na_Zeta(i,j));
+      printf("|\n");
+    } // for(int i = 0; i < 8; i++) {
+  #endif
+
 
   // Static members are now set.
   Element::Static_Members_Set = true;
