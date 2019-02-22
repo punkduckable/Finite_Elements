@@ -3,7 +3,7 @@
 
 #include "Element.h"
 #include <stdio.h>
-//#define ELEMENT_MONITOR
+#define ELEMENT_MONITOR
 
 using namespace Element_Errors;
 
@@ -13,10 +13,11 @@ using namespace Element_Errors;
 bool Element::Static_Members_Set = false;
 Matrix<unsigned> * Element::ID;
 Matrix<double> * Element::K;
-Matrix<double> Na      = Matrix<double>(8, 8, Memory::ROW_MAJOR);
-Matrix<double> Na_Xi   = Matrix<double>(8, 8, Memory::ROW_MAJOR);
-Matrix<double> Na_Eta  = Matrix<double>(8, 8, Memory::ROW_MAJOR);
-Matrix<double> Na_Zeta = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Node * Element::Nodes;
+Matrix<double> Element::Na      = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Element::Na_Xi   = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Element::Na_Eta  = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Element::Na_Zeta = Matrix<double>(8, 8, Memory::ROW_MAJOR);
 
 
 
@@ -94,17 +95,21 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Set up Local_Eq_Num_To_Node, Local_Eq_Num_To_Global_Eq_Num
+  // Set up Local_Eq_Num_To_Global_Eq_Num, Xa, Ya, and Za
 
   unsigned Eq_Num = 0;
   for(int Node = 0; Node < 8; Node++) {
+    // First, set the X, Y, and Z components of this node's position.
+    Xa[Node] = Nodes[Node_List[Node]].Position(0);
+    Ya[Node] = Nodes[Node_List[Node]].Position(1);
+    Za[Node] = Nodes[Node_List[Node]].Position(2);
+
+    // Now, get the Global node number
     const unsigned Global_Node_Number = Node_List[Node];
 
+    /* Cycle through the components, check which ones are free/which ones are
+    fixed using the ID array. Store this information in Local_Eq_Num_To_Global_Eq_Num */
     for(int Component = 0; Component < 3; Component++) {
-      // Set Local_Eq_Num_To_Node
-      Local_Eq_Num_To_Node[0 + Eq_Num*2] = Global_Node_Number;
-      Local_Eq_Num_To_Node[1 + Eq_Num*2] = Component;
-
       /* If a particular component of a node's position is fixed then there is
       no global equation for that component. Therefore, we don't want to map the
       corresponding component of Ke to K.
@@ -137,8 +142,26 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
     printf("Node list: ");
     for(int i = 0; i < 8; i++)
       printf("%u ", Node_List[i]);
-
     printf("\n");
+
+
+
+    printf("Node Positions:\n");
+    printf("Xa = | ");
+    for(int i = 0; i < 8; i++)
+      printf("%6.3lf ", Xa[i]);
+    printf("|\n");
+
+    printf("Ya = | ");
+    for(int i = 0; i < 8; i++)
+      printf("%6.3lf ", Ya[i]);
+    printf("|\n");
+
+    printf("Za = | ");
+    for(int i = 0; i < 8; i++)
+      printf("%6.3lf ", Za[i]);
+    printf("|\n");
+
 
 
     printf("Local_Eq_Num_To_Global_Eq_Num: ");
@@ -147,18 +170,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
       integers, I print it as an array of signed integers so that FIXED_COMPONENT
       shows up as -1 and not some nonsense large number. */
       printf("%d ", Local_Eq_Num_To_Global_Eq_Num[i]);
-
     printf("\n");
-
-
-    printf("Local_Eq_Num_To_Node:\n");
-    for(int j = 0; j < 2; j++) {
-      printf("| ");
-      for(int i = 0; i < 24; i++)
-        printf("%3u ", Local_Eq_Num_To_Node[i*2 + j]);
-
-      printf("|\n");
-    } // for(int j = 0; j < 24; j++) {
   #endif
 
   return SUCCESS;
@@ -181,8 +193,7 @@ Errors Element::Populate_Ke(void) {
 
   /* Assumption 2:
   This function assumes that this Element has been set up. More specificially,
-  this function assumes that the node list has been set, and that
-  Local_Eq_Num_To_Node has been set up. */
+  this function assumes that the node list and node positions have been set. */
   if(Element_Set_Up == false)
     return ELEMENT_NOT_SET_UP;
 
@@ -220,8 +231,7 @@ Errors Element::Fill_Ke_With_1s(void) {
 
   /* Assumption 1:
   This function assumes that this Element has been set up. More specificially,
-  this function assumes that the node list has been set, and that
-  Local_Eq_Num_To_Node has been set up. */
+  this function assumes that the node list has been set. */
   if(Element_Set_Up == false)
     return ELEMENT_NOT_SET_UP;
 
@@ -320,7 +330,7 @@ Errors Element::Move_Ke_To_K(void) const {
 ////////////////////////////////////////////////////////////////////////////////
 // Friend functions
 
-Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr) {
+Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, Node * Nodes_Ptr) {
   /* Function description:
   This function is used to set the static members for the Element class. This
   function also calculates the value of the shape functions (for the master
@@ -338,6 +348,7 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
   // Set Static members
   Element::ID = ID_Ptr;
   Element::K = K_Ptr;
+  Element::Nodes = Nodes_Ptr;
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -368,21 +379,21 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
   each node */
   for(int Node = 0; Node < 8; Node++) {
     for(int Point = 0; Point < 8; Point++) {
-      Na(Node, Point)      = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
-                                     (1. + Eta_a[Node]*Eta_Int[Point])*
-                                     (1. + Zeta_a[Node]*Zeta_Int[Point]);
+      Element::Na(Node, Point)      = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
+                                              (1. + Eta_a[Node]*Eta_Int[Point])*
+                                              (1. + Zeta_a[Node]*Zeta_Int[Point]);
 
-      Na_Xi(Node, Point)   = (1./8.)*(Xi_a[Node])*
-                                     (1. + Eta_a[Node]*Eta_Int[Point])*
-                                     (1. + Zeta_a[Node]*Zeta_Int[Point]);
+      Element::Na_Xi(Node, Point)   = (1./8.)*(Xi_a[Node])*
+                                              (1. + Eta_a[Node]*Eta_Int[Point])*
+                                              (1. + Zeta_a[Node]*Zeta_Int[Point]);
 
-      Na_Eta(Node, Point)  = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
-                                     (Eta_a[Node])*
-                                     (1. + Zeta_a[Node]*Zeta_Int[Point]);
+      Element::Na_Eta(Node, Point)  = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
+                                              (Eta_a[Node])*
+                                              (1. + Zeta_a[Node]*Zeta_Int[Point]);
 
-      Na_Zeta(Node, Point) = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
-                                     (1. + Eta_a[Node]*Eta_Int[Point])*
-                                     (Zeta_a[Node]);
+      Element::Na_Zeta(Node, Point) = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
+                                              (1. + Eta_a[Node]*Eta_Int[Point])*
+                                              (Zeta_a[Node]);
     } // for(int Point = 0; Point < 8; Point++) {
   } // for(int Node = 0; Node < 8; Node++) {
 
@@ -391,32 +402,40 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
     for(int i = 0; i < 8; i++)
       printf("| %6.3lf %6.3lf %6.3lf |\n", Xi_Int[i], Eta_Int[i], Zeta_Int[i]);
 
+
+
     printf("\nNa:\n");
     for(int i = 0; i < 8; i++) {
       printf("| ");
-      for(int j = 0; j < 8; j++) printf("%6.3lf ", Na(i,j));
+      for(int j = 0; j < 8; j++) printf("%6.3lf ", Element::Na(i,j));
       printf("|\n");
     } // for(int i = 0; i < 8; i++) {
+
+
 
     printf("\nNa_Xi:\n");
     for(int i = 0; i < 8; i++) {
       printf("| ");
-      for(int j = 0; j < 8; j++) printf("%6.3lf ", Na_Xi(i,j));
+      for(int j = 0; j < 8; j++) printf("%6.3lf ", Element::Na_Xi(i,j));
       printf("|\n");
     } // for(int i = 0; i < 8; i++) {
+
+
 
     printf("\nNa_Eta:\n");
     for(int i = 0; i < 8; i++) {
       printf("| ");
       for(int j = 0; j < 8; j++)
-        printf("%6.3lf ", Na_Eta(i,j));
+        printf("%6.3lf ", Element::Na_Eta(i,j));
       printf("|\n");
     } // for(int i = 0; i < 8; i++) {
+
+
 
     printf("\nNa_Zeta:\n");
     for(int i = 0; i < 8; i++) {
       printf("| ");
-      for(int j = 0; j < 8; j++) printf("%6.3lf ", Na_Zeta(i,j));
+      for(int j = 0; j < 8; j++) printf("%6.3lf ", Element::Na_Zeta(i,j));
       printf("|\n");
     } // for(int i = 0; i < 8; i++) {
   #endif
@@ -426,7 +445,7 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
   Element::Static_Members_Set = true;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr) {
+} // Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, Node * Nodes_Ptr) {
 
 
 

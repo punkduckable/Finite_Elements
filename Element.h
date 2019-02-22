@@ -10,14 +10,15 @@ class Element {
 private:
   //////////////////////////////////////////////////////////////////////////////
   // Static members
-  static bool Static_Members_Set;                                    // True if the static members have been set
-  static Matrix<unsigned> * ID;                                      // Points to the ID Matrix
-  static Matrix<double> * K;                                         // Points to the global stiffness matrix
-  static Matrix<double> Na;                                          // Value of each shape function at each integrating point
-  static Matrix<double> Na_Xi;                                       // Zeta-partial of each shape function at each integrating point
-  static Matrix<double> Na_Eta;                                      // Eta-partial of each shape function at each integrating point
-  static Matrix<double> Na_Zeta;                                     // Zeta-partial of each shape function at each integrating point
-  const static unsigned FIXED_COMPONENT = -1;                        // Used to indicate that a particular component of a node's displacement is fixed
+  static bool Static_Members_Set;                // True if the static members have been set
+  static Matrix<unsigned> * ID;                  // Points to the ID Matrix
+  static Matrix<double> * K;                     // Points to the global stiffness matrix
+  static Node * Nodes;                           // Points to the array of nodes.
+  static Matrix<double> Na;                      // Value of each shape function at each integrating point
+  static Matrix<double> Na_Xi;                   // Zeta-partial of each shape function at each integrating point
+  static Matrix<double> Na_Eta;                  // Eta-partial of each shape function at each integrating point
+  static Matrix<double> Na_Zeta;                 // Zeta-partial of each shape function at each integrating point
+  const static unsigned FIXED_COMPONENT = -1;    // Used to indicate that a particular component of a node's displacement is fixed
 
 
 
@@ -28,13 +29,16 @@ private:
   bool Element_Set_Up = false;
   bool Ke_Set_Up = false;
 
-  // The Global node numbers for the nodes associated with this Element.
-  unsigned int Node_List[8];
+  // Node information
+  unsigned int Node_List[8];                     // Global node numbers for the nodes associated with this Element.
+  double Xa[8];                                  // X spatial coordinate of each Node
+  double Ya[8];                                  // Y spatial coordinate of each Node
+  double Za[8];                                  // Z spatial coordinate of each Node
 
-  /* Assembly arrays. Local_Eq_Num_To_Node is used to construct Ke while
+
+  /* Assembly array.
   Local_Eq_Num_To_Global_Eq_Num is used to map Ke into K. */
-  unsigned Local_Eq_Num_To_Node[24*2];                     // Stores the global node # and component associated with each local equation
-  unsigned Local_Eq_Num_To_Global_Eq_Num[24];              // Stores the global equation # associated with each local eqiation
+  unsigned Local_Eq_Num_To_Global_Eq_Num[24];    // Stores the global equation # associated with each local eqiation
 
   // Local element stiffness matrix;
   Matrix<double> Ke = Matrix<double>(24, 24, Memory::COLUMN_MAJOR);
@@ -55,11 +59,8 @@ public:
 
   /* Set nodes.
 
-  This function sets Num_Local_Eq and allocates Local_Eq_Num_To_Node,
-  Local_Eq_Num_To_Global_Eq_Num, and Ke.
-
-  Local_Eq_Num_To_Node and Local_Eq_Num_To_Global_Eq_Num are set after being
-  allocated. */
+  This function sets Num_Local_Eq, Local_Eq_Num_To_Global_Eq_Num, and the
+  node position arrays (Xa, Ya, Za). */
   Element_Errors::Errors Set_Nodes(const unsigned Node0_ID,                    // Intent: Read
                                    const unsigned Node1_ID,                    // Intent: Read
                                    const unsigned Node2_ID,                    // Intent: Read
@@ -79,7 +80,8 @@ public:
 
 
   friend Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,    // Intent: Read
-                                                           Matrix<double> * K_Ptr);      // Intent: Read
+                                                           Matrix<double> * K_Ptr,       // Intend: Read
+                                                           Node * Nodes_Ptr);            // Intent: Read
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -100,6 +102,7 @@ public:
 }; // class Element {
 
 Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,   // Intent: Read
-                                                  Matrix<double> * K_Ptr);     // Intent: Read
+                                                  Matrix<double> * K_Ptr,      // Intent: Read
+                                                  Node * Nodes_Ptr);           // Intent: Read
 
 #endif

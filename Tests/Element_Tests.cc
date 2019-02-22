@@ -99,11 +99,11 @@ void Test::Element_Errors(void) {
 
   // We are now ready to set the static members of the Element class
   printf("\nSetting static members of the Element class\n");
-  El_Err = Set_Element_Static_Members(&ID, &K);
+  El_Err = Set_Element_Static_Members(&ID, &K, Nodes);
   Element_Errors::Handle_Error(El_Err);
 
   printf("Attempting to set the static members a second time\n");
-  El_Err = Set_Element_Static_Members(&ID, &K);
+  El_Err = Set_Element_Static_Members(&ID, &K, Nodes);
   Element_Errors::Handle_Error(El_Err);
 
   // Now, create an array of elements.
@@ -282,7 +282,7 @@ void Test::Element(void) {
   // Make some elements
 
   // Set up the element class
-  Set_Element_Static_Members(&ID, &K);
+  Set_Element_Static_Members(&ID, &K, Nodes);
 
   // Create some elements
   const unsigned Num_Elements = (Nx-1)*(Ny-1)*(Nz-1);
