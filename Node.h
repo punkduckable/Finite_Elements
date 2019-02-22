@@ -10,8 +10,7 @@ friend class Element;
 
 private:
   // Core members of the Node class
-  Array_3<double> Original_Position;        // Material position of the node    Units : M
-  Array_3<double> Current_Position;         // Spatial position of the node     Units : M
+  Array_3<double> Position;                 // Spatial position of the node     Units : M
   Array_3<bool> Fixed_Pos;                  // if Fixed_Pos[i] is true then the ith component of the original position is fixed/cannot be updated (prescribed position BC).
 
   /* this is a flag that prevents the Fixed_Pos and Origional position variables
@@ -37,8 +36,8 @@ public:
                                       const double New_Position);              // Intent: Read
 
   // Set internal variables
-  Node_Errors::Errors Set_Original_Position(const Array_3<double> Original_Position_In,                                // Intent: Read
-                                            const Array_3<bool> Fixed_Pos_In = Array_3<bool>(false, false, false));    // Intent: Read
+  Node_Errors::Errors Set_Position(const Array_3<double> Original_Position_In,                               // Intent: Read
+                                   const Array_3<bool> Fixed_Pos_In = Array_3<bool>(false, false, false));   // Intent: Read
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -46,8 +45,7 @@ public:
 
   Node_Errors::Errors Get_Is_Fixed(const unsigned index,                       // Intent: Read
                                    bool & Fixed_Pos_Out ) const;               // Intent: Write
-  Node_Errors::Errors Get_Original_Position( Array_3<double> & Original_Position_Out ) const;      // Intent: Write
-  Node_Errors::Errors Get_Current_Position( Array_3<double> & Current_Position_Out ) const;        // Intent: Write
+  Node_Errors::Errors Get_Position( Array_3<double> & Current_Position_Out ) const;      // Intent: Write
 
   //////////////////////////////////////////////////////////////////////////////
   // Other public methods

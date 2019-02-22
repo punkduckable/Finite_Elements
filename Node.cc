@@ -32,13 +32,13 @@ Errors Node::Update_Position(const unsigned component, const double New_Position
   } // if(Fixed_Pos[component] == true) {
 
   // If if all of the assumptions have been satisified then update the current position
-  Current_Position[component] = New_Position;
+  Position[component] = New_Position;
   return SUCCESS;
 } // Errors Node::Update_Position(const unsigned component, const double New_Position) {
 
 
 
-Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In, const Array_3<bool> Fixed_Pos_In) {
+Errors Node::Set_Position(const Array_3<double> Position_In, const Array_3<bool> Fixed_Pos_In) {
   /* Assumption 1:
 
   This function assumes that the node has not been set up already. */
@@ -46,7 +46,7 @@ Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In, c
     return NODE_ALREADY_SET_UP;
 
   // Set the Original Position using the passed Array
-  Original_Position = Original_Position_In;
+  Position = Position_In;
 
   // Set the Fixed Position array using the passed array
   Fixed_Pos = Fixed_Pos_In;
@@ -54,11 +54,8 @@ Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In, c
   // Original Position has been set
   Node_Set_Up = true;
 
-  // Now, set the Current position to the original position
-  Current_Position = Original_Position;
-
   return SUCCESS;
-} // Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In, const Array_3<bool> Fixed_Pos_In) {
+} // Errors Node::Set_Original_Position(const Array_3<double> Position_In, const Array_3<bool> Fixed_Pos_In) {
 
 
 
@@ -85,7 +82,7 @@ Errors Node::Get_Is_Fixed(const unsigned index, bool & Is_Fixed_Out) const {
 
 
 
-Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) const {
+Errors Node::Get_Position(Array_3<double> & Position_Out) const {
   /* Assumption 1:
 
   This function assumes that this node has already been set up. If it hasn't,
@@ -93,28 +90,12 @@ Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) cons
   if(Node_Set_Up == false)
     return NODE_NOT_SET_UP;
 
-  // Copy original position to Orig_Pos_Out variable
-  Original_Position_Out = Original_Position;
+  // Copy position to Pos_Out variable
+  Position_Out = Position;
 
   return SUCCESS;
-} // Errors Node::Get_Original_Position(Array_3<double> & Orig_Position_Out) const {
+} // Errors Node::Get_Original_Position(Array_3<double> & Position_Out) const {
 
-
-
-
-Errors Node::Get_Current_Position(Array_3<double> & Current_Position_Out) const {
-  /* Assumption 1:
-
-  This function assumes that this node has already been set up. IF it hasn't,
-  then there's no current position to report. */
-  if(Node_Set_Up == false)
-    return NODE_NOT_SET_UP;
-
-  // Copy original position to Orig_Pos_Out variable.
-  Current_Position_Out = Current_Position;
-
-  return SUCCESS;
-} // Errors Node::Get_Current_Position(Array_3<double> & Current_Position_Out) const {
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,9 +109,8 @@ Errors Node::Print(void) const {
   if(Node_Set_Up == false)
     return NODE_NOT_SET_UP;
 
-  printf(         "Original Position:            [%6.3lf, %6.3lf, %6.3lf]\n", Original_Position[0],  Original_Position[1], Original_Position[2]);
-  printf(         "Current Position :            [%6.3lf, %6.3lf, %6.3lf]\n", Current_Position[0] ,  Current_Position[1] , Current_Position[2] );
-  printf(         "Fixed_Pos        :            [");
+  printf(         "Position :          [%6.3lf, %6.3lf, %6.3lf]\n", Position[0],  Position[1], Position[2]);
+  printf(         "Fixed_Pos :         [");
     for(int i = 0; i < 3; i++) {
       // Print true if this component of the position is fixed, false otherwise
       if(Fixed_Pos[i] == true)

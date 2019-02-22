@@ -49,7 +49,7 @@ void Test::Element_Errors(void) {
   for(int i = 0; i < Nx; i++) {
     for(int j = 0; j < Ny; j++) {
       for(int k = 0; k < Nz; k++) {
-        Nodes[Node_Index].Set_Original_Position({IPS*i, IPS*j, IPS*k}, {false, false, false});
+        Nodes[Node_Index].Set_Position({IPS*i, IPS*j, IPS*k}, {false, false, false});
 
         /* Now cycle through the components of the current node. Use this info
         to populate ID. If the current component is not being used, fill that
@@ -229,9 +229,9 @@ void Test::Element(void) {
       for(int k = 0; k < Nz; k++) {
         // Set the Node's original position + BC's
         if(k == 0)
-          Nodes[Node_Index].Set_Original_Position({INS*i, INS*j, INS*k}, {false, false, false});
+          Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k}, {false, false, false});
         else
-          Nodes[Node_Index].Set_Original_Position({INS*i, INS*j, INS*k}, {false, false, false});
+          Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k}, {false, false, false});
 
         /* Now cycle through the components of the current node. Use this info
         to populate ID. If the current component is not being used, fill that

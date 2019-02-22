@@ -15,11 +15,4 @@ namespace Element_Errors {
   void Handle_Error(const Errors Error);
 } // namespace Element_Errors {
 
-
-
-namespace Simulation_Errors {
-  enum Errors{SUCCESS};
-  void Handle_Error(const Errors Error);
-} // namespace Simulation_Errors {
-
 #endif

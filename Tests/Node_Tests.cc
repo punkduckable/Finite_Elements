@@ -26,19 +26,15 @@ void Test::Node_Errors(void) {
   Er = Node.Get_Is_Fixed(3, Is_Fixed);
   Node_Errors::Handle_Error(Er);
 
-  printf("Trying to get Original position...\n");
+  printf("Trying to get position...\n");
   Array_3<double> Ar;
-  Er = Node.Get_Original_Position(Ar);
-  Node_Errors::Handle_Error(Er);
-
-  printf("Trying to get Current position...\n");
-  Er = Node.Get_Current_Position(Ar);
+  Er = Node.Get_Position(Ar);
   Node_Errors::Handle_Error(Er);
 
 
   // Set the Node's BC's, and original position
-  printf("Setting node Poisition, BC's: ");
-  Er = Node.Set_Original_Position({0,0,0},{false, true, false});
+  printf("\nSetting node position, BC's: ");
+  Er = Node.Set_Position({0,0,0},{false, true, false});
   Node_Errors::Handle_Error(Er);
 
   // Print out Node information
@@ -48,8 +44,8 @@ void Test::Node_Errors(void) {
 
 
   // Try setting BC's and Original Position again.
-  printf("Trying to set Original Position a second time...\n");
-  Er = Node.Set_Original_Position({1,2,3},{true, false, true});
+  printf("\nTrying to set Position a second time...\n");
+  Er = Node.Set_Position({1,2,3},{true, false, true});
   Node_Errors::Handle_Error(Er);
 
   // Print out current Node information
@@ -59,8 +55,8 @@ void Test::Node_Errors(void) {
 
 
 
-  // Modifiying current position
-  printf("Updating current position: ");
+  // Modifiying node position
+  printf("\nUpdating node position: ");
   Er = Node.Update_Position(0, 37);
   Node_Errors::Handle_Error(Er);
 
@@ -74,7 +70,7 @@ void Test::Node_Errors(void) {
   Node_Errors::Handle_Error(Er);
 
   // Try setting an out of bounds component of position
-  printf("Trying to set out of bounds component of position...\n");
+  printf("\nTrying to set out of bounds component of position...\n");
   Er = Node.Update_Position(3,37);
   Node_Errors::Handle_Error(Er);
 
@@ -88,7 +84,7 @@ void Test::Node_Errors(void) {
   Node.Print();
   printf("\n");
 
-  printf("Test complete\n");
+  printf("\nTest complete\n");
 } // void Test::Node_Errors(void) {
 
 
@@ -129,9 +125,9 @@ void Test::Node(void) {
         double y_pos = j*Intra_Nodal_Spacing;
 
         if(j == 0 )
-          Nodes[j + i*Ny + k*Nx*Ny].Set_Original_Position({x_pos, .5, z_pos}, {false, true, false});
+          Nodes[j + i*Ny + k*Nx*Ny].Set_Position({x_pos, .5, z_pos}, {false, true, false});
         else
-          Nodes[j + i*Ny + k*Nx*Ny].Set_Original_Position({x_pos, y_pos, z_pos});
+          Nodes[j + i*Ny + k*Nx*Ny].Set_Position({x_pos, y_pos, z_pos});
       } // for(int j = 0; j < Ny; j++) {
     } // for(int i = 0; i < Nx; i++) {
   } // for(int k = 0; k < Nz; k++) {
