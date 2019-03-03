@@ -43,6 +43,14 @@ private:
   // Local element stiffness matrix;
   Matrix<double> Ke = Matrix<double>(24, 24, Memory::COLUMN_MAJOR);
 
+
+  /* Calculate Coefficient matrix, Determinant.
+  This method is kept private since it us really only used by the Populate_Ke
+  method. This method calculates Coeff + J, allowing us to compute Na_x, Na_y,
+  and Na_z at each integration point in the Element. */
+  Element_Errors::Errors Calculate_Coefficient_Matrix(const unsigned Integration_Point_Index, // Intent: Read
+                                                      Matrix<double> & Coeff,  // Intent: Write
+                                                      double & J);             // Intent: Write
 public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor

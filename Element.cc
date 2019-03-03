@@ -69,15 +69,19 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   flipped to true. Therefore, if this flag is true then the assumption is
   satisified.  */
   if(Static_Members_Set == false) {
-    printf("Error in void Element::Set_Nodes!\n");
+    printf("Error in Element::Set_Nodes\n");
     return STATIC_MEMBERS_NOT_SET;
   } // if(Static_Members_Set == false) {
 
   /* Assumptions 3:
   This function also assumes that this specific element has not has its nodes
   set already. */
-  if(Element_Set_Up == true)
+  if(Element_Set_Up == true) {
+    printf("Error in Element::Set_Nodes\n");
     return ELEMENT_ALREADY_SET_UP;
+  } // if(Element_Set_Up == true) {
+
+  //////////////////////////////////////////////////////////////////////////////
 
 
   /* If we've made it this far then the Element class has been set up. We can
@@ -178,6 +182,86 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
 
 
+Errors Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> & Coeff, double & J) {
+  /* Function description:
+    This function calculates the coefficient matrix and jacobian determinant
+    for a specific integration point. */
+
+  /* Assumption 1:
+  This function assumes that "Point" is the index of an integration point.
+  Therefore, we assume that Point is in the set {0,1,2... 7}. Since Point
+  is unsigned, we only need to check if Point >= 8 to verrify this assumption */
+  if(Point >= 8) {
+    printf("Error in Element::Calculate_Coefficient_Matrix\n");
+    return INTEGRATION_POINT_INDEX_OUT_OF_BOUNDS;
+  } // if(Point >= 8) {
+
+  /* Assumption 2:
+  This function assumes that the spatial position of each Node is known. This
+  means that Xa, Ya, and Za have all been populated. This is done in the
+  "Set_Up_Element" method. Therefore, we can use the "Element_Set_Up" flag
+  to verrify this assumption */
+  if(Element_Set_Up == false) {
+    printf("Error in Element::Calculate_Coefficient_Matrix\n");
+    return ELEMENT_NOT_SET_UP;
+  } // if(Element_Set_Up == false) {
+
+  /* Assumption 3:
+  This function assumes that the Xi, Eta, and Zeta partial derivatives for
+  each shape function in the master element has been calculated. These
+  quantities are calculated by the "Set_Element_Static_Members" method.
+  Therefore, if the element class has been set up then this this assumption is
+  valid */
+  if(Static_Members_Set == false) {
+    printf("Error in Element::Calculate_Coefficient_Matrix\n");
+    return STATIC_MEMBERS_NOT_SET;
+  } // if(Static_Members_Set == false) {
+
+  //////////////////////////////////////////////////////////////////////////////
+
+  /* First, calculate the x, y, and z partials (with respect to Xi, Eta, and
+  Zeta) at the passed Integration point. */
+  double x_Xi = 0, x_Eta = 0, x_Zeta = 0;
+  double y_Xi = 0, y_Eta = 0, y_Zeta = 0;
+  double z_Xi = 0, z_Eta = 0, z_Zeta = 0;
+
+  for(int Node = 0; Node < 8; Node++) {
+    x_Xi   += Na_Xi  (Node, Point)*Xa[Node];
+    x_Eta  += Na_Eta (Node, Point)*Xa[Node];
+    x_Zeta += Na_Zeta(Node, Point)*Xa[Node];
+
+    y_Xi   += Na_Xi  (Node, Point)*Ya[Node];
+    y_Eta  += Na_Eta (Node, Point)*Ya[Node];
+    y_Zeta += Na_Zeta(Node, Point)*Ya[Node];
+
+    z_Xi   += Na_Xi  (Node, Point)*Za[Node];
+    z_Eta  += Na_Eta (Node, Point)*Za[Node];
+    z_Zeta += Na_Zeta(Node, Point)*Za[Node];
+  } // for(int Node = 0; Node < 8; Node++) {
+
+
+  /* Now, compute the components of the coefficient matrix. This is done using
+  the steps outlined on page 150 of Hughes' book. */
+  Coeff(1,1) = y_Eta*z_Zeta - y_Zeta*z_Eta;
+  Coeff(1,2) = y_Zeta*z_Xi  - y_Xi*z_Zeta;
+  Coeff(1,3) = y_Xi*z_Eta   - y_Eta*z_Xi;
+
+  Coeff(2,1) = z_Eta*x_Zeta - z_Zeta*x_Eta;
+  Coeff(2,2) = x_Xi*z_Zeta  - x_Zeta*z_Xi;
+  Coeff(2,3) = z_Xi*x_Eta   - z_Eta*x_Xi;
+
+  Coeff(3,1) = x_Eta*y_Zeta - x_Zeta*y_Eta;
+  Coeff(3,2) = x_Zeta*y_Xi  - x_Xi*y_Zeta;
+  Coeff(3,3) = x_Xi*y_Eta   - x_Eta*y_Xi;
+
+  /* Finally, calculate J (the jacobian determinant) */
+  J = x_Xi*Coeff(1,1) + x_Eta*Coeff(1,2) + x_Zeta*Coeff(1,3);
+
+  return SUCCESS;
+} // Errors Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> & Coeff, double & J) {
+
+
+
 Errors Element::Populate_Ke(void) {
   /* Function description:
   This method is used to populate Ke, the element stiffness matrix. Once
@@ -194,14 +278,19 @@ Errors Element::Populate_Ke(void) {
   /* Assumption 2:
   This function assumes that this Element has been set up. More specificially,
   this function assumes that the node list and node positions have been set. */
-  if(Element_Set_Up == false)
+  if(Element_Set_Up == false) {
+    printf("Error in Element::Populate_Ke\n");
     return ELEMENT_NOT_SET_UP;
+  } // if(Element_Set_Up == false) {
 
   /* Assumption 3:
   This function also assumes that Ke has not been set already. */
-  if(Ke_Set_Up == true)
+  if(Ke_Set_Up == true) {
+    printf("Error in Element::Populate_Ke\n");
     return KE_ALREADY_SET_UP;
+  } // if(Ke_Set_Up == true) {
 
+  //////////////////////////////////////////////////////////////////////////////
 
   // Ke has now been set
   Ke_Set_Up = true;
@@ -232,13 +321,19 @@ Errors Element::Fill_Ke_With_1s(void) {
   /* Assumption 1:
   This function assumes that this Element has been set up. More specificially,
   this function assumes that the node list has been set. */
-  if(Element_Set_Up == false)
+  if(Element_Set_Up == false) {
+    printf("Error in Element::Fill_Ke_With_1s\n");
     return ELEMENT_NOT_SET_UP;
+  } // if(Element_Set_Up == false) {
 
   /* Assumption 2:
   This function also assumes that Ke has not been set already. */
-  if(Ke_Set_Up == true)
+  if(Ke_Set_Up == true) {
+    printf("Error in Element::Fill_Ke_With_1s\n");
     return KE_ALREADY_SET_UP;
+  } // if(Ke_Set_Up == true) {
+
+  //////////////////////////////////////////////////////////////////////////////
 
   // Fill Ke's with 1's
   for(int i = 0; i < 24; i++)
@@ -279,8 +374,12 @@ Errors Element::Move_Ke_To_K(void) const {
 
   It is not possible, however, to set up Ke without having the Static members
   set. Therefore, if Ke is set then both assumptions must be satisified */
-  if(Ke_Set_Up == false)
+  if(Ke_Set_Up == false) {
+    printf("Error in Element::Move_Ke_To_K\n");
     return KE_NOT_SET_UP;
+  } // if(Ke_Set_Up == false) {
+
+
 
   /* First, move the diagional cells of Ke to K. We only move the components
   that correspond to a global equation. Recall that Ke has a row for each
@@ -341,8 +440,10 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
   able to do this once. (doing so multiple times would lead to disaster).
 
   If the Element static members have already been set then we return an error */
-  if(Element::Static_Members_Set == true)
+  if(Element::Static_Members_Set == true) {
+    printf("Error in Element::Set_Element_Static_Members\n");
     return STATIC_MEMBERS_ALREADY_SET;
+  } // if(Element::Static_Members_Set == true) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Set Static members
