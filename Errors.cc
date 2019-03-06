@@ -61,6 +61,16 @@ void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
 
 
 
+    case MATERIAL_NOT_SET:
+      printf("Element Error! The element material has not been set!\n");
+      break;
+
+    case MATERIAL_ALREADY_SET:
+      printf("Element Error! The element material has already been set!\n");
+      break;
+
+
+
     case ELEMENT_ALREADY_SET_UP:
       printf("Element Error! This element has already been set up! You can't set up an element twice!\n");
       break;

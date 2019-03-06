@@ -16,6 +16,7 @@ namespace Node_Errors {
 namespace Element_Errors {
   enum Errors{SUCCESS,
               STATIC_MEMBERS_NOT_SET, STATIC_MEMBERS_ALREADY_SET,
+              MATERIAL_NOT_SET, MATERIAL_ALREADY_SET, 
               ELEMENT_ALREADY_SET_UP, ELEMENT_NOT_SET_UP,
               KE_ALREADY_SET_UP, KE_NOT_SET_UP,
               NODE_ID_INDEX_OUT_OF_BOUNDS, INTEGRATION_POINT_INDEX_OUT_OF_BOUNDS};

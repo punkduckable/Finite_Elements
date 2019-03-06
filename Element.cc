@@ -10,16 +10,18 @@ using namespace Element_Errors;
 ////////////////////////////////////////////////////////////////////////////////
 // Declare Elements static members
 
-bool Element::Static_Members_Set = false;
+bool Element::Static_Members_Set  = false;
 Matrix<unsigned> * Element::ID;
 Matrix<double> * Element::K;
 Node * Element::Nodes;
-Matrix<double> Element::Na      = Matrix<double>(8, 8, Memory::ROW_MAJOR);
-Matrix<double> Element::Na_Xi   = Matrix<double>(8, 8, Memory::ROW_MAJOR);
-Matrix<double> Element::Na_Eta  = Matrix<double>(8, 8, Memory::ROW_MAJOR);
-Matrix<double> Element::Na_Zeta = Matrix<double>(8, 8, Memory::ROW_MAJOR);
 
+Matrix<double> Element::Na        = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Element::Na_Xi     = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Element::Na_Eta    = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Element::Na_Zeta   = Matrix<double>(8, 8, Memory::ROW_MAJOR);
 
+Matrix<double> Element::D         = Matrix<double>(6, 6, Memory::ROW_MAJOR);
+bool Element::Material_Set        = false;
 
 
 
@@ -547,6 +549,62 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
 
   return SUCCESS;
 } // Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, Node * Nodes_Ptr) {
+
+
+
+Errors Set_Element_Material(const double E, const double v) {
+  /* Function descrpition:
+  This function is designed to set up the D matrix for the element class. This
+  matrix is a reduced form of the Elasticity tensor C. D is constructed from C
+  using the symmetry of C. See my lecture notes section 2.7.4 for a proper
+  derivation of D (the book sucks at deriving D!). We construct D assuming that
+  the material is isotropic and homogeneous.
+
+  The input parameter E is the Young's modulus for the material
+  The input parameter v is the Poisson's ratio for the material */
+
+  /* Assumption 1:
+  We assume that the Element material has not already been set */
+  if(Element::Material_Set == true) {
+    printf("Error in Set_Element_Material\n");
+    return MATERIAL_ALREADY_SET;
+  } // if(Element::Material_Set == true) {
+
+  // First, let's calculate lambda and mu.
+  const double l = v*E/((1 + v)*(1 - 2*v));
+  const double m = E/(2*(1 + v));
+
+  /* Now let's populate D. To make this code easier to read, I decided to
+  first declare D as a regular C array (so that I can initialize it) and then
+  copy this Array to D. This is not the most efficient way to do this, but
+  since this function only runs once, it shouldn't really matter. */
+  const double D_Array[36] = { l+2*m,   l  ,   l  ,   0  ,   0  ,   0  ,
+                                 l  , l+2*m,   l  ,   0  ,   0  ,   0  ,
+                                 l  ,   l  , l+2*m,   0  ,   0  ,   0  ,
+                                 0  ,   0  ,   0  ,   m  ,   0  ,   0  ,
+                                 0  ,   0  ,   0  ,   0  ,   m  ,   0  ,
+                                 0  ,   0  ,   0  ,   0  ,   0  ,   m   };
+
+  // Copy D_Array to D
+  for(int i = 0; i < 6; i++)
+    for(int j = 0; j < 6; j++)
+      Element::D(i,j) = D_Array[i*6 + j];
+
+  // Material has now been set
+  Element::Material_Set = true;
+
+  #if defined(ELEMENT_MONITOR)
+    printf("D:\n");
+    for(int i = 0; i < 6; i++) {
+      printf("| ");
+      for(int j = 0; j < 6; j++)
+        printf("%9.3e ", Element::D(i,j));
+      printf("|\n");
+    } // for(int i = 0; i < 6; i++) {
+  #endif
+
+  return SUCCESS;
+} // Errors Set_Element_Material(const double E, const double v) {
 
 
 

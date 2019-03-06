@@ -10,14 +10,20 @@ class Element {
 private:
   //////////////////////////////////////////////////////////////////////////////
   // Static members
+
   static bool Static_Members_Set;                // True if the static members have been set
   static Matrix<unsigned> * ID;                  // Points to the ID Matrix
   static Matrix<double> * K;                     // Points to the global stiffness matrix
   static Node * Nodes;                           // Points to the array of nodes.
+
   static Matrix<double> Na;                      // Value of each shape function at each integrating point
   static Matrix<double> Na_Xi;                   // Zeta-partial of each shape function at each integrating point
   static Matrix<double> Na_Eta;                  // Eta-partial of each shape function at each integrating point
   static Matrix<double> Na_Zeta;                 // Zeta-partial of each shape function at each integrating point
+
+  static bool Material_Set;                      // True if the material parameter have been set (D is set up)
+  static Matrix<double> D;                       // Voigt notation elasticity tensor.
+
   const static unsigned FIXED_COMPONENT = -1;    // Used to indicate that a particular component of a node's displacement is fixed
 
 
@@ -91,6 +97,8 @@ public:
                                                            Matrix<double> * K_Ptr,       // Intend: Read
                                                            Node * Nodes_Ptr);            // Intent: Read
 
+  friend Element_Errors::Errors Set_Element_Material(const double E,           // Intent : Read
+                                                     const double v);          // Intent : Read
 
   //////////////////////////////////////////////////////////////////////////////
   // Disable Implicit methods
@@ -112,5 +120,8 @@ public:
 Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,   // Intent: Read
                                                   Matrix<double> * K_Ptr,      // Intent: Read
                                                   Node * Nodes_Ptr);           // Intent: Read
+
+Element_Errors::Errors Set_Element_Material(const double E,                    // Intent : Read
+                                            const double v);                   // Intent : Read
 
 #endif
