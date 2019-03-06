@@ -2,7 +2,7 @@
 #define TESTS_HEADER
 
 #include "../Node.h"
-#include "../Element.h"
+#include "../Element/Element.h"
 #include "../Matrix.h"
 #include "../Errors.h"
 
