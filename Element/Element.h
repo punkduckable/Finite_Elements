@@ -52,12 +52,27 @@ private:
 
 
   /* Calculate Coefficient matrix, Determinant.
-  This method is kept private since it us really only used by the Populate_Ke
-  method. This method calculates Coeff + J, allowing us to compute Na_x, Na_y,
-  and Na_z at each integration point in the Element. */
-  Element_Errors::Errors Calculate_Coefficient_Matrix(const unsigned Integration_Point_Index, // Intent: Read
-                                                      Matrix<double> & Coeff,  // Intent: Write
-                                                      double & J);             // Intent: Write
+  This method is kept private because the only time that it should be called is
+  when the Populate_Ke method is running.
+
+  This method calculates Coeff + J, allowing us to compute Na_x, Na_y, and Na_z
+  at each integration point in the Element. */
+  void Calculate_Coefficient_Matrix(const unsigned Integration_Point_Index,    // Intent: Read
+                                    Matrix<double> & Coeff,                    // Intent: Write
+                                    double & J);                               // Intent: Write
+
+
+  /* Calculate Ba and move it into B.
+  This method is kept private because the only time that it should be called is
+  when the Populate_Ke method is running.
+
+  This method computes the spatial partial derivatives (Na_x, Na_y, Na_z),
+  uses them to construct Ba, and them moves Ba into B. */
+  void Add_Ba_To_B(const unsigned Node,                                        // Intent: Read
+                   const unsigned Point,                                       // Intent: Read
+                   const Matrix<double> & Coeff,                               // Intent: Read
+                   const double J,                                             // Intent: Read
+                   Matrix<double> & B);                                        // Intent: Write
 public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor

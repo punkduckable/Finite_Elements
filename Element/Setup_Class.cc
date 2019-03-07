@@ -11,6 +11,8 @@ static members. */
 
 using namespace Element_Errors;
 
+
+
 Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, Node * Nodes_Ptr) {
   /* Function description:
   This function is used to set the static members for the Element class. This

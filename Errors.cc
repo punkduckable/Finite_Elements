@@ -91,12 +91,12 @@ void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
 
 
 
-    case INTEGRATION_POINT_INDEX_OUT_OF_BOUNDS:
-      printf("Element Error! There are only 8 integration points! Valid Integration Point Indicies are 0-7\n");
-      break;
-
     case NODE_ID_INDEX_OUT_OF_BOUNDS:
       printf("Element Error! Invalid Node ID Index! Valid indices are 0-7\n");
+      break;
+
+    case ZERO_DETERMINANT:
+      printf("Element Error! J = 0. Something went very wrong.\n");
       break;
 
 

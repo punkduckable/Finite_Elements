@@ -10,6 +10,8 @@ destructor, set up nodes, Move_Ke_to_K, etc...) */
 
 using namespace Element_Errors;
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Declare Elements static members
 
@@ -18,10 +20,10 @@ Matrix<unsigned> * Element::ID;
 Matrix<double> * Element::K;
 Node * Element::Nodes;
 
-Matrix<double> Element::Na        = Matrix<double>(8, 8, Memory::ROW_MAJOR);
-Matrix<double> Element::Na_Xi     = Matrix<double>(8, 8, Memory::ROW_MAJOR);
-Matrix<double> Element::Na_Eta    = Matrix<double>(8, 8, Memory::ROW_MAJOR);
-Matrix<double> Element::Na_Zeta   = Matrix<double>(8, 8, Memory::ROW_MAJOR);
+Matrix<double> Element::Na        = Matrix<double>(8, 8, Memory::COLUMN_MAJOR);
+Matrix<double> Element::Na_Xi     = Matrix<double>(8, 8, Memory::COLUMN_MAJOR);
+Matrix<double> Element::Na_Eta    = Matrix<double>(8, 8, Memory::COLUMN_MAJOR);
+Matrix<double> Element::Na_Zeta   = Matrix<double>(8, 8, Memory::COLUMN_MAJOR);
 
 Matrix<double> Element::D         = Matrix<double>(6, 6, Memory::ROW_MAJOR);
 bool Element::Material_Set        = false;
