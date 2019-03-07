@@ -7,7 +7,7 @@ Element stiffness matrix. */
 
 #include "Element.h"
 #include <stdio.h>
-//#define POPULATE_KE_MONITOR
+#define POPULATE_KE_MONITOR
 
 using namespace Element_Errors;
 

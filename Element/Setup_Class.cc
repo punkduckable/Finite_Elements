@@ -8,6 +8,7 @@ static members. */
 
 #include "Element.h"
 #include <stdio.h>
+#define SETUP_MONITOR
 
 using namespace Element_Errors;
 
@@ -62,8 +63,8 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
 
   /* Now, calculate Na, Na_Xi, Na_Eta, and Na_Zeta at each integration point for
   each node */
-  for(int Node = 0; Node < 8; Node++) {
-    for(int Point = 0; Point < 8; Point++) {
+  for(int Point = 0; Point < 8; Point++) {
+    for(int Node = 0; Node < 8; Node++) {
       Element::Na(Node, Point)      = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
                                               (1. + Eta_a[Node]*Eta_Int[Point])*
                                               (1. + Zeta_a[Node]*Zeta_Int[Point]);
@@ -79,10 +80,10 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
       Element::Na_Zeta(Node, Point) = (1./8.)*(1. + Xi_a[Node]*Xi_Int[Point])*
                                               (1. + Eta_a[Node]*Eta_Int[Point])*
                                               (Zeta_a[Node]);
-    } // for(int Point = 0; Point < 8; Point++) {
-  } // for(int Node = 0; Node < 8; Node++) {
+    } // for(int Node = 0; Node < 8; Node++) {
+  } // for(int Point = 0; Point < 8; Point++) {
 
-  #if defined(ELEMENT_MONITOR)
+  #if defined(SETUP_MONITOR)
     printf("Integration points:\n");
     for(int i = 0; i < 8; i++)
       printf("| %6.3lf %6.3lf %6.3lf |\n", Xi_Int[i], Eta_Int[i], Zeta_Int[i]);
@@ -175,7 +176,7 @@ Errors Set_Element_Material(const double E, const double v) {
   // Material has now been set
   Element::Material_Set = true;
 
-  #if defined(ELEMENT_MONITOR)
+  #if defined(SETUP_MONITOR)
     printf("D:\n");
     for(int i = 0; i < 6; i++) {
       printf("| ");
