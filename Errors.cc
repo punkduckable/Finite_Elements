@@ -95,8 +95,8 @@ void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
       printf("Element Error! Invalid Node ID Index! Valid indices are 0-7\n");
       break;
 
-    case ZERO_DETERMINANT:
-      printf("Element Error! J = 0. Something went very wrong.\n");
+    case BAD_DETERMINANT:
+      printf("Element Error! J <= 0. Something went very wrong.\n");
       break;
 
 

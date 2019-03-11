@@ -7,6 +7,8 @@ Element stiffness matrix. */
 
 #include "Element.h"
 #include <stdio.h>
+#define COEFFICIENT_MATRIX_MONITOR
+//#define BA_MONITOR
 #define POPULATE_KE_MONITOR
 
 using namespace Element_Errors;
@@ -86,16 +88,20 @@ void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> 
   /* Finally, calculate J (the jacobian determinant) */
   J = x_Xi*Coeff(1,1) + x_Eta*Coeff(1,2) + x_Zeta*Coeff(1,3);
 
-  #if defined(POPULATE_KE_MONITOR)
+  #if defined(COEFFICIENT_MATRIX_MONITOR)
+    printf("x_Xi = %6.3lf   x_Eta = %6.3lf   x_Zeta = %6.3lf\n", x_Xi, x_Eta, x_Zeta);
+    printf("y_Xi = %6.3lf   y_Eta = %6.3lf   y_Zeta = %6.3lf\n", y_Xi, y_Eta, y_Zeta);
+    printf("z_Xi = %6.3lf   z_Eta = %6.3lf   z_Zeta = %6.3lf\n", z_Xi, z_Eta, z_Zeta);
+
     printf("Coeff:\n");
     for(int i = 0; i < 3; i++) {
       printf("| ");
       for(int j = 0; j < 3; j++)
-        printf("%9.3e ", Coeff(i,j));
+        printf("%10.3e ", Coeff(i,j));
       printf("|\n");
     } // for(int i = 0; i < 3; i++) {
 
-    printf("J = %6.3lf\n\n", J);
+    printf("J = %10.3e\n\n", J);
   #endif
 } // void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> & Coeff, double & J) {
 
@@ -164,12 +170,12 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Point, const Matri
     for(int i = 0; i < 6; i++)
       B(i, j + 3*Node) = Ba_T[j*6 + i];
 
-  #if defined(POPULATE_KE_MONITOR)
+  #if defined(BA_MONITOR)
     printf("Ba_T:\n");
     for(int i = 0; i < 3; i++) {
       printf("| ");
       for(int j = 0; j < 6; j++)
-        printf("%9.3e ", Ba[i*6 + j];
+        printf("%10.2e ", Ba_T[i*6 + j]);
       printf("|\n");
     } // for(int i = 0; i < 3; i++) {
   #endif
@@ -208,6 +214,12 @@ Errors Element::Populate_Ke(void) {
     return KE_ALREADY_SET_UP;
   } // if(Ke_Set_Up == true) {
 
+  // First, set Ke to 0.
+  for(int j = 0; j < 24; j++)
+    for(int i = 0; i < 24; i++)
+      Ke(i,j) = 0;
+
+
   //////////////////////////////////////////////////////////////////////////////
   // Cycle through the 8 Integration points
 
@@ -221,9 +233,9 @@ Errors Element::Populate_Ke(void) {
     Calculate_Coefficient_Matrix(Point, Coeff, J);
 
     // Make sure that J is not zero.
-    if(J == 0) {
+    if(J <= 0) {
       printf("Error in Populate_Ke!\n");
-      return ZERO_DETERMINANT;
+      return BAD_DETERMINANT;
     } // if(J == 0) {
 
     // Calculate j*D
@@ -238,7 +250,85 @@ Errors Element::Populate_Ke(void) {
     for(int Node = 0; Node < 8; Node++)
       Add_Ba_To_B(Node, Point, Coeff, J, B);
 
+    // Calculate JD*B
+    class Matrix<double> JD_B = Matrix<double>(6, 24, Memory::COLUMN_MAJOR);
 
+    for(int j = 0; j < 24; j++) {
+      for(int i = 0; i < 6; i++) {
+        JD_B(i,j) = 0;
+
+        for(int k = 0; k < 6; k++)
+          JD_B(i,j) += JD(i,k)*B(k,j);
+      } // for(int i = 0; i < 6; i++) {
+    } // for(int j = 0; j < 24; j++) {
+
+    /* Now compute B^T*JD*B (this will be added into Ke).
+    We expect this matrix to be symmetric. Therefore to minimuze computations,
+    we first populate the main diagional of BT_JD_B, and then the off diagional
+    parts (by computing the (i,j) cell of BT_JD_B and then moving it into
+    the (j,i) cell. */
+    class Matrix<double> BT_JD_B = Matrix<double>(25, 24, Memory::COLUMN_MAJOR);
+
+    // Populate diagional cells of BT_JD_B
+    for(int j = 0; j < 24; j++) {
+      BT_JD_B(j,j) = 0;
+      for(int k = 0; k < 6; k++)
+        BT_JD_B(j,j) += B(k,j)*JD_B(k,j);
+    } // for(int j = 0; j < 24; j++) {
+
+    // Populate the off diagional cells of BT_JD_B (accounting for symmetry)
+    for(int j = 0; j < 24; j++) {
+      for(int i = j+1; i < 24; i++) {
+        // Calculate the i,j cell.
+        BT_JD_B(i,j) = 0;
+        for(int k = 0; k < 6; k++)
+          BT_JD_B(i,j) += B(k,i)*JD_B(k,j);
+
+        // Now set (j,i) cell using symmetry
+        BT_JD_B(j,i) = BT_JD_B(i,j);
+      } // for(int i = 0; i < 24; i++) {
+    } // for(int j = 0; j < 6; j++) {
+
+    // Now move BT_JD_B to KE.
+    for(int j = 0; j < 24; j++)
+      for(int i = 0; i < 24; i++)
+        Ke(i,j) += BT_JD_B(j,i);
+
+
+
+    #if defined(POPULATE_KE_MONITOR)
+      printf("JD:\n");
+      for(int i = 0; i < 6; i++) {
+        printf("| ");
+        for(int j = 0; j < 6; j++)
+          printf("%5.2lf ", JD(i,j));
+        printf("|\n");
+      } // for(int i = 0; i < 6; i++) {
+
+      printf("B:\n");
+      for(int i = 0; i < 6; i++) {
+        printf("| ");
+        for(int j = 0; j < 24; j++)
+          printf("%5.2lf ", B(i,j));
+        printf("|\n");
+      } // for(int i = 0; i < 6; i++) {
+
+      printf("JD_B:\n");
+      for(int i = 0; i < 6; i++) {
+        printf("| ");
+        for(int j = 0; j < 24; j++)
+          printf("%5.2lf ", JD_B(i,j));
+        printf("|\n");
+      } // for(int i = 0; i < 6; i++) {
+
+      printf("BT_JD_B:\n");
+      for(int i = 0; i < 24; i++) {
+        printf("| ");
+        for(int j = 0; j < 24; j++)
+          printf("%5.2lf ", BT_JD_B(i,j));
+        printf("|\n");
+      } // for(int i = 0; i < 24; i++) {
+    #endif
   } // for(int Point = 0; Point < 8; Point++) {
 
   // Ke has now been set
@@ -250,7 +340,7 @@ Errors Element::Populate_Ke(void) {
       printf("| ");
 
       for(int j = 0; j < 24; j++)
-        printf("%6.2lf ", Ke(i,j));
+        printf("%8.1e ", Ke(i,j));
 
       printf("|\n");
     } // for(int i = 0; i < 24, i++) {

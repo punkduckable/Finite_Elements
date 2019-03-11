@@ -136,14 +136,14 @@ void Test::Element_Errors(void) {
   for(int i = 0; i < Nx-1; i++) {
     for(int j = 0; j < Ny-1; j++) {
       for(int k = 0; k < Nz-1; k++) {
-        Elements[Element_Index].Set_Nodes(i + Nx*j + Nx*Ny*k,
-                                          i+1 + Nx*j + Nx*Ny*k,
-                                          i + Nx*(j+1) + Nx*Ny*k,
-                                          i+1 + Nx*(j+1) + Nx*Ny*k,
-                                          i + Nx*j + Nx*Ny*(k+1),
-                                          i+1 + Nx*j + Nx*Ny*(k+1),
-                                          i + Nx*(j+1) + Nx*Ny*(k+1),
-                                          i+1 + Nx*(j+1) + Nx*Ny*(k+1));
+        Elements[Element_Index].Set_Nodes(Ny*Nz*i + Nz*j + k,
+                                          Ny*Nz*(i+1) + Nz*j + k,
+                                          Ny*Nz*(i+1) + Nz*(j+1) + k,
+                                          Ny*Nz*i + Nz*(j+1) + k,
+                                          Ny*Nz*i + Nz*j + (k+1),
+                                          Ny*Nz*(i+1) + Nz*j + (k+1),
+                                          Ny*Nz*(i+1) + Nz*(j+1) + (k+1),
+                                          Ny*Nz*i + Nz*(j+1) + (k+1));
         Element_Index++;
       } // for(int k = 0; k < Nz-1; k++) {
     } // for(int j = 0; j < Ny-1; j++) {
@@ -201,13 +201,15 @@ void Test::Element_Errors(void) {
 
 
 void Test::Element(void) {
+  Element_Errors::Errors El_Err;
+
   //////////////////////////////////////////////////////////////////////////////
-  // Specicy dimension
+  // Specify dimension
 
   // First, specify the dimensions of the object that we're creating
-  const unsigned Nx = 4;
-  const unsigned Ny = 4;
-  const unsigned Nz = 4;
+  const unsigned Nx = 2;
+  const unsigned Ny = 2;
+  const unsigned Nz = 2;
   const unsigned Num_Nodes = Nx*Ny*Nz;
   const double INS = .1;                         // Inter-nodal spacing         Units: M
 
@@ -282,7 +284,17 @@ void Test::Element(void) {
   // Make some elements
 
   // Set up the element class
-  Set_Element_Static_Members(&ID, &K, Nodes);
+  El_Err = Set_Element_Static_Members(&ID, &K, Nodes);
+  if(El_Err != Element_Errors::SUCCESS) {
+    Element_Errors::Handle_Error(El_Err);
+    return;
+  } // if(El_Err != Element_Errors::SUCCESS) {
+
+  El_Err = Set_Element_Material(10, .3);
+  if(El_Err != Element_Errors::SUCCESS) {
+    Element_Errors::Handle_Error(El_Err);
+    return;
+  } // if(El_Err != Element_Errors::SUCCESS) {
 
   // Create some elements
   const unsigned Num_Elements = (Nx-1)*(Ny-1)*(Nz-1);
@@ -302,17 +314,30 @@ void Test::Element(void) {
   for(int i = 0; i < Nx-1; i++) {
     for(int j = 0; j < Ny-1; j++) {
       for(int k = 0; k < Nz-1; k++) {
-        Elements[Element_Index].Set_Nodes(i + Nx*j + Nx*Ny*k,
-                                          i+1 + Nx*j + Nx*Ny*k,
-                                          i + Nx*(j+1) + Nx*Ny*k,
-                                          i+1 + Nx*(j+1) + Nx*Ny*k,
-                                          i + Nx*j + Nx*Ny*(k+1),
-                                          i+1 + Nx*j + Nx*Ny*(k+1),
-                                          i + Nx*(j+1) + Nx*Ny*(k+1),
-                                          i+1 + Nx*(j+1) + Nx*Ny*(k+1));
+        El_Err = Elements[Element_Index].Set_Nodes(Ny*Nz*i + Nz*j + k,
+                                                   Ny*Nz*(i+1) + Nz*j + k,
+                                                   Ny*Nz*(i+1) + Nz*(j+1) + k,
+                                                   Ny*Nz*i + Nz*(j+1) + k,
+                                                   Ny*Nz*i + Nz*j + (k+1),
+                                                   Ny*Nz*(i+1) + Nz*j + (k+1),
+                                                   Ny*Nz*(i+1) + Nz*(j+1) + (k+1),
+                                                   Ny*Nz*i + Nz*(j+1) + (k+1));
+        if(El_Err != Element_Errors::SUCCESS) {
+          Element_Errors::Handle_Error(El_Err);
+          return;
+        } // if(El_Err != Element_Errors::SUCCESS) {
 
-        Elements[Element_Index].Fill_Ke_With_1s();
-        Elements[Element_Index].Move_Ke_To_K();
+        El_Err = Elements[Element_Index].Populate_Ke();
+        if(El_Err != Element_Errors::SUCCESS) {
+          Element_Errors::Handle_Error(El_Err);
+          return;
+        } // if(El_Err != Element_Errors::SUCCESS) {
+
+        El_Err = Elements[Element_Index].Move_Ke_To_K();
+        if(El_Err != Element_Errors::SUCCESS) {
+          Element_Errors::Handle_Error(El_Err);
+          return;
+        } // if(El_Err != Element_Errors::SUCCESS) {
 
         Element_Index++;
       } // for(int k = 0; k < Nz-1; k++) {

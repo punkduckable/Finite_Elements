@@ -154,8 +154,8 @@ Errors Set_Element_Material(const double E, const double v) {
   } // if(Element::Material_Set == true) {
 
   // First, let's calculate lambda and mu.
-  const double l = v*E/((1 + v)*(1 - 2*v));
-  const double m = E/(2*(1 + v));
+  const double l = (v*E)/((1. + v)*(1. - 2.*v));
+  const double m = E/(2.*(1. + v));
 
   /* Now let's populate D. To make this code easier to read, I decided to
   first declare D as a regular C array (so that I can initialize it) and then

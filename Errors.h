@@ -20,7 +20,7 @@ namespace Element_Errors {
               ELEMENT_ALREADY_SET_UP, ELEMENT_NOT_SET_UP,
               KE_ALREADY_SET_UP, KE_NOT_SET_UP,
               NODE_ID_INDEX_OUT_OF_BOUNDS,
-              ZERO_DETERMINANT};
+              BAD_DETERMINANT};
   void Handle_Error(const Errors Error);
 } // namespace Element_Errors {
 
