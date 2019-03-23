@@ -15,6 +15,7 @@ private:
   static bool Static_Members_Set;                // True if the static members have been set
   static Matrix<unsigned> * ID;                  // Points to the ID Matrix
   static Matrix<double> * K;                     // Points to the global stiffness matrix
+  static double * F;                             // Points to the global force vector.
   static Node * Nodes;                           // Points to the array of nodes.
 
   static Matrix<double> Na;                      // Value of each shape function at each integrating point
@@ -35,6 +36,7 @@ private:
   // Flags
   bool Element_Set_Up = false;
   bool Ke_Set_Up = false;
+  bool Fe_Set_Up = false;
 
   // Node information
   unsigned int Node_List[8];                     // Global node numbers for the nodes associated with this Element.
@@ -43,12 +45,20 @@ private:
   double Za[8];                                  // Z spatial coordinate of each Node
 
 
-  /* Assembly array.
+  /* Assembly arrays
   Local_Eq_Num_To_Global_Eq_Num is used to map Ke into K. */
-  unsigned Local_Eq_Num_To_Global_Eq_Num[24];    // Stores the global equation # associated with each local eqiation
+  unsigned Local_Eq_Num_To_Global_Eq_Num[24];    // Stores the global equation # associated with each local equation
 
-  // Local element stiffness matrix;
+  /* Prescribed positions array. If the ith local equation corresponds to a
+  fixed position then the ith component of this array stores the associated
+  prescribed BC. Otherwise (if the equation corresponds to a free component),
+  the ith component of this array is zero */
+  double Prescribed_Positions[24];
+
+
+  // Local element stiffness matrix, Force Vector
   Matrix<double> Ke = Matrix<double>(24, 24, Memory::COLUMN_MAJOR);
+  double Fe[24];
 
 
   /* Calculate Coefficient matrix, Determinant.
@@ -105,12 +115,20 @@ public:
   Element_Errors::Errors Populate_Ke(void);
   Element_Errors::Errors Fill_Ke_With_1s(void);                                // A function to test the assembly procedure
 
+  /* Populate Fe */
+  Element_Errors::Errors Populate_Fe(void);
+
   /* Move Ke into K */
   Element_Errors::Errors Move_Ke_To_K(void) const;
+
+  /* Move Fe into F */
+  Element_Errors::Errors Move_Fe_To_F(void) const;
+
 
 
   friend Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,    // Intent: Read
                                                            Matrix<double> * K_Ptr,       // Intend: Read
+                                                           double * F_Ptr,               // Intent: Read
                                                            Node * Nodes_Ptr);            // Intent: Read
 
   friend Element_Errors::Errors Set_Element_Material(const double E,           // Intent : Read
@@ -135,6 +153,7 @@ public:
 
 Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,   // Intent: Read
                                                   Matrix<double> * K_Ptr,      // Intent: Read
+                                                  double * F_Ptr,              // Intent: Read
                                                   Node * Nodes_Ptr);           // Intent: Read
 
 Element_Errors::Errors Set_Element_Material(const double E,                    // Intent : Read

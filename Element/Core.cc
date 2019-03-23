@@ -7,6 +7,7 @@ destructor, set up nodes, Move_Ke_to_K, etc...) */
 
 #include "Element.h"
 #include <stdio.h>
+#define F_MONITOR
 
 using namespace Element_Errors;
 
@@ -18,6 +19,7 @@ using namespace Element_Errors;
 bool Element::Static_Members_Set  = false;
 Matrix<unsigned> * Element::ID;
 Matrix<double> * Element::K;
+double * Element::F;
 Node * Element::Nodes;
 
 Matrix<double> Element::Na        = Matrix<double>(8, 8, Memory::COLUMN_MAJOR);
@@ -133,12 +135,20 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
       If this is the case, then we set the corresponding cell in
       Local_Eq_Num_To_Global_Eq_Num to the constant FIXED_COMPONENT, which
       indiciates that the corresponding component is fixed (this is important
-      for mapping Ke to K) */
+      for mapping Ke to K)
+
+      If the corresponding global equation is fixed, then we set the Eq_Num'th
+      component of Prescribed_Positions to the associated fixed position.
+      Otherwise, the Eq_Num'th component of Prescribed_Positions is set to 0*/
       int Global_Eq_Number = (*ID)(Global_Node_Number, Component);
-      if(Global_Eq_Number == -1)
+      if(Global_Eq_Number == -1) {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = FIXED_COMPONENT;
-      else
+        Prescribed_Positions[Eq_Num] = Nodes[Node_List[Node]].Position(Component);
+      } // if(Global_Eq_Number == -1) {
+      else {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = Global_Eq_Number;
+        Prescribed_Positions[Eq_Num] = 0;
+      } // else {
 
       // Increment equation number
       Eq_Num++;
@@ -186,6 +196,55 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
   return SUCCESS;
 } // Errors Element::Set_Nodes(const unsigned Node1_ID,
+
+
+
+
+
+Errors Element::Populate_Fe(void) {
+  /* Function Description:
+  This function is used to populate Fe, the local force vector.*/
+
+  /* Assumption 1:
+  This function assumes that Ke has been populated. This can be determined
+  by the "Ke_Set_Up" flag. */
+  if(Ke_Set_Up == false)
+    return KE_NOT_SET_UP;
+
+  /* Assumption 2:
+  This function assumes that Fe has not already been set up. This can be
+  determined with the "Fe_Set_Up" flag */
+  if(Fe_Set_Up == true)
+    return FE_ALREADY_SET_UP;
+
+  // Loop through the 24 local equations
+  for(int i = 0; i < 24; i++) {
+    // Set Fe to Zero to start
+    Fe[i] = 0;
+
+    /* Now, cycle through the 24 equations. If the jth local equation
+    corresponds to a fixed position then add its contribution to Fe.
+    Note: Fe[i] = Sum(over equations corresponding to prescribed positions of -Ke[i,j]*Prescribed_Positions[j]) */
+    for(int j = 0; j < 24; j++) {
+      if(Local_Eq_Num_To_Global_Eq_Num[j] == FIXED_COMPONENT)
+        Fe[i] -= Ke(i,j)*Prescribed_Positions[j];
+    } // for(int j = 0; j < 24; j++) {
+  } // for(int i = 0; i < 24; i++) {
+
+  // Fe is now set up
+  Fe_Set_Up = true;
+
+  #if defined(F_MONITOR)
+    printf("F = |");
+    for(int i = 0; i < 24; i++)
+      printf(" %6.3lf", Fe[i]);
+    printf("|\n");
+  #endif
+
+  return SUCCESS;
+} // Errors Elemnet::Populate_Fe(void) {
+
+
 
 
 
@@ -249,6 +308,32 @@ Errors Element::Move_Ke_To_K(void) const {
 
   return SUCCESS;
 } // Errors Element::Move_Ke_To_K(void) const {
+
+
+
+Errors Element::Move_Fe_To_F(void) const {
+  /* Function description
+  This function maps the local force vector, Fe, to the global force vector, F */
+
+  /* Assumption 1
+  This functiona assumes that the local force vector, Fe, has been set.
+
+  This function also also assumes that the Element class has access to the
+  global force vector, F. This occurs when the Element Class's static members
+  are set. Luckily, it is not possible for Fe to be populated unless the
+  static members have been set. Therefore, we only need to check if Ke has been
+  set to validate both assumptions */
+  if(Fe_Set_Up == false)
+    return FE_NOT_SET_UP;
+
+  // Now, add the local contributions to the force vector (Fe) to F.
+  for(int i = 0; i < 24; i++) {
+    const int I = Local_Eq_Num_To_Global_Eq_Num[i];
+    F[I] += Fe[i];
+  } // for(int i = 0; i < 24; i++) {
+
+  return SUCCESS;
+} // Errors Element::Move_Fe_To_F(void) const {
 
 
 

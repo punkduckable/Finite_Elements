@@ -14,7 +14,7 @@ using namespace Element_Errors;
 
 
 
-Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, Node * Nodes_Ptr) {
+Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
   /* Function description:
   This function is used to set the static members for the Element class. This
   function also calculates the value of the shape functions (for the master
@@ -34,6 +34,7 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
   // Set Static members
   Element::ID = ID_Ptr;
   Element::K = K_Ptr;
+  Element::F = F_Ptr;
   Element::Nodes = Nodes_Ptr;
 
 
@@ -131,7 +132,7 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
   Element::Static_Members_Set = true;
 
   return SUCCESS;
-} // Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, Node * Nodes_Ptr) {
+} // Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
 
 
 

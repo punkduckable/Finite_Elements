@@ -91,6 +91,16 @@ void Element_Errors::Handle_Error(const Element_Errors::Errors Error) {
 
 
 
+    case FE_ALREADY_SET_UP:
+      printf("Element Error! This element's force vector (Fe) has already been set!\n");
+      break;
+
+    case FE_NOT_SET_UP:
+      printf("Element Error! This element's force vector (Fe) has not been set!\n");
+      break;
+
+
+
     case NODE_ID_INDEX_OUT_OF_BOUNDS:
       printf("Element Error! Invalid Node ID Index! Valid indices are 0-7\n");
       break;

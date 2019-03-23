@@ -19,6 +19,7 @@ namespace Element_Errors {
               MATERIAL_NOT_SET, MATERIAL_ALREADY_SET,
               ELEMENT_ALREADY_SET_UP, ELEMENT_NOT_SET_UP,
               KE_ALREADY_SET_UP, KE_NOT_SET_UP,
+              FE_ALREADY_SET_UP, FE_NOT_SET_UP,
               NODE_ID_INDEX_OUT_OF_BOUNDS,
               BAD_DETERMINANT};
   void Handle_Error(const Errors Error);

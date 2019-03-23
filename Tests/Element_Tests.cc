@@ -89,8 +89,9 @@ void Test::Element_Errors(void) {
   //////////////////////////////////////////////////////////////////////////////
   // Create K, set Element static members.
 
-  // Now that we know the # of Global equations, allocate K
+  // Now that we know the # of Global equations, allocate K and F
   class Matrix<double> K(Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR);
+  double * F = new double[Num_Global_Eq];
 
   // Set the elements of K to zero
   for(int i = 0; i < Num_Global_Eq; i++)
@@ -99,11 +100,11 @@ void Test::Element_Errors(void) {
 
   // We are now ready to set the static members of the Element class
   printf("\nSetting static members of the Element class\n");
-  El_Err = Set_Element_Static_Members(&ID, &K, Nodes);
+  El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
   Element_Errors::Handle_Error(El_Err);
 
   printf("Attempting to set the static members a second time\n");
-  El_Err = Set_Element_Static_Members(&ID, &K, Nodes);
+  El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
   Element_Errors::Handle_Error(El_Err);
 
   // Now, create an array of elements.
@@ -273,6 +274,7 @@ void Test::Element(void) {
   //////////////////////////////////////////////////////////////////////////////
   // Set up K
   class Matrix<double> K(Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR);
+  double * F = new double[Num_Global_Eq];
 
   // Set the elements of K to zero
   for(int i = 0; i < Num_Global_Eq; i++)
@@ -284,7 +286,7 @@ void Test::Element(void) {
   // Make some elements
 
   // Set up the element class
-  El_Err = Set_Element_Static_Members(&ID, &K, Nodes);
+  El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
   if(El_Err != Element_Errors::SUCCESS) {
     Element_Errors::Handle_Error(El_Err);
     return;
