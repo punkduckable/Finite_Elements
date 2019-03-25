@@ -4,8 +4,8 @@ Flags = -c -Wall -O3
 
 
 # Core Rules
-All: Array.o Errors.o Main.o Matrix.o Node.o Core.o Populate_Ke.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o
-	$(Comp) -o FEM Array.o Errors.o Main.o Matrix.o Node.o Core.o Populate_Ke.o Setup_Class.o Element_Tests.o Matrix_tests.o Node_Tests.o
+All: Array.o Errors.o Main.o Matrix.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o
+	$(Comp) -o FEM Array.o Errors.o Main.o Matrix.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_tests.o Node_Tests.o
 
 Array.o: Array.cc Array.h
 	$(Comp) $(Flags) Array.cc
@@ -28,8 +28,11 @@ Node.o: Node.cc Node.h Array.h Errors.h
 Core.o: ./Element/Core.cc ./Element/Element.h Node.h Errors.h Matrix.h
 	$(Comp) $(Flags) ./Element/Core.cc
 
-Populate_Ke.o: ./Element/Populate_Ke.cc ./Element/Element.h Node.h Errors.h Matrix.h
-	$(Comp) $(Flags) ./Element/Populate_Ke.cc
+Ke.o: ./Element/Ke.cc ./Element/Element.h Node.h Errors.h Matrix.h
+	$(Comp) $(Flags) ./Element/Ke.cc
+
+Fe.o: ./Element/Fe.cc ./Element/Element.h Node.h Errors.h Matrix.h
+	$(Comp) $(Flags) ./Element/Fe.cc
 
 Setup_Class.o: ./Element/Setup_Class.cc ./Element/Element.h Node.h Errors.h Matrix.h
 	$(Comp) $(Flags) ./Element/Setup_Class.cc

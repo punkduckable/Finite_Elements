@@ -2,8 +2,8 @@
 #define ELEMENT_SOURCE
 
 /* File description:
-This file includes the core functions of the Element class (constructors,
-destructor, set up nodes, Move_Ke_to_K, etc...) */
+This file includes the core functions of the Element class including the
+constructors, destructor, and Node_Set_Up */
 
 #include "Element.h"
 #include <stdio.h>
@@ -196,144 +196,6 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
 
   return SUCCESS;
 } // Errors Element::Set_Nodes(const unsigned Node1_ID,
-
-
-
-
-
-Errors Element::Populate_Fe(void) {
-  /* Function Description:
-  This function is used to populate Fe, the local force vector.*/
-
-  /* Assumption 1:
-  This function assumes that Ke has been populated. This can be determined
-  by the "Ke_Set_Up" flag. */
-  if(Ke_Set_Up == false)
-    return KE_NOT_SET_UP;
-
-  /* Assumption 2:
-  This function assumes that Fe has not already been set up. This can be
-  determined with the "Fe_Set_Up" flag */
-  if(Fe_Set_Up == true)
-    return FE_ALREADY_SET_UP;
-
-  // Loop through the 24 local equations
-  for(int i = 0; i < 24; i++) {
-    // Set Fe to Zero to start
-    Fe[i] = 0;
-
-    /* Now, cycle through the 24 equations. If the jth local equation
-    corresponds to a fixed position then add its contribution to Fe.
-    Note: Fe[i] = Sum(over equations corresponding to prescribed positions of -Ke[i,j]*Prescribed_Positions[j]) */
-    for(int j = 0; j < 24; j++) {
-      if(Local_Eq_Num_To_Global_Eq_Num[j] == FIXED_COMPONENT)
-        Fe[i] -= Ke(i,j)*Prescribed_Positions[j];
-    } // for(int j = 0; j < 24; j++) {
-  } // for(int i = 0; i < 24; i++) {
-
-  // Fe is now set up
-  Fe_Set_Up = true;
-
-  #if defined(F_MONITOR)
-    printf("F = |");
-    for(int i = 0; i < 24; i++)
-      printf(" %6.3lf", Fe[i]);
-    printf("|\n");
-  #endif
-
-  return SUCCESS;
-} // Errors Elemnet::Populate_Fe(void) {
-
-
-
-
-
-Errors Element::Move_Ke_To_K(void) const {
-  /* Function description:
-  This fucntion is used to map the element stiffness matrix, Ke, to the global
-  stiffness matrix, K. */
-
-  /* Assumption 1:
-  This function assumes that the element stiffness matrix, Ke, has been set.
-
-  This function also assumes that the Element class static members, namely K,
-  has been set.
-
-  It is not possible, however, to set up Ke without having the Static members
-  set. Therefore, if Ke is set then both assumptions must be satisified */
-  if(Ke_Set_Up == false) {
-    printf("Error in Element::Move_Ke_To_K\n");
-    return KE_NOT_SET_UP;
-  } // if(Ke_Set_Up == false) {
-
-
-
-  /* First, move the diagional cells of Ke to K. We only move the components
-  that correspond to a global equation. Recall that Ke has a row for each
-  component of each of the 8 nodes in this Element's Node list, even though
-  some of those components may be fixed. We kept track of this with the
-  "FIXED_COMPONENT" constant wen we set up Local_Eq_Num_To_Global_Eq_Num */
-  for(int i = 0; i < 24; i++) {
-    const int I = Local_Eq_Num_To_Global_Eq_Num[i];
-    if(I == FIXED_COMPONENT)
-      continue;
-    else
-      (*K)(I, I) += Ke(i,i);
-  } // for(int i = 0; i < 24; i++) {
-
-  /* Now, move the off-diagional cells of Ke to K. Again, We only move the
-  components that correspond to a global equation (see previous comment) */
-  for(int Col = 0; Col < 24; Col++) {
-    // Get Global column number, J, associated with the local column number "Col"
-    const int J = Local_Eq_Num_To_Global_Eq_Num[Col];
-
-    // Check if J corresponds to a fixed component
-    if(J == FIXED_COMPONENT)
-      continue;
-    else
-      for(int Row = Col+1; Row < 24; Row++) {
-        // Get Global Row number, I, associated with the local row number "Row"
-        const int I = Local_Eq_Num_To_Global_Eq_Num[Row];
-
-        // Check if I corresponds to a fixed component
-        if(I == FIXED_COMPONENT)
-          continue;
-
-        // If not, move Ke(Row, Col) to the corresponding position in K.
-        const double Ke_Row_Col = Ke(Row, Col);
-        (*K)(I,J) += Ke_Row_Col;
-        (*K)(J,I) += Ke_Row_Col;
-      } // for(int Row = Col+1; Row < 24; Row++) {
-  } // for(int Col = 0; Col < 24; Col++) {
-
-  return SUCCESS;
-} // Errors Element::Move_Ke_To_K(void) const {
-
-
-
-Errors Element::Move_Fe_To_F(void) const {
-  /* Function description
-  This function maps the local force vector, Fe, to the global force vector, F */
-
-  /* Assumption 1
-  This functiona assumes that the local force vector, Fe, has been set.
-
-  This function also also assumes that the Element class has access to the
-  global force vector, F. This occurs when the Element Class's static members
-  are set. Luckily, it is not possible for Fe to be populated unless the
-  static members have been set. Therefore, we only need to check if Ke has been
-  set to validate both assumptions */
-  if(Fe_Set_Up == false)
-    return FE_NOT_SET_UP;
-
-  // Now, add the local contributions to the force vector (Fe) to F.
-  for(int i = 0; i < 24; i++) {
-    const int I = Local_Eq_Num_To_Global_Eq_Num[i];
-    F[I] += Fe[i];
-  } // for(int i = 0; i < 24; i++) {
-
-  return SUCCESS;
-} // Errors Element::Move_Fe_To_F(void) const {
 
 
 

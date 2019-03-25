@@ -1,9 +1,10 @@
-#if !defined(ELEMENT_POPULATE_KE)
-#define ELEMENT_POPULATE_KE
+#if !defined(ELEMENT_KE)
+#define ELEMENT_KE
 
 /* File description:
-This file holds all of the functions that are involved in Populating the
-Element stiffness matrix. */
+This file holds all of the functions that work with the Element Stiffness
+matrix. This includes the functions required to Populate Ke, as well as
+the functions requried to move Ke to K. */
 
 #include "Element.h"
 #include <stdio.h>
@@ -398,5 +399,68 @@ Errors Element::Fill_Ke_With_1s(void) {
 
   return SUCCESS;
 } // Errors Element::Fill_Ke_With_1s(void) {
+
+
+
+Errors Element::Move_Ke_To_K(void) const {
+  /* Function description:
+  This fucntion is used to map the element stiffness matrix, Ke, to the global
+  stiffness matrix, K. */
+
+  /* Assumption 1:
+  This function assumes that the element stiffness matrix, Ke, has been set.
+
+  This function also assumes that the Element class static members, namely K,
+  has been set.
+
+  It is not possible, however, to set up Ke without having the Static members
+  set. Therefore, if Ke is set then both assumptions must be satisified */
+  if(Ke_Set_Up == false) {
+    printf("Error in Element::Move_Ke_To_K\n");
+    return KE_NOT_SET_UP;
+  } // if(Ke_Set_Up == false) {
+
+
+
+  /* First, move the diagional cells of Ke to K. We only move the components
+  that correspond to a global equation. Recall that Ke has a row for each
+  component of each of the 8 nodes in this Element's Node list, even though
+  some of those components may be fixed. We kept track of this with the
+  "FIXED_COMPONENT" constant wen we set up Local_Eq_Num_To_Global_Eq_Num */
+  for(int i = 0; i < 24; i++) {
+    const int I = Local_Eq_Num_To_Global_Eq_Num[i];
+    if(I == FIXED_COMPONENT)
+      continue;
+    else
+      (*K)(I, I) += Ke(i,i);
+  } // for(int i = 0; i < 24; i++) {
+
+  /* Now, move the off-diagional cells of Ke to K. Again, We only move the
+  components that correspond to a global equation (see previous comment) */
+  for(int Col = 0; Col < 24; Col++) {
+    // Get Global column number, J, associated with the local column number "Col"
+    const int J = Local_Eq_Num_To_Global_Eq_Num[Col];
+
+    // Check if J corresponds to a fixed component
+    if(J == FIXED_COMPONENT)
+      continue;
+    else
+      for(int Row = Col+1; Row < 24; Row++) {
+        // Get Global Row number, I, associated with the local row number "Row"
+        const int I = Local_Eq_Num_To_Global_Eq_Num[Row];
+
+        // Check if I corresponds to a fixed component
+        if(I == FIXED_COMPONENT)
+          continue;
+
+        // If not, move Ke(Row, Col) to the corresponding position in K.
+        const double Ke_Row_Col = Ke(Row, Col);
+        (*K)(I,J) += Ke_Row_Col;
+        (*K)(J,I) += Ke_Row_Col;
+      } // for(int Row = Col+1; Row < 24; Row++) {
+  } // for(int Col = 0; Col < 24; Col++) {
+
+  return SUCCESS;
+} // Errors Element::Move_Ke_To_K(void) const {
 
 #endif
