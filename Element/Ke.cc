@@ -8,9 +8,10 @@ the functions requried to move Ke to K. */
 
 #include "Element.h"
 #include <stdio.h>
-#define COEFFICIENT_MATRIX_MONITOR
-//#define BA_MONITOR
-#define POPULATE_KE_MONITOR
+//#define COEFFICIENT_MATRIX_MONITOR     // Prints Coeff, J, and Xi, Eta, Zeta partials of x,y,z
+//#define BA_MONITOR                     // Prints each Ba (used to construct B)
+//#define POPULATE_KE_MONITOR            // Prints JD, B, JD*B and B^T*JD*B
+//#define KE_MONITOR                     // Prints Ke
 
 using namespace Element_Errors;
 
@@ -207,13 +208,21 @@ Errors Element::Populate_Ke(void) {
     return ELEMENT_NOT_SET_UP;
   } // if(Element_Set_Up == false) {
 
-
   /* Assumption 3:
+  This function assumes that D has been set. This can be tested with the
+  "Material_Set" flag. */
+  if(Material_Set == false) {
+    printf("Error in Element::Populate_Ke\n");
+    return MATERIAL_NOT_SET;
+  } // if(Material_Set == false) {
+
+  /* Assumption 4:
   This function also assumes that Ke has not been set already. */
   if(Ke_Set_Up == true) {
     printf("Error in Element::Populate_Ke\n");
     return KE_ALREADY_SET_UP;
   } // if(Ke_Set_Up == true) {
+
 
   // First, set Ke to 0.
   for(int j = 0; j < 24; j++)
@@ -335,7 +344,7 @@ Errors Element::Populate_Ke(void) {
   // Ke has now been set
   Ke_Set_Up = true;
 
-  #if defined(ELEMENT_MONITOR)
+  #if defined(KE_MONITOR)
     printf("Element stiffness matrix:\n");
     for(int i = 0; i < 24; i++) {
       printf("| ");
@@ -385,7 +394,7 @@ Errors Element::Fill_Ke_With_1s(void) {
   // Ke has now been set
   Ke_Set_Up = true;
 
-  #if defined(ELEMENT_MONITOR)
+  #if defined(KE_MONITOR)
     printf("Element stiffness matrix:\n");
     for(int i = 0; i < 24; i++) {
       printf("| ");

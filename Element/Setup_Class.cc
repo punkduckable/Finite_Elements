@@ -8,7 +8,7 @@ static members. */
 
 #include "Element.h"
 #include <stdio.h>
-#define SETUP_MONITOR
+#define SETUP_MONITOR                  // Prints Integration points, Shape function partials, D
 
 using namespace Element_Errors;
 

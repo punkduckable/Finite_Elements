@@ -4,8 +4,6 @@
 #include "../Node.h"
 #include "../Errors.h"
 #include "../Matrix.h"
-#define ELEMENT_MONITOR
-
 
 class Element {
 private:

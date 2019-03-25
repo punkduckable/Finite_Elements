@@ -7,7 +7,7 @@ constructors, destructor, and Node_Set_Up */
 
 #include "Element.h"
 #include <stdio.h>
-#define F_MONITOR
+#define ELEMENT_MONITOR                // Prints Node list and Node positions
 
 using namespace Element_Errors;
 

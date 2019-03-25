@@ -87,7 +87,7 @@ void Test::Element_Errors(void) {
   } // for(int i = 0; i < Num_Nodes; i++) {
 
   //////////////////////////////////////////////////////////////////////////////
-  // Create K, set Element static members.
+  // Create K, set Element static members, Material
 
   // Now that we know the # of Global equations, allocate K and F
   class Matrix<double> K(Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR);
@@ -107,6 +107,14 @@ void Test::Element_Errors(void) {
   El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
   Element_Errors::Handle_Error(El_Err);
 
+  printf("\nSetting Element material\n");
+  El_Err = Set_Element_Material(10, .3);
+  Element_Errors::Handle_Error(El_Err);
+
+  printf("Attempting to set Element material a second time\n");
+  El_Err = Set_Element_Material(10, .3);
+  Element_Errors::Handle_Error(El_Err);
+
   // Now, create an array of elements.
   const unsigned Num_Elements = (Nx-1)*(Ny-1)*(Nz-1);
   class Element Elements[Num_Elements];
@@ -115,7 +123,7 @@ void Test::Element_Errors(void) {
   ///////////////////////////////////////////////////////////////////////////////
   // Try using element methods before setting nodes.
 
-  printf("Attempting to Populate_Ke before setting node list\n");
+  printf("\nAttempting to Populate_Ke before setting node list\n");
   El_Err = Elements[0].Populate_Ke();
   Element_Errors::Handle_Error(El_Err);
 
@@ -126,7 +134,6 @@ void Test::Element_Errors(void) {
   printf("Attempting to move Ke to K before setting node list\n");
   El_Err = Elements[0].Move_Ke_To_K();
   Element_Errors::Handle_Error(El_Err);
-
 
   ///////////////////////////////////////////////////////////////////////////////
   // Now, set each element's node list
@@ -155,6 +162,13 @@ void Test::Element_Errors(void) {
   El_Err = Elements[0].Move_Ke_To_K();
   Element_Errors::Handle_Error(El_Err);
 
+  printf("Attempting to move Fe to F\n");
+  El_Err = Elements[0].Move_Fe_To_F();
+  Element_Errors::Handle_Error(El_Err);
+
+  printf("Attempting to populate Fe\n");
+  El_Err = Elements[0].Populate_Fe();
+  Element_Errors::Handle_Error(El_Err);
 
   ///////////////////////////////////////////////////////////////////////////////
   // Fill each Ke with 1's
@@ -179,24 +193,31 @@ void Test::Element_Errors(void) {
   El_Err = Elements[0].Fill_Ke_With_1s();
   Element_Errors::Handle_Error(El_Err);
 
+  printf("Attempting to move Fe to F\n");
+  El_Err = Elements[0].Move_Fe_To_F();
+  Element_Errors::Handle_Error(El_Err);
+
 
   ///////////////////////////////////////////////////////////////////////////////
   // Move Ke to K
 
   Element_Index = 0;
-  printf("\nConstructing K...");
+  printf("\nConstructing K...\n");
   for(int i = 0; i < Nx-1; i++) {
     for(int j = 0; j < Ny-1; j++) {
       for(int k = 0; k < Nz-1; k++) {
         Elements[Element_Index].Move_Ke_To_K();
+        Elements[Element_Index].Populate_Fe();
+        Elements[Element_Index].Move_Fe_To_F();
         Element_Index++;
       } // for(int k = 0; k < Nz-1; k++) {
     } // for(int j = 0; j < Ny-1; j++) {
   } // for(int i = 0; i < Nx-1; i++) {
   printf("Done!\n");
 
-  // In theory, K should now be set. Let's check. Print K to a file
+  // In theory, K and F should now be set. Let's check. Print K, F to a file
   Simulation::Print_K_To_File(K);
+  Simulation::Print_F_To_File(F, Num_Global_Eq);
 } // void Test::Element_Errors(void) {
 
 
@@ -346,8 +367,12 @@ void Test::Element(void) {
     } // for(int j = 0; j < Ny-1; j++)
   } // for(int i = 0; i < Nx-1; i++)
 
+  // Print results to file.
   Simulation::Print_K_To_File(K);
+  Simulation::Print_F_To_File(F, Num_Global_Eq);
 } // void Test::Element_Errors(void) {
+
+
 
 
 
@@ -370,6 +395,25 @@ void Simulation::Print_K_To_File(const Matrix<double> & K) {
 
     fprintf(File,"|\n");
   } // for(int i = 0; i < Num_Rows; i++) {
+
+  // All done. Close the file
+  fclose(File);
 } // void Simulation::Print_K_To_File(const Matrix<double> & K) {
+
+
+
+void Simulation::Print_F_To_File(const double * F, const unsigned Num_Global_Eq) {
+  // First, open a new file.
+  FILE * File = fopen("F.txt","w");
+
+  // Now, print the contents of F to the file.
+  fprintf(File, "| ");
+  for(int i = 0; i < Num_Global_Eq; i++)
+    fprintf(File, "%7.3lf ", F[i]);
+  fprintf(File, "|");
+
+  // All done, close the file
+  fclose(File);
+} // void Simulation::Print_F_To_File(const double * F, const unsigned Num_Global_Eq) {
 
 #endif

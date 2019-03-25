@@ -7,7 +7,7 @@ to F. */
 
 #include "Element.h"
 #include <stdio.h>
-#define POPULATE_FE_MONITOR
+//#define FE_MONITOR                     // Prints Fe
 
 using namespace Element_Errors;
 
@@ -19,14 +19,18 @@ Errors Element::Populate_Fe(void) {
   /* Assumption 1:
   This function assumes that Ke has been populated. This can be determined
   by the "Ke_Set_Up" flag. */
-  if(Ke_Set_Up == false)
+  if(Ke_Set_Up == false) {
+    printf("Error in Element::Populate_Fe\n");
     return KE_NOT_SET_UP;
+  } // if(Ke_Set_Up == false) {
 
   /* Assumption 2:
   This function assumes that Fe has not already been set up. This can be
   determined with the "Fe_Set_Up" flag */
-  if(Fe_Set_Up == true)
+  if(Fe_Set_Up == true) {
+    printf("Error in Element::Populate_Fe\n");
     return FE_ALREADY_SET_UP;
+  } // if(Fe_Set_Up == true) {
 
   // Loop through the 24 local equations
   for(int i = 0; i < 24; i++) {
@@ -45,8 +49,8 @@ Errors Element::Populate_Fe(void) {
   // Fe is now set up
   Fe_Set_Up = true;
 
-  #if defined(F_MONITOR)
-    printf("F = |");
+  #if defined(FE_MONITOR)
+    printf("FE = |");
     for(int i = 0; i < 24; i++)
       printf(" %6.3lf", Fe[i]);
     printf("|\n");
@@ -70,8 +74,10 @@ Errors Element::Move_Fe_To_F(void) const {
   are set. Luckily, it is not possible for Fe to be populated unless the
   static members have been set. Therefore, we only need to check if Ke has been
   set to validate both assumptions */
-  if(Fe_Set_Up == false)
+  if(Fe_Set_Up == false) {
+    printf("Error in Move_Fe_To_F\n");
     return FE_NOT_SET_UP;
+  } // if(Fe_Set_Up == false) {
 
   // Now, add the local contributions to the force vector (Fe) to F.
   for(int i = 0; i < 24; i++) {
