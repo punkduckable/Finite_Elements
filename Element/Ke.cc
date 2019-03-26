@@ -11,7 +11,7 @@ the functions requried to move Ke to K. */
 //#define COEFFICIENT_MATRIX_MONITOR     // Prints Coeff, J, and Xi, Eta, Zeta partials of x,y,z
 //#define BA_MONITOR                     // Prints each Ba (used to construct B)
 //#define POPULATE_KE_MONITOR            // Prints JD, B, JD*B and B^T*JD*B
-//#define KE_MONITOR                     // Prints Ke
+#define KE_MONITOR                     // Prints Ke
 
 using namespace Element_Errors;
 

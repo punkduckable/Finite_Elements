@@ -7,7 +7,7 @@ to F. */
 
 #include "Element.h"
 #include <stdio.h>
-//#define FE_MONITOR                     // Prints Fe
+#define FE_MONITOR                     // Prints Fe
 
 using namespace Element_Errors;
 
@@ -82,7 +82,10 @@ Errors Element::Move_Fe_To_F(void) const {
   // Now, add the local contributions to the force vector (Fe) to F.
   for(int i = 0; i < 24; i++) {
     const int I = Local_Eq_Num_To_Global_Eq_Num[i];
-    F[I] += Fe[i];
+    if(I == FIXED_COMPONENT)
+      continue;
+    else
+      F[I] += Fe[i];
   } // for(int i = 0; i < 24; i++) {
 
   return SUCCESS;

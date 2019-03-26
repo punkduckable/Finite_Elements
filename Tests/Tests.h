@@ -18,7 +18,9 @@ namespace Test {
 
 
 namespace Simulation {
-  void Print_K_To_File(const Matrix<double> & K);                              // Intent: Read
+  enum Printing_Mode{INTEGER, EXP};
+  void Print_K_To_File(const Matrix<double> & K,                               // Intent: Read
+                       const Printing_Mode Mode = EXP);                        // Intent: Read
   void Print_F_To_File(const double * F,                                       // Intent: Read
                        const unsigned Num_Global_Eq);                          // Intent: Read
 } // namespace Simulation {

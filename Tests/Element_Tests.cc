@@ -93,10 +93,15 @@ void Test::Element_Errors(void) {
   class Matrix<double> K(Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR);
   double * F = new double[Num_Global_Eq];
 
-  // Set the elements of K to zero
+  // Zero initialize K
   for(int i = 0; i < Num_Global_Eq; i++)
     for(int j = 0; j < Num_Global_Eq; j++)
       K(i,j) = 0;
+
+  // zero initialize F
+  for(int i = 0; i < Num_Global_Eq; i++)
+    F[i] = 0;
+
 
   // We are now ready to set the static members of the Element class
   printf("\nSetting static members of the Element class\n");
@@ -216,7 +221,7 @@ void Test::Element_Errors(void) {
   printf("Done!\n");
 
   // In theory, K and F should now be set. Let's check. Print K, F to a file
-  Simulation::Print_K_To_File(K);
+  Simulation::Print_K_To_File(K, Simulation::INTEGER);
   Simulation::Print_F_To_File(F, Num_Global_Eq);
 } // void Test::Element_Errors(void) {
 
@@ -253,7 +258,7 @@ void Test::Element(void) {
       for(int k = 0; k < Nz; k++) {
         // Set the Node's original position + BC's
         if(k == 0)
-          Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k}, {false, false, false});
+          Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k}, {true, true, false});
         else
           Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k}, {false, false, false});
 
@@ -297,11 +302,14 @@ void Test::Element(void) {
   class Matrix<double> K(Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR);
   double * F = new double[Num_Global_Eq];
 
-  // Set the elements of K to zero
+  // Zero initialize K
   for(int i = 0; i < Num_Global_Eq; i++)
     for(int j = 0; j < Num_Global_Eq; j++)
       K(i,j) = 0;
 
+  // zero initialize F
+  for(int i = 0; i < Num_Global_Eq; i++)
+    F[i] = 0;
 
   //////////////////////////////////////////////////////////////////////////////
   // Make some elements
@@ -325,18 +333,21 @@ void Test::Element(void) {
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Create ordered Node lists.
+  // Find K, F
 
   // Make a matrix to store all the node lists
   class Matrix<unsigned> Node_Lists = Matrix<unsigned>(Num_Elements, 8, Memory::ROW_MAJOR);
 
-  /* Now, set each Element's Node list. Note, the order that we set these nodes
-  is very specific. This is done so that the orientation of the nodes in the
-  element matches that on page 124 of Hughes' book. */
+  /* Cycle through the elements. For each element, supply the nodes, compute Ke (and Fe)
+  and then move Ke (and Fe) into K (and F)*/
   unsigned Element_Index = 0;
   for(int i = 0; i < Nx-1; i++) {
     for(int j = 0; j < Ny-1; j++) {
       for(int k = 0; k < Nz-1; k++) {
+        /* Set Element Nodes:
+        Now, set each Element's Node list. Note, the order that we set these
+        nodes is very specific. This is done so that the orientation of the nodes
+        in the element matches that on page 124 of Hughes' book. */
         El_Err = Elements[Element_Index].Set_Nodes(Ny*Nz*i + Nz*j + k,
                                                    Ny*Nz*(i+1) + Nz*j + k,
                                                    Ny*Nz*(i+1) + Nz*(j+1) + k,
@@ -345,18 +356,39 @@ void Test::Element(void) {
                                                    Ny*Nz*(i+1) + Nz*j + (k+1),
                                                    Ny*Nz*(i+1) + Nz*(j+1) + (k+1),
                                                    Ny*Nz*i + Nz*(j+1) + (k+1));
+        // Check for error
         if(El_Err != Element_Errors::SUCCESS) {
           Element_Errors::Handle_Error(El_Err);
           return;
         } // if(El_Err != Element_Errors::SUCCESS) {
 
+
+        // Populate Ke and check for errors
         El_Err = Elements[Element_Index].Populate_Ke();
         if(El_Err != Element_Errors::SUCCESS) {
           Element_Errors::Handle_Error(El_Err);
           return;
         } // if(El_Err != Element_Errors::SUCCESS) {
 
+
+        // Populate Fe and check for errors
+        El_Err = Elements[Element_Index].Populate_Fe();
+        if(El_Err != Element_Errors::SUCCESS) {
+          Element_Errors::Handle_Error(El_Err);
+          return;
+        } // if(El_Err != Element_Errors::SUCCESS) {
+
+
+        // Move Ke to K and check for errors
         El_Err = Elements[Element_Index].Move_Ke_To_K();
+        if(El_Err != Element_Errors::SUCCESS) {
+          Element_Errors::Handle_Error(El_Err);
+          return;
+        } // if(El_Err != Element_Errors::SUCCESS) {
+
+
+        // Move Fe to F and check for errors
+        El_Err = Elements[Element_Index].Move_Fe_To_F();
         if(El_Err != Element_Errors::SUCCESS) {
           Element_Errors::Handle_Error(El_Err);
           return;
@@ -376,7 +408,7 @@ void Test::Element(void) {
 
 
 
-void Simulation::Print_K_To_File(const Matrix<double> & K) {
+void Simulation::Print_K_To_File(const Matrix<double> & K, const Printing_Mode Mode) {
   // First, open a new file
   FILE * File = fopen("K.txt","w");
 
@@ -390,7 +422,10 @@ void Simulation::Print_K_To_File(const Matrix<double> & K) {
   for(int i = 0; i < Num_Rows; i++) {
     fprintf(File,"| ");
     for(int j = 0; j < Num_Cols; j++) {
-      fprintf(File,"%1.0lf ", K(i,j));
+      if(Mode == INTEGER)
+        fprintf(File,"%1.0lf ", K(i,j));
+      else
+        fprintf(File,"%8.1e ", K(i,j));
     } // for(int j = 0; j < Num_Cols; j++) {
 
     fprintf(File,"|\n");
@@ -409,7 +444,7 @@ void Simulation::Print_F_To_File(const double * F, const unsigned Num_Global_Eq)
   // Now, print the contents of F to the file.
   fprintf(File, "| ");
   for(int i = 0; i < Num_Global_Eq; i++)
-    fprintf(File, "%7.3lf ", F[i]);
+    fprintf(File, "%10.3e ", F[i]);
   fprintf(File, "|");
 
   // All done, close the file

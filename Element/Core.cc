@@ -192,6 +192,12 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
       shows up as -1 and not some nonsense large number. */
       printf("%d ", Local_Eq_Num_To_Global_Eq_Num[i]);
     printf("\n");
+
+
+    printf("Prescribed Positions: ");
+    for(int i = 0; i < 24; i++)
+      printf("%5.2lf ", Prescribed_Positions[i]);
+    printf("\n");
   #endif
 
   return SUCCESS;
