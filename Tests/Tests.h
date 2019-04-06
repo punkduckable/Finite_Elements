@@ -1,7 +1,7 @@
 #if !defined(TESTS_HEADER)
 #define TESTS_HEADER
 
-#include "../Node.h"
+#include "../Node/Node.h"
 #include "../Element/Element.h"
 #include "../Matrix.h"
 #include "../Errors.h"

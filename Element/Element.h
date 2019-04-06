@@ -1,7 +1,7 @@
 #if !defined(ELEMENT_HEADER)
 #define ELEMENT_HEADER
 
-#include "../Node.h"
+#include "../Node/Node.h"
 #include "../Errors.h"
 #include "../Matrix.h"
 
