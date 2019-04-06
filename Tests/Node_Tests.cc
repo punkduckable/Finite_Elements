@@ -21,21 +21,26 @@ void Test::Node_Errors(void) {
   Node_Errors::Handle_Error(Er);
 
   // Try Using the getter methods before the node has been set up.
-  printf("Trying to get Fixed_Componsnt information...\n");
-  bool Is_Fixed;
-  Er = Node.Get_Is_Fixed(3, Is_Fixed);
+  printf("Trying to get Has_BC information...\n");
+  bool Has_BC;
+  Er = Node.Get_Has_BC(3, Has_BC);
   Node_Errors::Handle_Error(Er);
 
-  printf("Trying to get position...\n");
+  printf("Trying to get Original Position...\n");
   Array_3<double> Ar;
-  Er = Node.Get_Position(Ar);
+  Er = Node.Get_Original_Position(Ar);
   Node_Errors::Handle_Error(Er);
 
 
-  // Set the Node's BC's, and original position
-  printf("\nSetting node position, BC's: ");
-  Er = Node.Set_Position({0,0,0},{false, true, false});
+  // Set the Node Original Position, BC's
+  printf("\nSetting Node Original Position:\n ");
+  Er = Node.Set_Original_Position({0,0,0});
   Node_Errors::Handle_Error(Er);
+
+  printf("Setting Node BCs:\n ");
+  Er = Node.Set_BC(1,.5);
+  Node_Errors::Handle_Error(Er);
+
 
   // Print out Node information
   printf("After set up:\n");
@@ -45,7 +50,7 @@ void Test::Node_Errors(void) {
 
   // Try setting BC's and Original Position again.
   printf("\nTrying to set Position a second time...\n");
-  Er = Node.Set_Position({1,2,3},{true, false, true});
+  Er = Node.Set_Original_Position({1,2,3});
   Node_Errors::Handle_Error(Er);
 
   // Print out current Node information
@@ -65,10 +70,6 @@ void Test::Node_Errors(void) {
   Node.Print();
   printf("\n");
 
-  // Try modifying a protected Component of the position
-  Er = Node.Update_Position(1, 37);
-  Node_Errors::Handle_Error(Er);
-
   // Try setting an out of bounds component of position
   printf("\nTrying to set out of bounds component of position...\n");
   Er = Node.Update_Position(3,37);
@@ -76,7 +77,7 @@ void Test::Node_Errors(void) {
 
   // Try getting out of bounds Fixed_Component information
   printf("Trying to get out of bounds Fixed_Component info\n");
-  Er = Node.Get_Is_Fixed( 5, Is_Fixed );
+  Er = Node.Get_Has_BC( 5, Has_BC );
   Node_Errors::Handle_Error(Er);
 
   // Print Node's information
@@ -124,10 +125,10 @@ void Test::Node(void) {
       for(int j = 0; j < Ny; j++) {
         double y_pos = j*Intra_Nodal_Spacing;
 
-        if(j == 0 )
-          Nodes[j + i*Ny + k*Nx*Ny].Set_Position({x_pos, .5, z_pos}, {false, true, false});
-        else
-          Nodes[j + i*Ny + k*Nx*Ny].Set_Position({x_pos, y_pos, z_pos});
+        Nodes[j + i*Ny + k*Nx*Ny].Set_Original_Position({x_pos, y_pos, z_pos});
+
+        if(j == 0)
+          Nodes[j + i*Ny + k*Nx*Ny].Set_BC(1,.5);
       } // for(int j = 0; j < Ny; j++) {
     } // for(int i = 0; i < Nx; i++) {
   } // for(int k = 0; k < Nz; k++) {

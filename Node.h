@@ -3,6 +3,7 @@
 
 #include "Errors.h"
 #include "Array.h"
+#include <math.h>
 
 class Node {
 // Elements need to be able to access the private Node members.
@@ -10,13 +11,12 @@ friend class Element;
 
 private:
   // Core members of the Node class
-  Array_3<double> Position;                 // Spatial position of the node     Units : M
-  Array_3<bool> Fixed_Pos;                  // if Fixed_Pos[i] is true then the ith component of the original position is fixed/cannot be updated (prescribed position BC).
+  Array_3<double> Original_Position;             // Initial spatial position of Node     Units : M
+  bool Node_Set_Up = false;                      // Prevents Original position from being overwritten.
 
-  /* this is a flag that prevents the Fixed_Pos and Origional position variables
-  from being overwritten once set. Basically, this makes it so that the node
-  can only be set up once. */
-  bool Node_Set_Up = false;
+  Array_3<double> Position;                      // Current Spatial position of the Node Units : M
+  Array_3<bool> Has_BC;                          // ith component is true if the Node has a BC in that component
+  Array_3<double> BC;                            // Prescribed Boundary Conditions       Units : M
 public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor
@@ -29,23 +29,35 @@ public:
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Setter methods
+  // Set Original position of the Node (used for construction of K)
+  Node_Errors::Errors Set_Original_Position(const Array_3<double> Original_Position_In); // Intent: Read
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Update Node methods
 
   // Updates the current (spatial) position of the node
   Node_Errors::Errors Update_Position(const unsigned int component,            // Intent: Read
                                       const double New_Position);              // Intent: Read
 
-  // Set internal variables
-  Node_Errors::Errors Set_Position(const Array_3<double> Original_Position_In,                               // Intent: Read
-                                   const Array_3<bool> Fixed_Pos_In = Array_3<bool>(false, false, false));   // Intent: Read
+  // Sets a Particular component of the BC's
+  Node_Errors::Errors Set_BC(const unsigned component,                         // Intent: Read
+                             const double BC_In);                              // Intent: Read
+
+  // Updates positions using the prescribed position BCs
+  Node_Errors::Errors Update_Position_Using_BCs(void);
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods
 
-  Node_Errors::Errors Get_Is_Fixed(const unsigned index,                       // Intent: Read
-                                   bool & Fixed_Pos_Out ) const;               // Intent: Write
-  Node_Errors::Errors Get_Position( Array_3<double> & Current_Position_Out ) const;      // Intent: Write
+  Node_Errors::Errors Get_Has_BC(const unsigned index,                         // Intent: Read
+                                 bool & Fixed_Pos_Out ) const;                 // Intent: Write
+
+  Node_Errors::Errors Get_Current_Position( Array_3<double> & Current_Position_Out ) const;   // Intent: Write
+
+  Node_Errors::Errors Get_Original_Position( Array_3<double> & Original_Position_Out) const;  // Intent: Write
+
 
   //////////////////////////////////////////////////////////////////////////////
   // Other public methods

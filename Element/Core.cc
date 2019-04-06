@@ -113,9 +113,9 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   unsigned Eq_Num = 0;
   for(int Node = 0; Node < 8; Node++) {
     // First, set the X, Y, and Z components of this node's position.
-    Xa[Node] = Nodes[Node_List[Node]].Position(0);
-    Ya[Node] = Nodes[Node_List[Node]].Position(1);
-    Za[Node] = Nodes[Node_List[Node]].Position(2);
+    Xa[Node] = Nodes[Node_List[Node]].Original_Position(0);
+    Ya[Node] = Nodes[Node_List[Node]].Original_Position(1);
+    Za[Node] = Nodes[Node_List[Node]].Original_Position(2);
 
     // Now, get the Global node number
     const unsigned Global_Node_Number = Node_List[Node];
@@ -143,7 +143,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
       int Global_Eq_Number = (*ID)(Global_Node_Number, Component);
       if(Global_Eq_Number == -1) {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = FIXED_COMPONENT;
-        Prescribed_Positions[Eq_Num] = Nodes[Node_List[Node]].Position(Component);
+        Prescribed_Positions[Eq_Num] = Nodes[Node_List[Node]].BC(Component);
       } // if(Global_Eq_Number == -1) {
       else {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = Global_Eq_Number;

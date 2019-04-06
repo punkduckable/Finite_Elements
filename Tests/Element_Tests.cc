@@ -37,35 +37,46 @@ void Test::Element_Errors(void) {
   const unsigned Ny = 3;
   const unsigned Nz = 3;
   const unsigned Num_Nodes = Nx*Ny*Nz;
-  const double IPS = .1;
+  const double INS = .1;
 
   // Node array, ID array
   class Node Nodes[Num_Nodes];
   class Matrix<unsigned> ID(Num_Nodes, 3, Memory::ROW_MAJOR);
 
-  // Set up Nodes + ID array
-  unsigned Num_Global_Eq = 0;
+  // Set up Node positions and BC's
   unsigned Node_Index = 0;
   for(int i = 0; i < Nx; i++) {
     for(int j = 0; j < Ny; j++) {
       for(int k = 0; k < Nz; k++) {
-        Nodes[Node_Index].Set_Position({IPS*i, IPS*j, IPS*k}, {false, false, false});
+        // Set the Node's original position + BC's
+        Nodes[Node_Index].Set_Original_Position({INS*i, INS*j, INS*k});
 
-        /* Now cycle through the components of the current node. Use this info
+        Node_Index++;
+      } // for(int k = 0; k < Nz; k++) {
+    } // for(int j = 0; j < Ny; j++) {
+  } // for(int i = 0; i < Nx; i++) {
+
+  // Populate ID array
+  unsigned Num_Global_Eq = 0;
+  Node_Index = 0;
+  for(int i = 0; i < Nx; i++) {
+    for(int j = 0; j < Ny; j++) {
+      for(int k = 0; k < Nz; k++) {
+        /* Cycle through the components of the current node. Use this info
         to populate ID. If the current component is not being used, fill that
         cell of ID with a -1 */
         for(int Comp = 0; Comp < 3; Comp++) {
-          bool Is_Fixed;
-          Nodes[Node_Index].Get_Is_Fixed(Comp, Is_Fixed);
+          bool Has_BC;
+          Nodes[Node_Index].Get_Has_BC(Comp, Has_BC);
 
-          if(Is_Fixed == false) {
+          if(Has_BC == false) {
             ID(Node_Index, Comp) = Num_Global_Eq;
 
             // Increment number of equations by 1.
             Num_Global_Eq++;
           } // for(int Comp = 0; Comp < 3; Comp++) {
           else
-            ID(Node_Index, Comp) = -1;           // Note: ID is an unsigned matrix. (unsigned)-1 is the largest possible unsigned integer
+            ID(Node_Index, Comp) = -1;           // Note: ID is an unsigned matrix. (unsigned)-1 is the largest unsigned integer
         } // for(int Comp = 0; Comp < 3; Comp++) {
 
         Node_Index++;
@@ -250,26 +261,36 @@ void Test::Element(void) {
   // Create the ID Array
   class Matrix<unsigned> ID(Num_Nodes, 3, Memory::ROW_MAJOR);
 
-  // Set up the Node positions + Populate the ID array
-  unsigned Num_Global_Eq = 0;
+  // Set up Node positions and BC's
   unsigned Node_Index = 0;
   for(int i = 0; i < Nx; i++) {
     for(int j = 0; j < Ny; j++) {
       for(int k = 0; k < Nz; k++) {
         // Set the Node's original position + BC's
-        if(k == 0)
-          Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k}, {true, true, false});
-        else
-          Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k}, {false, false, false});
+        Nodes[Node_Index].Set_Original_Position({INS*i, INS*j, INS*k});
 
-        /* Now cycle through the components of the current node. Use this info
+        if(k == 0)
+          Nodes[Node_Index].Set_BC(1,INS*j+1);
+
+        Node_Index++;
+      } // for(int k = 0; k < Nz; k++) {
+    } // for(int j = 0; j < Ny; j++) {
+  } // for(int i = 0; i < Nx; i++) {
+
+  // Populate ID array
+  unsigned Num_Global_Eq = 0;
+  Node_Index = 0;
+  for(int i = 0; i < Nx; i++) {
+    for(int j = 0; j < Ny; j++) {
+      for(int k = 0; k < Nz; k++) {
+        /* Cycle through the components of the current node. Use this info
         to populate ID. If the current component is not being used, fill that
         cell of ID with a -1 */
         for(int Comp = 0; Comp < 3; Comp++) {
-          bool Is_Fixed;
-          Nodes[Node_Index].Get_Is_Fixed(Comp, Is_Fixed);
+          bool Has_BC;
+          Nodes[Node_Index].Get_Has_BC(Comp, Has_BC);
 
-          if(Is_Fixed == false) {
+          if(Has_BC == false) {
             ID(Node_Index, Comp) = Num_Global_Eq;
 
             // Increment number of equations by 1.
@@ -310,6 +331,7 @@ void Test::Element(void) {
   // zero initialize F
   for(int i = 0; i < Num_Global_Eq; i++)
     F[i] = 0;
+
 
   //////////////////////////////////////////////////////////////////////////////
   // Make some elements

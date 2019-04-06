@@ -23,8 +23,8 @@ void Node_Errors::Handle_Error(const Node_Errors::Errors Error) {
 
 
 
-    case FIXED_POSITION_COMPONENT:
-      printf("Node Error! You tried to set a component of a Node's position that is fixed (precribed BC)\n");
+    case BC_ALREADY_SET:
+      printf("Node Error! This prescribed boundary BC has already been set!\n");
       break;
 
 

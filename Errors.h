@@ -5,7 +5,7 @@
 namespace Node_Errors {
   enum Errors{SUCCESS,
               NODE_NOT_SET_UP, NODE_ALREADY_SET_UP,
-              FIXED_POSITION_COMPONENT,
+              BC_ALREADY_SET,
               INDEX_OUT_OF_BOUNDS};
   void Handle_Error(const Errors Error);
 } //namespace Node_Errors {
