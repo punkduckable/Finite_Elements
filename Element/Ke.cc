@@ -233,8 +233,8 @@ Element_Errors Element::Populate_Ke(void) {
 
   // First, declare J, Coeff, and jD
   double J;
-  class Matrix<double> Coeff = Matrix<double>(3, 3, Memory::ROW_MAJOR);
-  class Matrix<double> JD    = Matrix<double>(6, 6, Memory::ROW_MAJOR);
+  class Matrix<double> Coeff{3, 3, Memory::ROW_MAJOR};
+  class Matrix<double> JD{6, 6, Memory::ROW_MAJOR};
 
   for(int Point = 0; Point < 8; Point++) {
     // Find coefficient matrix, J.
@@ -252,14 +252,14 @@ Element_Errors Element::Populate_Ke(void) {
         JD(i,j) = J*D(i,j);
 
     // Declare B
-    class Matrix<double> B = Matrix<double>(6, 24, Memory::COLUMN_MAJOR);
+    class Matrix<double> B{6, 24, Memory::COLUMN_MAJOR};
 
     // Now construct B
     for(int Node = 0; Node < 8; Node++)
       Add_Ba_To_B(Node, Point, Coeff, J, B);
 
     // Calculate JD*B
-    class Matrix<double> JD_B = Matrix<double>(6, 24, Memory::COLUMN_MAJOR);
+    class Matrix<double> JD_B{6, 24, Memory::COLUMN_MAJOR};
 
     for(int j = 0; j < 24; j++) {
       for(int i = 0; i < 6; i++) {
@@ -275,7 +275,7 @@ Element_Errors Element::Populate_Ke(void) {
     we first populate the main diagional of BT_JD_B, and then the off diagional
     parts (by computing the (i,j) cell of BT_JD_B and then moving it into
     the (j,i) cell. */
-    class Matrix<double> BT_JD_B = Matrix<double>(25, 24, Memory::COLUMN_MAJOR);
+    class Matrix<double> BT_JD_B{25, 24, Memory::COLUMN_MAJOR};
 
     // Populate diagional cells of BT_JD_B
     for(int j = 0; j < 24; j++) {

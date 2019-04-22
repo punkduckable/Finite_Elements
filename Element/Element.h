@@ -55,7 +55,7 @@ private:
 
 
   // Local element stiffness matrix, Force Vector
-  Matrix<double> Ke = Matrix<double>(24, 24, Memory::COLUMN_MAJOR);
+  Matrix<double> Ke{24, 24, Memory::COLUMN_MAJOR};
   double Fe[24];
 
 
@@ -143,10 +143,10 @@ public:
   then. */
 
   // Disabled copy constructor
-  Element(const Element & El);
+  Element(const Element & El) = delete;
 
   // disabled = operator.
-  Element & operator=(const Element & El);
+  Element & operator=(const Element & El) = delete;
 }; // class Element {
 
 Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,           // Intent: Read

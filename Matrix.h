@@ -10,16 +10,13 @@ private:
   Type * Ar;
 
   // Dimension of the matrix
-  unsigned Num_Rows;
-  unsigned Num_Cols;
+  const unsigned Num_Rows;
+  const unsigned Num_Cols;
 
   // Specify row or column major storage scheme
   const Memory Memory_Layout;
 public:
-  // Default constructor
-  Matrix(const Memory Layout_In);
-
-  // Set up Constructor
+  // Constructor
   Matrix(const unsigned Rows_In,                                               // Intent: Read
          const unsigned Cols_In,                                               // Intent: Read
          const Memory Layout_In);                                              // Intent: Read
@@ -59,10 +56,10 @@ public:
   prints an angry message when either of them is used */
 
   // Disabled Copy Constructor
-  Matrix(const Matrix<Type> & M_In);
+  Matrix(const Matrix<Type> & M_In) = delete;
 
   // Disabled = operator
-  Matrix<Type> & operator=(const Matrix<Type> & M_In);
+  Matrix<Type> & operator=(const Matrix<Type> & M_In) = delete;
 }; // class Matrix {
 
 #include "Matrix.cc"

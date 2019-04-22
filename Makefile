@@ -51,4 +51,4 @@ Node_Tests.o: ./Tests/Node_Tests.cc ./Tests/Tests.h ./Node/Node.h Matrix.h ./Ele
 
 
 Clean:
-	rm *.o FEM K.txt
+	rm *.o FEM K.txt F.txt

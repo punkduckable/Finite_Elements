@@ -20,12 +20,12 @@ Matrix<double> * Element::K;
 double * Element::F;
 Node * Element::Nodes;
 
-Matrix<double> Element::Na        = Matrix<double>(8, 8, Memory::COLUMN_MAJOR);
-Matrix<double> Element::Na_Xi     = Matrix<double>(8, 8, Memory::COLUMN_MAJOR);
-Matrix<double> Element::Na_Eta    = Matrix<double>(8, 8, Memory::COLUMN_MAJOR);
-Matrix<double> Element::Na_Zeta   = Matrix<double>(8, 8, Memory::COLUMN_MAJOR);
+Matrix<double> Element::Na        {8, 8, Memory::COLUMN_MAJOR};
+Matrix<double> Element::Na_Xi     {8, 8, Memory::COLUMN_MAJOR};
+Matrix<double> Element::Na_Eta    {8, 8, Memory::COLUMN_MAJOR};
+Matrix<double> Element::Na_Zeta   {8, 8, Memory::COLUMN_MAJOR};
 
-Matrix<double> Element::D         = Matrix<double>(6, 6, Memory::ROW_MAJOR);
+Matrix<double> Element::D         {6, 6, Memory::ROW_MAJOR};
 bool Element::Material_Set        = false;
 
 
@@ -200,28 +200,5 @@ Element_Errors Element::Set_Nodes(const unsigned Node0_ID,
 
   return Element_Errors::SUCCESS;
 } // Element_Errors Element::Set_Nodes(const unsigned Node1_ID,
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Disabled Implicit methods
-
-// Disabled copy constructor
-Element::Element(const Element & El) {
-  // Yell at the user if they try to use the copy Constructor
-  printf("Element Error! You tried using the copy construct for the Element class\n");
-  printf("The copy constructor is disabled! \n");
-} // Element::Element(const Element & El) {
-
-
-
-// Disabled = operator
-Element & Element::operator=(const Element & El) {
-  printf("Error in Element & Element::operator=(const Element & El)\n");
-  printf("Element equality is not defined! Returning *this\n");
-  return *this;
-} // Element & operator=(const Element & El) {
 
 #endif

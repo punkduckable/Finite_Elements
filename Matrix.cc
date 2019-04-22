@@ -7,24 +7,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Constructor, destructor
 
-// Constructor
-template <typename Type>
-Matrix<Type>::Matrix(const Memory Layout_In) : Memory_Layout(Layout_In) {
-  Ar = NULL;
-  Num_Rows = 0;
-  Num_Cols = 0;
-} // Matrix<Type>::Matrix(const Memory Layout_In) : Memory_Layout(Layout_In) {
-
-
-
 template<typename Type>
-Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) : Memory_Layout(Layout_In) {
+Matrix<Type>::Matrix(const unsigned Rows_In,
+                     const unsigned Cols_In,
+                     const Memory Layout_In)
+                     : Num_Rows(Rows_In),
+                     Num_Cols(Cols_In),
+                     Memory_Layout(Layout_In) {
+
   // Allocate the matrix
   Ar = new Type[Rows_In*Cols_In];
-
-  Num_Rows = Rows_In;
-  Num_Cols = Cols_In;
-} // Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) : Memory_Layout(Layout_In) {
+} // Matrix<Type>::Matrix(const unsigned Rows_In,...
 
 
 
@@ -71,25 +64,5 @@ Type Matrix<Type>::operator()(const unsigned i, const unsigned j) const {
   else // (Memory_Layout == Memory::COLUMN_MAJOR)
     return Ar[i + j*Num_Rows];
 } // Type Matrix<Type>::operator()(const unsigned i, const unsigned j) const {
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Disabled implicit methods
-
-template <typename Type>
-Matrix<Type>::Matrix(const Matrix<Type> & M_In) : Memory_Layout(Memory::ROW_MAJOR) {
-  printf("The copy constructor is disabled for the Matrix class! BAD!\n");
-} // Matrix<type>::Matrix(const Matrix<Type> & M_In) {
-
-
-
-template <typename Type>
-Matrix<Type> & Matrix<Type>::operator=(const Matrix<Type> & M_In) {
-  printf("Matrix equality is not defined! BAD!\n");
-  return *this;
-} // Matrix<Type> & Matrix<Type>::operator=(const Matrix<Type> & M_In) {
 
 #endif

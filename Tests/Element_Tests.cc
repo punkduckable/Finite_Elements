@@ -41,7 +41,7 @@ void Test::Element_Error_Tests(void) {
 
   // Node array, ID array
   class Node Nodes[Num_Nodes];
-  class Matrix<unsigned> ID(Num_Nodes, 3, Memory::ROW_MAJOR);
+  class Matrix<unsigned> ID{Num_Nodes, 3, Memory::ROW_MAJOR};
 
   // Set up Node positions and BC's
   unsigned Node_Index = 0;
@@ -101,7 +101,7 @@ void Test::Element_Error_Tests(void) {
   // Create K, set Element static members, Material
 
   // Now that we know the # of Global equations, allocate K and F
-  class Matrix<double> K(Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR);
+  class Matrix<double> K{Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR};
   double * F = new double[Num_Global_Eq];
 
   // Zero initialize K
@@ -259,7 +259,7 @@ void Test::Element(void) {
   class Node Nodes[Num_Nodes];
 
   // Create the ID Array
-  class Matrix<unsigned> ID(Num_Nodes, 3, Memory::ROW_MAJOR);
+  class Matrix<unsigned> ID{Num_Nodes, 3, Memory::ROW_MAJOR};
 
   // Set up Node positions and BC's
   unsigned Node_Index = 0;
@@ -320,7 +320,7 @@ void Test::Element(void) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Set up K
-  class Matrix<double> K(Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR);
+  class Matrix<double> K{Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR};
   double * F = new double[Num_Global_Eq];
 
   // Zero initialize K
@@ -358,7 +358,7 @@ void Test::Element(void) {
   // Find K, F
 
   // Make a matrix to store all the node lists
-  class Matrix<unsigned> Node_Lists = Matrix<unsigned>(Num_Elements, 8, Memory::ROW_MAJOR);
+  class Matrix<unsigned> Node_Lists{Num_Elements, 8, Memory::ROW_MAJOR};
 
   /* Cycle through the elements. For each element, supply the nodes, compute Ke (and Fe)
   and then move Ke (and Fe) into K (and F)*/
