@@ -10,11 +10,9 @@ static members. */
 #include <stdio.h>
 //#define SETUP_MONITOR                  // Prints Integration points, Shape function partials, D
 
-using namespace Element_Errors;
 
 
-
-Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
+Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
   /* Function description:
   This function is used to set the static members for the Element class. This
   function also calculates the value of the shape functions (for the master
@@ -27,7 +25,7 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
   If the Element static members have already been set then we return an error */
   if(Element::Static_Members_Set == true) {
     printf("Error in Element::Set_Element_Static_Members\n");
-    return STATIC_MEMBERS_ALREADY_SET;
+    return Element_Errors::STATIC_MEMBERS_ALREADY_SET;
   } // if(Element::Static_Members_Set == true) {
 
   //////////////////////////////////////////////////////////////////////////////
@@ -131,12 +129,12 @@ Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_
   // Static members are now set.
   Element::Static_Members_Set = true;
 
-  return SUCCESS;
-} // Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
+  return Element_Errors::SUCCESS;
+} // Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
 
 
 
-Errors Set_Element_Material(const double E, const double v) {
+Element_Errors Set_Element_Material(const double E, const double v) {
   /* Function description:
   This function is designed to set up the D matrix for the element class. This
   matrix is a reduced form of the Elasticity tensor C. D is constructed from C
@@ -151,7 +149,7 @@ Errors Set_Element_Material(const double E, const double v) {
   We assume that the Element material has not already been set */
   if(Element::Material_Set == true) {
     printf("Error in Set_Element_Material\n");
-    return MATERIAL_ALREADY_SET;
+    return Element_Errors::MATERIAL_ALREADY_SET;
   } // if(Element::Material_Set == true) {
 
   // First, let's calculate lambda and mu.
@@ -187,7 +185,7 @@ Errors Set_Element_Material(const double E, const double v) {
     } // for(int i = 0; i < 6; i++) {
   #endif
 
-  return SUCCESS;
-} // Errors Set_Element_Material(const double E, const double v) {
+  return Element_Errors::SUCCESS;
+} // Element_Errors Set_Element_Material(const double E, const double v) {
 
 #endif

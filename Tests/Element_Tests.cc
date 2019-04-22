@@ -4,25 +4,25 @@
 #include "Tests.h"
 #include <stdio.h>
 
-void Test::Element_Errors(void) {
+void Test::Element_Error_Tests(void) {
   // First, lets create some elements.
   class Element El[4];
-  Element_Errors::Errors El_Err;
+  Element_Errors El_Err;
 
   //////////////////////////////////////////////////////////////////////////////
   // Let's check that the "ELEMENT_NOT_SET_UP" Error is handled correctly
 
   printf("\nTrying to set nodes\n");
   El_Err = El[1].Set_Nodes(0,1,2,3,4,5,6,7);
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("\nTrying to populate Ke\n");
   El_Err = El[2].Populate_Ke();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("\nTrying to move Ke to K\n");
   El_Err = El[3].Move_Ke_To_K();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -117,19 +117,19 @@ void Test::Element_Errors(void) {
   // We are now ready to set the static members of the Element class
   printf("\nSetting static members of the Element class\n");
   El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("Attempting to set the static members a second time\n");
   El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("\nSetting Element material\n");
   El_Err = Set_Element_Material(10, .3);
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("Attempting to set Element material a second time\n");
   El_Err = Set_Element_Material(10, .3);
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   // Now, create an array of elements.
   const unsigned Num_Elements = (Nx-1)*(Ny-1)*(Nz-1);
@@ -141,15 +141,15 @@ void Test::Element_Errors(void) {
 
   printf("\nAttempting to Populate_Ke before setting node list\n");
   El_Err = Elements[0].Populate_Ke();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("Attempting to Fill_Ke_With_1s before setting node list\n");
   El_Err = Elements[0].Fill_Ke_With_1s();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("Attempting to move Ke to K before setting node list\n");
   El_Err = Elements[0].Move_Ke_To_K();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   ///////////////////////////////////////////////////////////////////////////////
   // Now, set each element's node list
@@ -176,15 +176,15 @@ void Test::Element_Errors(void) {
 
   printf("Attempting to move Ke to K\n");
   El_Err = Elements[0].Move_Ke_To_K();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("Attempting to move Fe to F\n");
   El_Err = Elements[0].Move_Fe_To_F();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("Attempting to populate Fe\n");
   El_Err = Elements[0].Populate_Fe();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   ///////////////////////////////////////////////////////////////////////////////
   // Fill each Ke with 1's
@@ -203,15 +203,15 @@ void Test::Element_Errors(void) {
 
   printf("Attempting to populate Element[0]'s (it's already set)\n");
   El_Err = Elements[0].Populate_Ke();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("Attempting to fill Element[0]'s Ke with 1's\n");
   El_Err = Elements[0].Fill_Ke_With_1s();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
   printf("Attempting to move Fe to F\n");
   El_Err = Elements[0].Move_Fe_To_F();
-  Element_Errors::Handle_Error(El_Err);
+  Handle_Error(El_Err);
 
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -232,14 +232,14 @@ void Test::Element_Errors(void) {
   printf("Done!\n");
 
   // In theory, K and F should now be set. Let's check. Print K, F to a file
-  Simulation::Print_K_To_File(K, Simulation::INTEGER);
+  Simulation::Print_K_To_File(K, Simulation::Printing_Mode::INTEGER);
   Simulation::Print_F_To_File(F, Num_Global_Eq);
-} // void Test::Element_Errors(void) {
+} // void Test::Element_Error_Tests(void) {
 
 
 
 void Test::Element(void) {
-  Element_Errors::Errors El_Err;
+  Element_Errors El_Err;
 
   //////////////////////////////////////////////////////////////////////////////
   // Specify dimension
@@ -339,13 +339,13 @@ void Test::Element(void) {
   // Set up the element class
   El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
   if(El_Err != Element_Errors::SUCCESS) {
-    Element_Errors::Handle_Error(El_Err);
+    Handle_Error(El_Err);
     return;
   } // if(El_Err != Element_Errors::SUCCESS) {
 
   El_Err = Set_Element_Material(10, .3);
   if(El_Err != Element_Errors::SUCCESS) {
-    Element_Errors::Handle_Error(El_Err);
+    Handle_Error(El_Err);
     return;
   } // if(El_Err != Element_Errors::SUCCESS) {
 
@@ -380,7 +380,7 @@ void Test::Element(void) {
                                                    Ny*Nz*i + Nz*(j+1) + (k+1));
         // Check for error
         if(El_Err != Element_Errors::SUCCESS) {
-          Element_Errors::Handle_Error(El_Err);
+          Handle_Error(El_Err);
           return;
         } // if(El_Err != Element_Errors::SUCCESS) {
 
@@ -388,7 +388,7 @@ void Test::Element(void) {
         // Populate Ke and check for errors
         El_Err = Elements[Element_Index].Populate_Ke();
         if(El_Err != Element_Errors::SUCCESS) {
-          Element_Errors::Handle_Error(El_Err);
+          Handle_Error(El_Err);
           return;
         } // if(El_Err != Element_Errors::SUCCESS) {
 
@@ -396,7 +396,7 @@ void Test::Element(void) {
         // Populate Fe and check for errors
         El_Err = Elements[Element_Index].Populate_Fe();
         if(El_Err != Element_Errors::SUCCESS) {
-          Element_Errors::Handle_Error(El_Err);
+          Handle_Error(El_Err);
           return;
         } // if(El_Err != Element_Errors::SUCCESS) {
 
@@ -404,7 +404,7 @@ void Test::Element(void) {
         // Move Ke to K and check for errors
         El_Err = Elements[Element_Index].Move_Ke_To_K();
         if(El_Err != Element_Errors::SUCCESS) {
-          Element_Errors::Handle_Error(El_Err);
+          Handle_Error(El_Err);
           return;
         } // if(El_Err != Element_Errors::SUCCESS) {
 
@@ -412,7 +412,7 @@ void Test::Element(void) {
         // Move Fe to F and check for errors
         El_Err = Elements[Element_Index].Move_Fe_To_F();
         if(El_Err != Element_Errors::SUCCESS) {
-          Element_Errors::Handle_Error(El_Err);
+          Handle_Error(El_Err);
           return;
         } // if(El_Err != Element_Errors::SUCCESS) {
 
@@ -444,7 +444,7 @@ void Simulation::Print_K_To_File(const Matrix<double> & K, const Printing_Mode M
   for(int i = 0; i < Num_Rows; i++) {
     fprintf(File,"| ");
     for(int j = 0; j < Num_Cols; j++) {
-      if(Mode == INTEGER)
+      if(Mode == Printing_Mode::INTEGER)
         fprintf(File,"%1.0lf ", K(i,j));
       else
         fprintf(File,"%8.1e ", K(i,j));

@@ -1,9 +1,7 @@
 #if !defined(MATRIX_HEADER)
 #define MATRIX_HEADER
 
-namespace Memory {
-  enum Layout{ROW_MAJOR, COLUMN_MAJOR};
-} // namespace Memory {
+enum class Memory{ROW_MAJOR, COLUMN_MAJOR};
 
 template <typename Type>
 class Matrix {
@@ -16,7 +14,7 @@ private:
   unsigned Num_Cols;
 
   // Specify row or column major storage scheme
-  Memory::Layout Memory_Layout;
+  Memory Memory_Layout;
 public:
   // Default constructor
   Matrix(void);
@@ -24,7 +22,7 @@ public:
   // Set up Constructor
   Matrix(const unsigned Rows_In,                                               // Intent: Read
          const unsigned Cols_In,                                               // Intent: Read
-         const Memory::Layout Layout_In);                                      // Intent: Read
+         const Memory Layout_In);                                              // Intent: Read
 
   // Destructor
   ~Matrix(void);
@@ -36,7 +34,7 @@ public:
   // Set up matrix method
   void Set_Up(const unsigned Rows_In,                                          // Intent: Read
               const unsigned Cols_In,                                          // Intent: Read
-              const Memory::Layout Layout_In);                                 // Intent: Read
+              const Memory Layout_In);                                         // Intent: Read
 
   // Write to an element of the matrix
   Type & operator()(const unsigned i,                                          // Intent: Read
@@ -52,7 +50,7 @@ public:
 
   unsigned Get_Num_Rows(void) const { return Num_Rows; }
   unsigned Get_Num_Cols(void) const { return Num_Cols; }
-  Memory::Layout Get_Memory_Layout(void) const { return Memory_Layout; }
+  Memory Get_Memory_Layout(void) const { return Memory_Layout; }
 
 
   //////////////////////////////////////////////////////////////////////////////

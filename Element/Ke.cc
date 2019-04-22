@@ -13,8 +13,6 @@ the functions requried to move Ke to K. */
 //#define POPULATE_KE_MONITOR            // Prints JD, B, JD*B and B^T*JD*B
 #define KE_MONITOR                     // Prints Ke
 
-using namespace Element_Errors;
-
 
 
 void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> & Coeff, double & J) {
@@ -185,7 +183,7 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Point, const Matri
 
 
 
-Errors Element::Populate_Ke(void) {
+Element_Errors Element::Populate_Ke(void) {
   /* Function description:
   This method is used to populate Ke, the element stiffness matrix. Once
   this method has run, Ke can be mapped to K and F. */
@@ -205,7 +203,7 @@ Errors Element::Populate_Ke(void) {
   this function assumes that the node list and node positions have been set. */
   if(Element_Set_Up == false) {
     printf("Error in Element::Populate_Ke\n");
-    return ELEMENT_NOT_SET_UP;
+    return Element_Errors::ELEMENT_NOT_SET_UP;
   } // if(Element_Set_Up == false) {
 
   /* Assumption 3:
@@ -213,14 +211,14 @@ Errors Element::Populate_Ke(void) {
   "Material_Set" flag. */
   if(Material_Set == false) {
     printf("Error in Element::Populate_Ke\n");
-    return MATERIAL_NOT_SET;
+    return Element_Errors::MATERIAL_NOT_SET;
   } // if(Material_Set == false) {
 
   /* Assumption 4:
   This function also assumes that Ke has not been set already. */
   if(Ke_Set_Up == true) {
     printf("Error in Element::Populate_Ke\n");
-    return KE_ALREADY_SET_UP;
+    return Element_Errors::KE_ALREADY_SET_UP;
   } // if(Ke_Set_Up == true) {
 
 
@@ -245,7 +243,7 @@ Errors Element::Populate_Ke(void) {
     // Make sure that J is not zero.
     if(J <= 0) {
       printf("Error in Populate_Ke!\n");
-      return BAD_DETERMINANT;
+      return Element_Errors::BAD_DETERMINANT;
     } // if(J == 0) {
 
     // Calculate j*D
@@ -356,12 +354,12 @@ Errors Element::Populate_Ke(void) {
     } // for(int i = 0; i < 24, i++) {
   #endif
 
-  return SUCCESS;
-} // Errors Element::Populate_Ke(void) {
+  return Element_Errors::SUCCESS;
+} // Element_Errors Element::Populate_Ke(void) {
 
 
 
-Errors Element::Fill_Ke_With_1s(void) {
+Element_Errors Element::Fill_Ke_With_1s(void) {
   /* Function description:
   This function is used for testing purposes. It sets every element of Ke to 1.
   Once this has been done, Ke can be mapped to K. This is used to test that
@@ -373,7 +371,7 @@ Errors Element::Fill_Ke_With_1s(void) {
   this function assumes that the node list has been set. */
   if(Element_Set_Up == false) {
     printf("Error in Element::Fill_Ke_With_1s\n");
-    return ELEMENT_NOT_SET_UP;
+    return Element_Errors::ELEMENT_NOT_SET_UP;
   } // if(Element_Set_Up == false) {
 
 
@@ -381,7 +379,7 @@ Errors Element::Fill_Ke_With_1s(void) {
   This function also assumes that Ke has not been set already. */
   if(Ke_Set_Up == true) {
     printf("Error in Element::Fill_Ke_With_1s\n");
-    return KE_ALREADY_SET_UP;
+    return Element_Errors::KE_ALREADY_SET_UP;
   } // if(Ke_Set_Up == true) {
 
   //////////////////////////////////////////////////////////////////////////////
@@ -406,12 +404,12 @@ Errors Element::Fill_Ke_With_1s(void) {
     } // for(int i = 0; i < 24, i++) {
   #endif
 
-  return SUCCESS;
-} // Errors Element::Fill_Ke_With_1s(void) {
+  return Element_Errors::SUCCESS;
+} // Element_Errors Element::Fill_Ke_With_1s(void) {
 
 
 
-Errors Element::Move_Ke_To_K(void) const {
+Element_Errors Element::Move_Ke_To_K(void) const {
   /* Function description:
   This fucntion is used to map the element stiffness matrix, Ke, to the global
   stiffness matrix, K. */
@@ -426,7 +424,7 @@ Errors Element::Move_Ke_To_K(void) const {
   set. Therefore, if Ke is set then both assumptions must be satisified */
   if(Ke_Set_Up == false) {
     printf("Error in Element::Move_Ke_To_K\n");
-    return KE_NOT_SET_UP;
+    return Element_Errors::KE_NOT_SET_UP;
   } // if(Ke_Set_Up == false) {
 
 
@@ -469,7 +467,7 @@ Errors Element::Move_Ke_To_K(void) const {
       } // for(int Row = Col+1; Row < 24; Row++) {
   } // for(int Col = 0; Col < 24; Col++) {
 
-  return SUCCESS;
-} // Errors Element::Move_Ke_To_K(void) const {
+  return Element_Errors::SUCCESS;
+} // Element_Errors Element::Move_Ke_To_K(void) const {
 
 #endif

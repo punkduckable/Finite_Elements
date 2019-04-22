@@ -4,12 +4,10 @@
 #include "Node.h"
 #include <stdio.h>
 
-using namespace Node_Errors;
-
 ////////////////////////////////////////////////////////////////////////////////
 // Setter methods
 
-Errors Node::Update_Position(const unsigned component, const double New_Position) {
+Node_Errors Node::Update_Position(const unsigned component, const double New_Position) {
   /* Function Description:
   This function is used to update a particular component of the Node's position. */
 
@@ -17,7 +15,7 @@ Errors Node::Update_Position(const unsigned component, const double New_Position
   This function assumes that this specific Node has been set up. */
   if(Node_Set_Up == false) {
     printf("Error in Update_Position\n");
-    return NODE_NOT_SET_UP;
+    return Node_Errors::NODE_NOT_SET_UP;
   } // if(Node_Set_Up == false) {
 
   /* Assumption 2:
@@ -25,17 +23,17 @@ Errors Node::Update_Position(const unsigned component, const double New_Position
   since the Position array only has 3 components.*/
   if(component > 2) {
     printf("Error in Update_Position\n");
-    return INDEX_OUT_OF_BOUNDS;
+    return Node_Errors::INDEX_OUT_OF_BOUNDS;
   } // if(component > 2) {
 
   // If if all of the assumptions have been satisified then update the current position
   Position[component] = New_Position;
-  return SUCCESS;
-} // Errors Node::Update_Position(const unsigned component, const double New_Position) {
+  return Node_Errors::SUCCESS;
+} // Node_Errors Node::Update_Position(const unsigned component, const double New_Position) {
 
 
 
-Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
+Node_Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
   /* Function Description:
   This function is used to set the original position of the Node. The original
   position is used to compute K. */
@@ -44,7 +42,7 @@ Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
   This function assumes that the node has not been set up already. */
   if(Node_Set_Up == true) {
     printf("Error in Set_Original_Position\n");
-    return NODE_ALREADY_SET_UP;
+    return Node_Errors::NODE_ALREADY_SET_UP;
   } // if(Node_Set_Up == true) {
 
   // Set the Original Position and Current_Position using the passed Array
@@ -59,12 +57,12 @@ Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
   // Original Position has been set
   Node_Set_Up = true;
 
-  return SUCCESS;
-} // Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
+  return Node_Errors::SUCCESS;
+} // Node_Errors Node::Set_Original_Position(const Array_3<double> Original_Position_In) {
 
 
 
-Errors Node::Set_BC(const unsigned Component, const double BC_In) {
+Node_Errors Node::Set_BC(const unsigned Component, const double BC_In) {
   /* Function Description:
   This function is used to set the BC for a particular node. */
 
@@ -72,7 +70,7 @@ Errors Node::Set_BC(const unsigned Component, const double BC_In) {
   This function assumes that the node has been set up */
   if(Node_Set_Up == false) {
     printf("Error in Set_BC\n");
-    return NODE_NOT_SET_UP;
+    return Node_Errors::NODE_NOT_SET_UP;
   } // if(Node_Set_Up == false) {
 
   /* Assumption 2:
@@ -80,14 +78,14 @@ Errors Node::Set_BC(const unsigned Component, const double BC_In) {
   since the Position array only has 3 components.*/
   if(Component > 2) {
     printf("Error in Set_BC\n");
-    return INDEX_OUT_OF_BOUNDS;
+    return Node_Errors::INDEX_OUT_OF_BOUNDS;
   } // if(component > 2) {
 
   /* Assumption 3:
   This function assumes that the specificed BC has not already been set */
   if(Has_BC[Component] == true) {
     printf("Error in Set_BC\n");
-    return BC_ALREADY_SET;
+    return Node_Errors::BC_ALREADY_SET;
   } // if(Has_BC[Component] == true) {
 
   // Set the BC.
@@ -95,12 +93,12 @@ Errors Node::Set_BC(const unsigned Component, const double BC_In) {
   Has_BC[Component] = true;
 
   // All done!
-  return SUCCESS;
-} // Errors Node::Set_BC(const unsigned Component, const double BC_In) {
+  return Node_Errors::SUCCESS;
+} // Node_Errors Node::Set_BC(const unsigned Component, const double BC_In) {
 
 
 
-Errors Node::Update_Position_Using_BCs(void) {
+Node_Errors Node::Update_Position_Using_BCs(void) {
   /* Function Description:
   This function is used to update the current position of the node using the
   Prescribed Position BCs. This function transfers any prescribed boundary BCs
@@ -113,7 +111,7 @@ Errors Node::Update_Position_Using_BCs(void) {
   This function assumes that the node has been set up */
   if(Node_Set_Up == false) {
     printf("Error in Update_Position_From_BCs\n");
-    return NODE_NOT_SET_UP;
+    return Node_Errors::NODE_NOT_SET_UP;
   } // if(Node_Set_Up == false) {
 
   /* Cycle through the components. If a particular component has a BC, set
@@ -125,8 +123,8 @@ Errors Node::Update_Position_Using_BCs(void) {
     } // if(Has_BC[i] == true) {
 
   // All done!
-  return SUCCESS;
-} // Errors Node::Update_Position_Using_BCs(void) {
+  return Node_Errors::SUCCESS;
+} // Node_Errors Node::Update_Position_Using_BCs(void) {
 
 
 
@@ -136,7 +134,7 @@ Errors Node::Update_Position_Using_BCs(void) {
 ////////////////////////////////////////////////////////////////////////////////
 // Getter methods
 
-Errors Node::Get_Has_BC(const unsigned index, bool & Has_Bc_Out) const {
+Node_Errors Node::Get_Has_BC(const unsigned index, bool & Has_Bc_Out) const {
   /* Function Description:
   This function is used to determine if a particular component of a Node's
   position is fixed (has a Prescribed displacement BC) or free. */
@@ -146,7 +144,7 @@ Errors Node::Get_Has_BC(const unsigned index, bool & Has_Bc_Out) const {
   nothing to report */
   if(Node_Set_Up == false) {
     printf("Error in Get_Has_BC\n");
-    return NODE_NOT_SET_UP;
+    return Node_Errors::NODE_NOT_SET_UP;
   } // if(Node_Set_Up == false) {
 
   /* Assumption 2:
@@ -154,17 +152,17 @@ Errors Node::Get_Has_BC(const unsigned index, bool & Has_Bc_Out) const {
   array only has 3 elements, so anything with index > 2 is undefined */
   if(index > 2) {
     printf("Error in Get_Has_BC\n");
-    return INDEX_OUT_OF_BOUNDS;
+    return Node_Errors::INDEX_OUT_OF_BOUNDS;
   } // if(index > 2) {
 
   Has_Bc_Out = Has_BC[index];
 
-  return SUCCESS;
-} // Errors Node::Get_Has_BC(const unsigned index, bool & Has_Bc_Out) const {
+  return Node_Errors::SUCCESS;
+} // Node_Errors Node::Get_Has_BC(const unsigned index, bool & Has_Bc_Out) const {
 
 
 
-Errors Node::Get_Current_Position(Array_3<double> & Current_Position_Out) const {
+Node_Errors Node::Get_Current_Position(Array_3<double> & Current_Position_Out) const {
   /* Function Description:
   This function is used to obtain the current position of the Node. */
 
@@ -173,18 +171,18 @@ Errors Node::Get_Current_Position(Array_3<double> & Current_Position_Out) const 
   then there is no "Original position" to report. */
   if(Node_Set_Up == false) {
     printf("Error in Get_Current_Position\n");
-    return NODE_NOT_SET_UP;
+    return Node_Errors::NODE_NOT_SET_UP;
   } // if(Node_Set_Up == false) {
 
   // Copy position to Pos_Out variable
   Current_Position_Out = Position;
 
-  return SUCCESS;
-} // Errors Node::Get_Current_Position(Array_3<double> & Position_Out) const {
+  return Node_Errors::SUCCESS;
+} // Node_Errors Node::Get_Current_Position(Array_3<double> & Position_Out) const {
 
 
 
-Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) const {
+Node_Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) const {
   /* Function Description:
   This function is used to obtain the Original position of the Node. */
 
@@ -193,14 +191,14 @@ Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) cons
   then there is no "Original position" to report. */
   if(Node_Set_Up == false) {
     printf("Error in Get_Original_Position\n");
-    return NODE_NOT_SET_UP;
+    return Node_Errors::NODE_NOT_SET_UP;
   } // if(Node_Set_Up == false) {
 
   // Copy position to Pos_Out variable
   Original_Position_Out = Original_Position;
 
-  return SUCCESS;
-} // Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) const {
+  return Node_Errors::SUCCESS;
+} // Node_Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) const {
 
 
 
@@ -209,7 +207,7 @@ Errors Node::Get_Original_Position(Array_3<double> & Original_Position_Out) cons
 ////////////////////////////////////////////////////////////////////////////////
 // Other methods
 
-Errors Node::Print(void) const {
+Node_Errors Node::Print(void) const {
   /* Function Description:
   This function prints out information about the node. */
 
@@ -218,7 +216,7 @@ Errors Node::Print(void) const {
   then there's nothing to print. */
   if(Node_Set_Up == false) {
     printf("Error in Print\n");
-    return NODE_NOT_SET_UP;
+    return Node_Errors::NODE_NOT_SET_UP;
   } // if(Node_Set_Up == false) {
 
   printf(         "Original Position   :         [%6.3lf, %6.3lf, %6.3lf]\n", Original_Position[0],  Original_Position[1], Original_Position[2]);
@@ -237,8 +235,8 @@ Errors Node::Print(void) const {
     } // for(int i = 0; i < 3; i++) {
     printf("]\n");
 
-  return SUCCESS;
-} // Errors Node::Print(void) const {
+  return Node_Errors::SUCCESS;
+} // Node_Errors Node::Print(void) const {
 
 
 #endif

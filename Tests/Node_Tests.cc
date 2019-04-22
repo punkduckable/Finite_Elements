@@ -4,7 +4,7 @@
 #include "Tests.h"
 #include <stdio.h>
 
-void Test::Node_Errors(void) {
+void Test::Node_Error_Tests(void) {
   ///////////////////////////////////////////////////////////////////////////////
   // Node Error handeling tests
 
@@ -13,33 +13,33 @@ void Test::Node_Errors(void) {
   class Node Node;
 
   // Declare an Node_Error type variable
-  Node_Errors::Errors Er;
+  Node_Errors Er;
 
   // Try to update the Node before it has been set up
   printf("Trying to update Node position before setting the node up...\n");
   Er = Node.Update_Position(37, 1);
-  Node_Errors::Handle_Error(Er);
+  Handle_Error(Er);
 
   // Try Using the getter methods before the node has been set up.
   printf("Trying to get Has_BC information...\n");
   bool Has_BC;
   Er = Node.Get_Has_BC(3, Has_BC);
-  Node_Errors::Handle_Error(Er);
+  Handle_Error(Er);
 
   printf("Trying to get Original Position...\n");
   Array_3<double> Ar;
   Er = Node.Get_Original_Position(Ar);
-  Node_Errors::Handle_Error(Er);
+  Handle_Error(Er);
 
 
   // Set the Node Original Position, BC's
   printf("\nSetting Node Original Position:\n ");
   Er = Node.Set_Original_Position({0,0,0});
-  Node_Errors::Handle_Error(Er);
+  Handle_Error(Er);
 
   printf("Setting Node BCs:\n ");
   Er = Node.Set_BC(1,.5);
-  Node_Errors::Handle_Error(Er);
+  Handle_Error(Er);
 
 
   // Print out Node information
@@ -51,7 +51,7 @@ void Test::Node_Errors(void) {
   // Try setting BC's and Original Position again.
   printf("\nTrying to set Position a second time...\n");
   Er = Node.Set_Original_Position({1,2,3});
-  Node_Errors::Handle_Error(Er);
+  Handle_Error(Er);
 
   // Print out current Node information
   printf("After trying to set Original position twice:\n");
@@ -63,7 +63,7 @@ void Test::Node_Errors(void) {
   // Modifiying node position
   printf("\nUpdating node position: ");
   Er = Node.Update_Position(0, 37);
-  Node_Errors::Handle_Error(Er);
+  Handle_Error(Er);
 
   // Print new Node information
   printf("After setting 0 component of Node's position:\n");
@@ -73,12 +73,12 @@ void Test::Node_Errors(void) {
   // Try setting an out of bounds component of position
   printf("\nTrying to set out of bounds component of position...\n");
   Er = Node.Update_Position(3,37);
-  Node_Errors::Handle_Error(Er);
+  Handle_Error(Er);
 
   // Try getting out of bounds Fixed_Component information
   printf("Trying to get out of bounds Fixed_Component info\n");
   Er = Node.Get_Has_BC( 5, Has_BC );
-  Node_Errors::Handle_Error(Er);
+  Handle_Error(Er);
 
   // Print Node's information
   printf("After trying to modify current position:\n");
@@ -86,7 +86,7 @@ void Test::Node_Errors(void) {
   printf("\n");
 
   printf("\nTest complete\n");
-} // void Test::Node_Errors(void) {
+} // void Test::Node_Error_Tests(void) {
 
 
 

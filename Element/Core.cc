@@ -9,8 +9,6 @@ constructors, destructor, and Node_Set_Up */
 #include <stdio.h>
 #define ELEMENT_MONITOR                // Prints Node list and Node positions
 
-using namespace Element_Errors;
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,14 +43,14 @@ Element::~Element(void) {
 ////////////////////////////////////////////////////////////////////////////////
 // Other Element methods
 
-Errors Element::Set_Nodes(const unsigned Node0_ID,
-                          const unsigned Node1_ID,
-                          const unsigned Node2_ID,
-                          const unsigned Node3_ID,
-                          const unsigned Node4_ID,
-                          const unsigned Node5_ID,
-                          const unsigned Node6_ID,
-                          const unsigned Node7_ID) {
+Element_Errors Element::Set_Nodes(const unsigned Node0_ID,
+                                  const unsigned Node1_ID,
+                                  const unsigned Node2_ID,
+                                  const unsigned Node3_ID,
+                                  const unsigned Node4_ID,
+                                  const unsigned Node5_ID,
+                                  const unsigned Node6_ID,
+                                  const unsigned Node7_ID) {
   /* Function description:
   This function is used to set set up the Element. The passed Node ID's are
   moved into the Node_List, which then uses the ID array to populate the
@@ -79,7 +77,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   satisified.  */
   if(Static_Members_Set == false) {
     printf("Error in Element::Set_Nodes\n");
-    return STATIC_MEMBERS_NOT_SET;
+    return Element_Errors::STATIC_MEMBERS_NOT_SET;
   } // if(Static_Members_Set == false) {
 
   /* Assumptions 3:
@@ -87,7 +85,7 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
   set already. */
   if(Element_Set_Up == true) {
     printf("Error in Element::Set_Nodes\n");
-    return ELEMENT_ALREADY_SET_UP;
+    return Element_Errors::ELEMENT_ALREADY_SET_UP;
   } // if(Element_Set_Up == true) {
 
   //////////////////////////////////////////////////////////////////////////////
@@ -200,8 +198,8 @@ Errors Element::Set_Nodes(const unsigned Node0_ID,
     printf("\n");
   #endif
 
-  return SUCCESS;
-} // Errors Element::Set_Nodes(const unsigned Node1_ID,
+  return Element_Errors::SUCCESS;
+} // Element_Errors Element::Set_Nodes(const unsigned Node1_ID,
 
 
 

@@ -99,38 +99,38 @@ public:
 
   This function sets Num_Local_Eq, Local_Eq_Num_To_Global_Eq_Num, and the
   node position arrays (Xa, Ya, Za). */
-  Element_Errors::Errors Set_Nodes(const unsigned Node0_ID,                    // Intent: Read
-                                   const unsigned Node1_ID,                    // Intent: Read
-                                   const unsigned Node2_ID,                    // Intent: Read
-                                   const unsigned Node3_ID,                    // Intent: Read
-                                   const unsigned Node4_ID,                    // Intent: Read
-                                   const unsigned Node5_ID,                    // Intent: Read
-                                   const unsigned Node6_ID,                    // Intent: Read
-                                   const unsigned Node7_ID);                   // Intent: Read
+  Element_Errors Set_Nodes(const unsigned Node0_ID,                            // Intent: Read
+                           const unsigned Node1_ID,                            // Intent: Read
+                           const unsigned Node2_ID,                            // Intent: Read
+                           const unsigned Node3_ID,                            // Intent: Read
+                           const unsigned Node4_ID,                            // Intent: Read
+                           const unsigned Node5_ID,                            // Intent: Read
+                           const unsigned Node6_ID,                            // Intent: Read
+                           const unsigned Node7_ID);                           // Intent: Read
 
   /* Populate Ke.
   This function populates the Ke matrix for this Element */
-  Element_Errors::Errors Populate_Ke(void);
-  Element_Errors::Errors Fill_Ke_With_1s(void);                                // A function to test the assembly procedure
+  Element_Errors Populate_Ke(void);
+  Element_Errors Fill_Ke_With_1s(void);                                        // A function to test the assembly procedure
 
   /* Populate Fe */
-  Element_Errors::Errors Populate_Fe(void);
+  Element_Errors Populate_Fe(void);
 
   /* Move Ke into K */
-  Element_Errors::Errors Move_Ke_To_K(void) const;
+  Element_Errors Move_Ke_To_K(void) const;
 
   /* Move Fe into F */
-  Element_Errors::Errors Move_Fe_To_F(void) const;
+  Element_Errors Move_Fe_To_F(void) const;
 
 
 
-  friend Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,    // Intent: Read
-                                                           Matrix<double> * K_Ptr,       // Intend: Read
-                                                           double * F_Ptr,               // Intent: Read
-                                                           Node * Nodes_Ptr);            // Intent: Read
+  friend Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,  // Intent: Read
+                                                   Matrix<double> * K_Ptr,     // Intend: Read
+                                                   double * F_Ptr,             // Intent: Read
+                                                   Node * Nodes_Ptr);          // Intent: Read
 
-  friend Element_Errors::Errors Set_Element_Material(const double E,           // Intent : Read
-                                                     const double v);          // Intent : Read
+  friend Element_Errors Set_Element_Material(const double E,                   // Intent : Read
+                                             const double v);                  // Intent : Read
 
   //////////////////////////////////////////////////////////////////////////////
   // Disable Implicit methods
@@ -149,12 +149,12 @@ public:
   Element & operator=(const Element & El);
 }; // class Element {
 
-Element_Errors::Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,   // Intent: Read
-                                                  Matrix<double> * K_Ptr,      // Intent: Read
-                                                  double * F_Ptr,              // Intent: Read
-                                                  Node * Nodes_Ptr);           // Intent: Read
+Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,           // Intent: Read
+                                          Matrix<double> * K_Ptr,              // Intent: Read
+                                          double * F_Ptr,                      // Intent: Read
+                                          Node * Nodes_Ptr);                   // Intent: Read
 
-Element_Errors::Errors Set_Element_Material(const double E,                    // Intent : Read
-                                            const double v);                   // Intent : Read
+Element_Errors Set_Element_Material(const double E,                            // Intent : Read
+                                    const double v);                           // Intent : Read
 
 #endif

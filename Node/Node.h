@@ -30,39 +30,39 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
   // Set Original position of the Node (used for construction of K)
-  Node_Errors::Errors Set_Original_Position(const Array_3<double> Original_Position_In); // Intent: Read
+  Node_Errors Set_Original_Position(const Array_3<double> Original_Position_In); // Intent: Read
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Update Node methods
 
   // Updates the current (spatial) position of the node
-  Node_Errors::Errors Update_Position(const unsigned int component,            // Intent: Read
+  Node_Errors Update_Position(const unsigned int component,                    // Intent: Read
                                       const double New_Position);              // Intent: Read
 
   // Sets a Particular component of the BC's
-  Node_Errors::Errors Set_BC(const unsigned component,                         // Intent: Read
-                             const double BC_In);                              // Intent: Read
+  Node_Errors Set_BC(const unsigned component,                                 // Intent: Read
+                     const double BC_In);                                      // Intent: Read
 
   // Updates positions using the prescribed position BCs
-  Node_Errors::Errors Update_Position_Using_BCs(void);
+  Node_Errors Update_Position_Using_BCs(void);
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods
 
-  Node_Errors::Errors Get_Has_BC(const unsigned index,                         // Intent: Read
+  Node_Errors Get_Has_BC(const unsigned index,                                 // Intent: Read
                                  bool & Fixed_Pos_Out ) const;                 // Intent: Write
 
-  Node_Errors::Errors Get_Current_Position( Array_3<double> & Current_Position_Out ) const;   // Intent: Write
+  Node_Errors Get_Current_Position( Array_3<double> & Current_Position_Out ) const; // Intent: Write
 
-  Node_Errors::Errors Get_Original_Position( Array_3<double> & Original_Position_Out) const;  // Intent: Write
+  Node_Errors Get_Original_Position( Array_3<double> & Original_Position_Out) const;// Intent: Write
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Other public methods
 
-  Node_Errors::Errors Print(void) const;
+  Node_Errors Print(void) const;
 }; // class Node {
 
 #endif

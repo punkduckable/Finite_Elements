@@ -9,10 +9,8 @@ to F. */
 #include <stdio.h>
 #define FE_MONITOR                     // Prints Fe
 
-using namespace Element_Errors;
 
-
-Errors Element::Populate_Fe(void) {
+Element_Errors Element::Populate_Fe(void) {
   /* Function Description:
   This function is used to populate Fe, the local force vector.*/
 
@@ -21,7 +19,7 @@ Errors Element::Populate_Fe(void) {
   by the "Ke_Set_Up" flag. */
   if(Ke_Set_Up == false) {
     printf("Error in Element::Populate_Fe\n");
-    return KE_NOT_SET_UP;
+    return Element_Errors::KE_NOT_SET_UP;
   } // if(Ke_Set_Up == false) {
 
   /* Assumption 2:
@@ -29,7 +27,7 @@ Errors Element::Populate_Fe(void) {
   determined with the "Fe_Set_Up" flag */
   if(Fe_Set_Up == true) {
     printf("Error in Element::Populate_Fe\n");
-    return FE_ALREADY_SET_UP;
+    return Element_Errors::FE_ALREADY_SET_UP;
   } // if(Fe_Set_Up == true) {
 
   // Loop through the 24 local equations
@@ -56,13 +54,13 @@ Errors Element::Populate_Fe(void) {
     printf("|\n");
   #endif
 
-  return SUCCESS;
-} // Errors Elemnet::Populate_Fe(void) {
+  return Element_Errors::SUCCESS;
+} // Element_Errors Elemnet::Populate_Fe(void) {
 
 
 
 
-Errors Element::Move_Fe_To_F(void) const {
+Element_Errors Element::Move_Fe_To_F(void) const {
   /* Function description
   This function maps the local force vector, Fe, to the global force vector, F */
 
@@ -76,7 +74,7 @@ Errors Element::Move_Fe_To_F(void) const {
   set to validate both assumptions */
   if(Fe_Set_Up == false) {
     printf("Error in Move_Fe_To_F\n");
-    return FE_NOT_SET_UP;
+    return Element_Errors::FE_NOT_SET_UP;
   } // if(Fe_Set_Up == false) {
 
   // Now, add the local contributions to the force vector (Fe) to F.
@@ -88,8 +86,8 @@ Errors Element::Move_Fe_To_F(void) const {
       F[I] += Fe[i];
   } // for(int i = 0; i < 24; i++) {
 
-  return SUCCESS;
-} // Errors Element::Move_Fe_To_F(void) const {
+  return Element_Errors::SUCCESS;
+} // Element_Errors Element::Move_Fe_To_F(void) const {
 
 
 #endif

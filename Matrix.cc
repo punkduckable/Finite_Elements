@@ -18,9 +18,9 @@ Matrix<Type>::Matrix(void) {
 
 
 template<typename Type>
-Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Layout_In) {
+Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) {
   (*this).Set_Up(Rows_In, Cols_In, Layout_In);
-} // Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Layout_In) {
+} // Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) {
 
 
 
@@ -39,7 +39,7 @@ Matrix<Type>::~Matrix(void) {
 
 // Set up method
 template <typename Type>
-void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Layout_In) {
+void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) {
   // Allocate the matrix
   Ar = new Type[Rows_In*Cols_In];
 
@@ -48,7 +48,7 @@ void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const 
 
   // Set the Layout (this is used to access elements of the matrix)
   Memory_Layout = Layout_In;
-} // void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory::Layout Dominace_In) {
+} // void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory Dominace_In) {
 
 
 
