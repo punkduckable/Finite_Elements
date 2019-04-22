@@ -52,13 +52,18 @@ public:
   dynamically allocated memory. Therefore, a shallow copy to a temporary
   object could end up de-allocating memory that should not be de-allocated,
   leading to disaster. I do not want either of these to be useable for the
-  matrix class. Therefore, I wrote explicit version of these functions that
-  prints an angry message when either of them is used */
+  matrix class.
 
-  // Disabled Copy Constructor
+  Further, it really doesn't make any sense (in the context of what my code
+  does) to be able to set matricies equal to one another or to create
+  new matricies using the = operator.
+
+  Thus, to eliminate potential errors, I explicitly delete both of these methods.
+  If, for whatever reason, I use these methods in the code, their usage
+  will be caught at compile time, not runtime. */
+
   Matrix(const Matrix<Type> & M_In) = delete;
 
-  // Disabled = operator
   Matrix<Type> & operator=(const Matrix<Type> & M_In) = delete;
 }; // class Matrix {
 

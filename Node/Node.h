@@ -29,6 +29,19 @@ public:
 
 
   //////////////////////////////////////////////////////////////////////////////
+  // Disable Implicit methods
+  /* C++ implicitly defines the = operator and the copy construct for all
+  classes. Both of these methods work by member-by-member copying the members of
+  one object into another. However, I have no intention of allowing Nodes to be
+  created using the copy constructor or set equal to one another using the =
+  operator. Thus, I explicitly delete these methods */
+
+  Node(const Node & Node_In) = delete;
+
+  Node & operator=(const Node & Node_In) = delete;
+
+
+  //////////////////////////////////////////////////////////////////////////////
   // Set Original position of the Node (used for construction of K)
   Node_Errors Set_Original_Position(const Array_3<double> Original_Position_In); // Intent: Read
 

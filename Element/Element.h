@@ -138,14 +138,17 @@ public:
   classes. Both of these methods work by member-by-member copying the members of
   one object into another. The issue is that the Element class has dynamically
   allocated members. Copying member-by-member is a shallow copy. This could lead
-  to disaster. Thus, I explicitly define these this method to basically disable
-  the implicit ones. All that these methods do is yell at the user for using
-  then. */
+  to disaster.
 
-  // Disabled copy constructor
+  Further, I really doesn't make any sense to set two elements equal to one
+  another, and I have no intention of using the copy constructor for Elements
+
+  Thus, I explicitly disable both of these this method so that the compiler
+  will catch any accidential usage of these methods (thereby flagging potential
+  issues at compile time) */
+
   Element(const Element & El) = delete;
 
-  // disabled = operator.
   Element & operator=(const Element & El) = delete;
 }; // class Element {
 

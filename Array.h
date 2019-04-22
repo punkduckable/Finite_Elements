@@ -30,14 +30,21 @@ public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, destructor
 
-  // Default constructor
-  Array_3(void) {}
+  // Constructors
+  Array_3(void) {}                               // Default constructor
+
+  Array_3(const Array_3<Type> & Ar_In);          // Copy constructor           // Intent: Read
+
+  Array_3(const Type Ar_In[3]);                  // Create Array_3 from Array  // Intent: Read
+
+  Array_3(const Type a,                          // Specify components         // Intent: Read
+          const Type b,                                                        // Intent: Read
+          const Type c);                                                       // Intent: Read
+
+
+  // Copy constructor
 
   // Initialize using a 3 component array
-  Array_3(const Type Ar_In[3]);
-
-  // Initialize using a 3 component array
-  Array_3(const Type a, const Type b, const Type c);
 
   // Destructor
   ~Array_3(void) {}

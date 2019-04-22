@@ -7,12 +7,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Constructors, Destructor
 
+// Copy constructor
 template<typename Type>
-Array_3<Type>::Array_3(const Type Ar_In[3]) {
-  Ar[0] = Ar_In[0];
-  Ar[1] = Ar_In[1];
-  Ar[2] = Ar_In[2];
-} // Array_3<Type>::Array_3(const Type Ar_In[3]) {
+Array_3<Type>::Array_3(const Array_3<Type> & Ar_In) {
+  Ar[0] = Ar_In.Ar[0];
+  Ar[1] = Ar_In.Ar[1];
+  Ar[2] = Ar_In.Ar[2];
+} // Array_3<Type>::Array_3(const Array_3<Type> & Ar_In) {
+
 
 
 // Initialize using a 3 component array
@@ -22,6 +24,16 @@ Array_3<Type>::Array_3(const Type a, const Type b, const Type c) {
   Ar[1] = b;
   Ar[2] = c;
 } // Array_3<Type>::Array_3(const Type a, const Type b, const Type c) {
+
+
+
+template<typename Type>
+Array_3<Type>::Array_3(const Type Ar_In[3]) {
+  Ar[0] = Ar_In[0];
+  Ar[1] = Ar_In[1];
+  Ar[2] = Ar_In[2];
+} // Array_3<Type>::Array_3(const Type Ar_In[3]) {
+
 
 
 
@@ -40,6 +52,7 @@ Type Array_3<Type>::operator()(const unsigned int Index) const {
 } // Type Array_3<Type>::operator()(const unsigned int Index) const {
 
 
+
 /* Used to write to an element of the Array. */
 template<typename Type>
 Type & Array_3<Type>::operator()(const unsigned int Index) {
@@ -49,6 +62,7 @@ Type & Array_3<Type>::operator()(const unsigned int Index) {
 
   return Ar[Index];
 } // Type & Array_3<Type>::operator()(const unsigned int Index) {
+
 
 
 template<typename Type>
