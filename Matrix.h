@@ -14,10 +14,10 @@ private:
   unsigned Num_Cols;
 
   // Specify row or column major storage scheme
-  Memory Memory_Layout;
+  const Memory Memory_Layout;
 public:
   // Default constructor
-  Matrix(void);
+  Matrix(const Memory Layout_In);
 
   // Set up Constructor
   Matrix(const unsigned Rows_In,                                               // Intent: Read
@@ -30,11 +30,6 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
   // Class methods
-
-  // Set up matrix method
-  void Set_Up(const unsigned Rows_In,                                          // Intent: Read
-              const unsigned Cols_In,                                          // Intent: Read
-              const Memory Layout_In);                                         // Intent: Read
 
   // Write to an element of the matrix
   Type & operator()(const unsigned i,                                          // Intent: Read

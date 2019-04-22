@@ -10,8 +10,7 @@ void Test::Matrix_Tests(void) {
   unsigned Num_Cols = 4;
 
   // First, declare the ROW_MAJOR matrix
-  Matrix<int> M1;
-  M1.Set_Up(Num_Rows, Num_Cols, Memory::ROW_MAJOR);
+  Matrix<int> M1 = Matrix<int>(Num_Rows, Num_Cols, Memory::ROW_MAJOR);
 
   // Populate M1
   printf("Populating matrix... ");
@@ -39,8 +38,7 @@ void Test::Matrix_Tests(void) {
   Num_Cols = 2;
 
   // First, declare the COLUMN_MAJOR matrix.
-  Matrix<double> M2;
-  M2.Set_Up(Num_Rows, Num_Cols, Memory::COLUMN_MAJOR);
+  Matrix<double> M2 = Matrix<double>(Num_Rows, Num_Cols, Memory::COLUMN_MAJOR);
 
   // Populate M2
   printf("Populating Matrix... ");

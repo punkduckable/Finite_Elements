@@ -9,18 +9,22 @@
 
 // Constructor
 template <typename Type>
-Matrix<Type>::Matrix(void) {
+Matrix<Type>::Matrix(const Memory Layout_In) : Memory_Layout(Layout_In) {
   Ar = NULL;
   Num_Rows = 0;
   Num_Cols = 0;
-} // Matrix<Type>::Matrix(void) {
+} // Matrix<Type>::Matrix(const Memory Layout_In) : Memory_Layout(Layout_In) {
 
 
 
 template<typename Type>
-Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) {
-  (*this).Set_Up(Rows_In, Cols_In, Layout_In);
-} // Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) {
+Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) : Memory_Layout(Layout_In) {
+  // Allocate the matrix
+  Ar = new Type[Rows_In*Cols_In];
+
+  Num_Rows = Rows_In;
+  Num_Cols = Cols_In;
+} // Matrix<Type>::Matrix(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) : Memory_Layout(Layout_In) {
 
 
 
@@ -36,20 +40,6 @@ Matrix<Type>::~Matrix(void) {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Class methods
-
-// Set up method
-template <typename Type>
-void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory Layout_In) {
-  // Allocate the matrix
-  Ar = new Type[Rows_In*Cols_In];
-
-  Num_Rows = Rows_In;
-  Num_Cols = Cols_In;
-
-  // Set the Layout (this is used to access elements of the matrix)
-  Memory_Layout = Layout_In;
-} // void Matrix<Type>::Set_Up(const unsigned Rows_In, const unsigned Cols_In, const Memory Dominace_In) {
-
 
 
 // Write to an element of the matrix
@@ -90,7 +80,7 @@ Type Matrix<Type>::operator()(const unsigned i, const unsigned j) const {
 // Disabled implicit methods
 
 template <typename Type>
-Matrix<Type>::Matrix(const Matrix<Type> & M_In) {
+Matrix<Type>::Matrix(const Matrix<Type> & M_In) : Memory_Layout(Memory::ROW_MAJOR) {
   printf("The copy constructor is disabled for the Matrix class! BAD!\n");
 } // Matrix<type>::Matrix(const Matrix<Type> & M_In) {
 
