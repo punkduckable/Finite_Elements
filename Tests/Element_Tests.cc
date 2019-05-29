@@ -45,27 +45,27 @@ void Test::Element_Error_Tests(void) {
 
   // Set up Node positions and BC's
   unsigned Node_Index = 0;
-  for(int i = 0; i < Nx; i++) {
-    for(int j = 0; j < Ny; j++) {
-      for(int k = 0; k < Nz; k++) {
+  for(unsigned i = 0; i < Nx; i++) {
+    for(unsigned j = 0; j < Ny; j++) {
+      for(unsigned k = 0; k < Nz; k++) {
         // Set the Node's original position + BC's
         Nodes[Node_Index].Set_Original_Position({INS*i, INS*j, INS*k});
 
         Node_Index++;
-      } // for(int k = 0; k < Nz; k++) {
-    } // for(int j = 0; j < Ny; j++) {
-  } // for(int i = 0; i < Nx; i++) {
+      } // for(unsigned k = 0; k < Nz; k++) {
+    } // for(unsigned j = 0; j < Ny; j++) {
+  } // for(unsigned i = 0; i < Nx; i++) {
 
   // Populate ID array
   unsigned Num_Global_Eq = 0;
   Node_Index = 0;
-  for(int i = 0; i < Nx; i++) {
-    for(int j = 0; j < Ny; j++) {
-      for(int k = 0; k < Nz; k++) {
+  for(unsigned i = 0; i < Nx; i++) {
+    for(unsigned j = 0; j < Ny; j++) {
+      for(unsigned k = 0; k < Nz; k++) {
         /* Cycle through the components of the current node. Use this info
         to populate ID. If the current component is not being used, fill that
         cell of ID with a -1 */
-        for(int Comp = 0; Comp < 3; Comp++) {
+        for(unsigned Comp = 0; Comp < 3; Comp++) {
           bool Has_BC;
           Nodes[Node_Index].Get_Has_BC(Comp, Has_BC);
 
@@ -74,20 +74,20 @@ void Test::Element_Error_Tests(void) {
 
             // Increment number of equations by 1.
             Num_Global_Eq++;
-          } // for(int Comp = 0; Comp < 3; Comp++) {
+          } // for(unsigned Comp = 0; Comp < 3; Comp++) {
           else
             ID(Node_Index, Comp) = -1;           // Note: ID is an unsigned matrix. (unsigned)-1 is the largest unsigned integer
-        } // for(int Comp = 0; Comp < 3; Comp++) {
+        } // for(unsigned Comp = 0; Comp < 3; Comp++) {
 
         Node_Index++;
-      } // for(int k = 0; k < Nz; k++) {
-    } // for(int j = 0; j < Ny; j++) {
-  } // for(int i = 0; i < Nx; i++) {
+      } // for(unsigned k = 0; k < Nz; k++) {
+    } // for(unsigned j = 0; j < Ny; j++) {
+  } // for(unsigned i = 0; i < Nx; i++) {
   printf("Done!\n");
 
   // Print out the ID array (make sure it was set up correctly)
   printf("\nID array: \n");
-  for(int i = 0; i < Num_Nodes; i++) {
+  for(unsigned i = 0; i < Num_Nodes; i++) {
     printf("| ");
     for(int j = 0; j < 3; j++)
       /* Note, even though ID is a matrix of unsigned integers, I print ID(i,j)
@@ -95,7 +95,7 @@ void Test::Element_Error_Tests(void) {
       than some nonsense large number. */
       printf(" %3d ", ID(i,j));
     printf("|\n");
-  } // for(int i = 0; i < Num_Nodes; i++) {
+  } // for(unsigned i = 0; i < Num_Nodes; i++) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Create K, set Element static members, Material
@@ -105,12 +105,12 @@ void Test::Element_Error_Tests(void) {
   double * F = new double[Num_Global_Eq];
 
   // Zero initialize K
-  for(int i = 0; i < Num_Global_Eq; i++)
-    for(int j = 0; j < Num_Global_Eq; j++)
+  for(unsigned i = 0; i < Num_Global_Eq; i++)
+    for(unsigned j = 0; j < Num_Global_Eq; j++)
       K(i,j) = 0;
 
   // zero initialize F
-  for(int i = 0; i < Num_Global_Eq; i++)
+  for(unsigned i = 0; i < Num_Global_Eq; i++)
     F[i] = 0;
 
 
@@ -157,9 +157,9 @@ void Test::Element_Error_Tests(void) {
   /* Set up Node list, Popuatle Ke, and then move Ke to K for each element. */
   printf("\nSetting Node Lists... ");
   unsigned Element_Index = 0;
-  for(int i = 0; i < Nx-1; i++) {
-    for(int j = 0; j < Ny-1; j++) {
-      for(int k = 0; k < Nz-1; k++) {
+  for(unsigned i = 0; i < Nx-1; i++) {
+    for(unsigned j = 0; j < Ny-1; j++) {
+      for(unsigned k = 0; k < Nz-1; k++) {
         Elements[Element_Index].Set_Nodes(Ny*Nz*i + Nz*j + k,
                                           Ny*Nz*(i+1) + Nz*j + k,
                                           Ny*Nz*(i+1) + Nz*(j+1) + k,
@@ -169,9 +169,9 @@ void Test::Element_Error_Tests(void) {
                                           Ny*Nz*(i+1) + Nz*(j+1) + (k+1),
                                           Ny*Nz*i + Nz*(j+1) + (k+1));
         Element_Index++;
-      } // for(int k = 0; k < Nz-1; k++) {
-    } // for(int j = 0; j < Ny-1; j++) {
-  } // for(int i = 0; i < Nx-1; i++) {
+      } // for(unsigned k = 0; k < Nz-1; k++) {
+    } // for(unsigned j = 0; j < Ny-1; j++) {
+  } // for(unsigned i = 0; i < Nx-1; i++) {
   printf("Done!\n");
 
   printf("Attempting to move Ke to K\n");
@@ -191,14 +191,14 @@ void Test::Element_Error_Tests(void) {
 
   printf("\nFilling every Elemnet's Ke with 1's...");
   Element_Index = 0;
-  for(int i = 0; i < Nx-1; i++) {
-    for(int j = 0; j < Ny-1; j++) {
-      for(int k = 0; k < Nz-1; k++) {
+  for(unsigned i = 0; i < Nx-1; i++) {
+    for(unsigned j = 0; j < Ny-1; j++) {
+      for(unsigned k = 0; k < Nz-1; k++) {
         Elements[Element_Index].Fill_Ke_With_1s();
         Element_Index++;
-      } // for(int k = 0; k < Nz-1; k++) {
-    } // for(int j = 0; j < Ny-1; j++) {
-  } // for(int i = 0; i < Nx-1; i++) {
+      } // for(unsigned k = 0; k < Nz-1; k++) {
+    } // for(unsigned j = 0; j < Ny-1; j++) {
+  } // for(unsigned i = 0; i < Nx-1; i++) {
   printf("Done!\n");
 
   printf("Attempting to populate Element[0]'s (it's already set)\n");
@@ -219,16 +219,16 @@ void Test::Element_Error_Tests(void) {
 
   Element_Index = 0;
   printf("\nConstructing K...\n");
-  for(int i = 0; i < Nx-1; i++) {
-    for(int j = 0; j < Ny-1; j++) {
-      for(int k = 0; k < Nz-1; k++) {
+  for(unsigned i = 0; i < Nx-1; i++) {
+    for(unsigned j = 0; j < Ny-1; j++) {
+      for(unsigned k = 0; k < Nz-1; k++) {
         Elements[Element_Index].Move_Ke_To_K();
         Elements[Element_Index].Populate_Fe();
         Elements[Element_Index].Move_Fe_To_F();
         Element_Index++;
-      } // for(int k = 0; k < Nz-1; k++) {
-    } // for(int j = 0; j < Ny-1; j++) {
-  } // for(int i = 0; i < Nx-1; i++) {
+      } // for(unsigned k = 0; k < Nz-1; k++) {
+    } // for(unsigned j = 0; j < Ny-1; j++) {
+  } // for(unsigned i = 0; i < Nx-1; i++) {
   printf("Done!\n");
 
   // In theory, K and F should now be set. Let's check. Print K, F to a file
@@ -263,9 +263,9 @@ void Test::Element(void) {
 
   // Set up Node positions and BC's
   unsigned Node_Index = 0;
-  for(int i = 0; i < Nx; i++) {
-    for(int j = 0; j < Ny; j++) {
-      for(int k = 0; k < Nz; k++) {
+  for(unsigned i = 0; i < Nx; i++) {
+    for(unsigned j = 0; j < Ny; j++) {
+      for(unsigned k = 0; k < Nz; k++) {
         // Set the Node's original position + BC's
         Nodes[Node_Index].Set_Original_Position({INS*i, INS*j, INS*k});
 
@@ -273,20 +273,20 @@ void Test::Element(void) {
           Nodes[Node_Index].Set_BC(1,INS*j+1);
 
         Node_Index++;
-      } // for(int k = 0; k < Nz; k++) {
-    } // for(int j = 0; j < Ny; j++) {
-  } // for(int i = 0; i < Nx; i++) {
+      } // for(unsigned k = 0; k < Nz; k++) {
+    } // for(unsigned j = 0; j < Ny; j++) {
+  } // for(unsigned i = 0; i < Nx; i++) {
 
   // Populate ID array
   unsigned Num_Global_Eq = 0;
   Node_Index = 0;
-  for(int i = 0; i < Nx; i++) {
-    for(int j = 0; j < Ny; j++) {
-      for(int k = 0; k < Nz; k++) {
+  for(unsigned i = 0; i < Nx; i++) {
+    for(unsigned j = 0; j < Ny; j++) {
+      for(unsigned k = 0; k < Nz; k++) {
         /* Cycle through the components of the current node. Use this info
         to populate ID. If the current component is not being used, fill that
         cell of ID with a -1 */
-        for(int Comp = 0; Comp < 3; Comp++) {
+        for(unsigned Comp = 0; Comp < 3; Comp++) {
           bool Has_BC;
           Nodes[Node_Index].Get_Has_BC(Comp, Has_BC);
 
@@ -295,27 +295,27 @@ void Test::Element(void) {
 
             // Increment number of equations by 1.
             Num_Global_Eq++;
-          } // for(int Comp = 0; Comp < 3; Comp++) {
+          } // for(unsigned Comp = 0; Comp < 3; Comp++) {
           else
             ID(Node_Index, Comp) = -1;           // Note: ID is an unsigned matrix. (unsigned)-1 is the largest unsigned integer
-        } // for(int Comp = 0; Comp < 3; Comp++) {
+        } // for(unsigned Comp = 0; Comp < 3; Comp++) {
 
         Node_Index++;
-      } // for(int k = 0; k < Nz; k++) {
-    } // for(int j = 0; j < Ny; j++) {
-  } // for(int i = 0; i < Nx; i++) {
+      } // for(unsigned k = 0; k < Nz; k++) {
+    } // for(unsigned j = 0; j < Ny; j++) {
+  } // for(unsigned i = 0; i < Nx; i++) {
 
   // Print out the ID array (make sure it was set up correctly)
   printf("\nID array: \n");
-  for(int i = 0; i < Num_Nodes; i++) {
+  for(unsigned i = 0; i < Num_Nodes; i++) {
     printf("| ");
-    for(int j = 0; j < 3; j++)
+    for(unsigned j = 0; j < 3; j++)
       /* Note, even though ID is a matrix of unsigned integers, I print ID(i,j)
       as a signed integer so that any components set to -1 show up as -1 rather
       than some nonsense large number. */
       printf(" %3d ", ID(i,j));
     printf("|\n");
-  } // for(int i = 0; i < Num_Nodes; i++) {
+  } // for(unsigned i = 0; i < Num_Nodes; i++) {
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -324,12 +324,12 @@ void Test::Element(void) {
   double * F = new double[Num_Global_Eq];
 
   // Zero initialize K
-  for(int i = 0; i < Num_Global_Eq; i++)
-    for(int j = 0; j < Num_Global_Eq; j++)
+  for(unsigned i = 0; i < Num_Global_Eq; i++)
+    for(unsigned j = 0; j < Num_Global_Eq; j++)
       K(i,j) = 0;
 
   // zero initialize F
-  for(int i = 0; i < Num_Global_Eq; i++)
+  for(unsigned i = 0; i < Num_Global_Eq; i++)
     F[i] = 0;
 
 
@@ -363,9 +363,9 @@ void Test::Element(void) {
   /* Cycle through the elements. For each element, supply the nodes, compute Ke (and Fe)
   and then move Ke (and Fe) into K (and F)*/
   unsigned Element_Index = 0;
-  for(int i = 0; i < Nx-1; i++) {
-    for(int j = 0; j < Ny-1; j++) {
-      for(int k = 0; k < Nz-1; k++) {
+  for(unsigned i = 0; i < Nx-1; i++) {
+    for(unsigned j = 0; j < Ny-1; j++) {
+      for(unsigned k = 0; k < Nz-1; k++) {
         /* Set Element Nodes:
         Now, set each Element's Node list. Note, the order that we set these
         nodes is very specific. This is done so that the orientation of the nodes
@@ -417,9 +417,9 @@ void Test::Element(void) {
         } // if(El_Err != Element_Errors::SUCCESS) {
 
         Element_Index++;
-      } // for(int k = 0; k < Nz-1; k++) {
-    } // for(int j = 0; j < Ny-1; j++)
-  } // for(int i = 0; i < Nx-1; i++)
+      } // for(unsigned k = 0; k < Nz-1; k++) {
+    } // for(unsigned j = 0; j < Ny-1; j++)
+  } // for(unsigned i = 0; i < Nx-1; i++)
 
   // Print results to file.
   Simulation::Print_K_To_File(K);
@@ -441,17 +441,17 @@ void Simulation::Print_K_To_File(const Matrix<double> & K, const Printing_Mode M
   /* Note, this is not a very fast way to print K, since K is a column major
   matrix and we're printing it it in row major order. Oh well, this only runs
   once anyway */
-  for(int i = 0; i < Num_Rows; i++) {
+  for(unsigned i = 0; i < Num_Rows; i++) {
     fprintf(File,"| ");
-    for(int j = 0; j < Num_Cols; j++) {
+    for(unsigned j = 0; j < Num_Cols; j++) {
       if(Mode == Printing_Mode::INTEGER)
         fprintf(File,"%1.0lf ", K(i,j));
       else
         fprintf(File,"%8.1e ", K(i,j));
-    } // for(int j = 0; j < Num_Cols; j++) {
+    } // for(unsigned j = 0; j < Num_Cols; j++) {
 
     fprintf(File,"|\n");
-  } // for(int i = 0; i < Num_Rows; i++) {
+  } // for(unsigned i = 0; i < Num_Rows; i++) {
 
   // All done. Close the file
   fclose(File);
@@ -465,7 +465,7 @@ void Simulation::Print_F_To_File(const double * F, const unsigned Num_Global_Eq)
 
   // Now, print the contents of F to the file.
   fprintf(File, "| ");
-  for(int i = 0; i < Num_Global_Eq; i++)
+  for(unsigned i = 0; i < Num_Global_Eq; i++)
     fprintf(File, "%10.3e ", F[i]);
   fprintf(File, "|");
 

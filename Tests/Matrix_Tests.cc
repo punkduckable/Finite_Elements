@@ -14,22 +14,22 @@ void Test::Matrix_Tests(void) {
 
   // Populate M1
   printf("Populating matrix... ");
-  for(int i = 0; i < Num_Rows; i++)
-    for(int j = 0; j < Num_Cols; j++)
+  for(unsigned i = 0; i < Num_Rows; i++)
+    for(unsigned j = 0; j < Num_Cols; j++)
       M1(i,j) = i + j;
   printf("Done!\n");
 
   // Now, print out M1
-  for(int i = 0; i < Num_Rows; i++) {
+  for(unsigned i = 0; i < Num_Rows; i++) {
     // Start each row with a "|"
     printf("|");
 
-    for(int j = 0; j < Num_Cols; j++)
+    for(unsigned j = 0; j < Num_Cols; j++)
       printf(" %3d ", M1(i,j));
 
     // End each row with a "|"
     printf(" |\n");
-  } // for(int i = 0; i < Num_Rows; i++) {
+  } // for(unsigned i = 0; i < Num_Rows; i++) {
 
 
 
@@ -42,22 +42,22 @@ void Test::Matrix_Tests(void) {
 
   // Populate M2
   printf("Populating Matrix... ");
-  for(int j = 0; j < Num_Cols; j++)
-    for(int i = 0; i < Num_Rows; i++)
+  for(unsigned j = 0; j < Num_Cols; j++)
+    for(unsigned i = 0; i < Num_Rows; i++)
       M2(i,j) = 1./( (double)(i + j + 1));
   printf("Done!\n");
 
   // Now, print out M2
-  for(int i = 0; i < Num_Rows; i++) {
+  for(unsigned i = 0; i < Num_Rows; i++) {
     // Start each row with a "|"
     printf("|");
 
-    for(int j = 0; j < Num_Cols; j++)
+    for(unsigned j = 0; j < Num_Cols; j++)
       printf(" %6.3lf ", M2(i,j));
 
     // End each row with a "|"
     printf(" |\n");
-  } // for(int i = 0; i < Num_Rows; i++) {
+  } // for(unsigned i = 0; i < Num_Rows; i++) {
 } // void Test::Matrix_Tests(void) {
 
 #endif

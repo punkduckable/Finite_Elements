@@ -18,7 +18,7 @@ bool Element::Static_Members_Set  = false;
 Matrix<unsigned> * Element::ID;
 Matrix<double> * Element::K;
 double * Element::F;
-Node * Element::Nodes;
+Node * Element::Global_Node_Array;
 
 Matrix<double> Element::Na        {8, 8, Memory::COLUMN_MAJOR};
 Matrix<double> Element::Na_Xi     {8, 8, Memory::COLUMN_MAJOR};
@@ -94,29 +94,29 @@ Element_Errors Element::Set_Nodes(const unsigned Node0_ID,
   /* If we've made it this far then the Element class has been set up. We can
   therefore set the nodes.
   To begin, set the Node_List using the passed Node_ID's */
-  Node_List[0] = Node0_ID;
-  Node_List[1] = Node1_ID;
-  Node_List[2] = Node2_ID;
-  Node_List[3] = Node3_ID;
-  Node_List[4] = Node4_ID;
-  Node_List[5] = Node5_ID;
-  Node_List[6] = Node6_ID;
-  Node_List[7] = Node7_ID;
+  Element_Nodes[0].ID = Node0_ID;
+  Element_Nodes[1].ID = Node1_ID;
+  Element_Nodes[2].ID = Node2_ID;
+  Element_Nodes[3].ID = Node3_ID;
+  Element_Nodes[4].ID = Node4_ID;
+  Element_Nodes[5].ID = Node5_ID;
+  Element_Nodes[6].ID = Node6_ID;
+  Element_Nodes[7].ID = Node7_ID;
 
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Set up Local_Eq_Num_To_Global_Eq_Num, Xa, Ya, and Za
+  // Set up Local_Eq_Num_To_Global_Eq_Num, Element_Nodes
 
   unsigned Eq_Num = 0;
   for(int Node = 0; Node < 8; Node++) {
     // First, set the X, Y, and Z components of this node's position.
-    Xa[Node] = Nodes[Node_List[Node]].Original_Position(0);
-    Ya[Node] = Nodes[Node_List[Node]].Original_Position(1);
-    Za[Node] = Nodes[Node_List[Node]].Original_Position(2);
+    Element_Nodes[Node].Xa = Global_Node_Array[Element_Nodes[Node].ID].Original_Position(0);
+    Element_Nodes[Node].Ya = Global_Node_Array[Element_Nodes[Node].ID].Original_Position(1);
+    Element_Nodes[Node].Za = Global_Node_Array[Element_Nodes[Node].ID].Original_Position(2);
 
     // Now, get the Global node number
-    const unsigned Global_Node_Number = Node_List[Node];
+    const unsigned Global_Node_Number = Element_Nodes[Node].ID;
 
     /* Cycle through the components, check which ones are free/which ones are
     fixed using the ID array. Store this information in Local_Eq_Num_To_Global_Eq_Num */
@@ -141,7 +141,7 @@ Element_Errors Element::Set_Nodes(const unsigned Node0_ID,
       int Global_Eq_Number = (*ID)(Global_Node_Number, Component);
       if(Global_Eq_Number == -1) {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = FIXED_COMPONENT;
-        Prescribed_Positions[Eq_Num] = Nodes[Node_List[Node]].BC(Component);
+        Prescribed_Positions[Eq_Num] = Global_Node_Array[Element_Nodes[Node].ID].BC(Component);
       } // if(Global_Eq_Number == -1) {
       else {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = Global_Eq_Number;
@@ -160,7 +160,7 @@ Element_Errors Element::Set_Nodes(const unsigned Node0_ID,
   #if defined(ELEMENT_MONITOR)
     printf("Node list: ");
     for(int i = 0; i < 8; i++)
-      printf("%u ", Node_List[i]);
+      printf("%u ", Element_Nodes[i].ID);
     printf("\n");
 
 
@@ -168,17 +168,17 @@ Element_Errors Element::Set_Nodes(const unsigned Node0_ID,
     printf("Node Positions:\n");
     printf("Xa = | ");
     for(int i = 0; i < 8; i++)
-      printf("%6.3lf ", Xa[i]);
+      printf("%6.3lf ", Element_Nodes[i].Xa);
     printf("|\n");
 
     printf("Ya = | ");
     for(int i = 0; i < 8; i++)
-      printf("%6.3lf ", Ya[i]);
+      printf("%6.3lf ", Element_Nodes[i].Ya);
     printf("|\n");
 
     printf("Za = | ");
     for(int i = 0; i < 8; i++)
-      printf("%6.3lf ", Za[i]);
+      printf("%6.3lf ", Element_Nodes[i].Za);
     printf("|\n");
 
 

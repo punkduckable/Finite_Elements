@@ -114,35 +114,35 @@ void Test::Node(void) {
   /* Now, let's set up the nodes. We will make it so that the bottom row of
   nodes (those with a y coordinate of zero) have a precribed BC in the y
   direction */
-  for(int k = 0; k < Nz; k++) {
+  for(unsigned k = 0; k < Nz; k++) {
     double z_pos = k*Intra_Nodal_Spacing;
 
     // Cycle throughh the columns at a given z coordinate
-    for(int i = 0; i < Nx; i++) {
+    for(unsigned i = 0; i < Nx; i++) {
       double x_pos = i*Intra_Nodal_Spacing;
 
       // Cycle through the nodes in a column.
-      for(int j = 0; j < Ny; j++) {
+      for(unsigned j = 0; j < Ny; j++) {
         double y_pos = j*Intra_Nodal_Spacing;
 
         Nodes[j + i*Ny + k*Nx*Ny].Set_Original_Position({x_pos, y_pos, z_pos});
 
         if(j == 0)
           Nodes[j + i*Ny + k*Nx*Ny].Set_BC(1,.5);
-      } // for(int j = 0; j < Ny; j++) {
-    } // for(int i = 0; i < Nx; i++) {
-  } // for(int k = 0; k < Nz; k++) {
+      } // for(unsigned j = 0; j < Ny; j++) {
+    } // for(unsigned i = 0; i < Nx; i++) {
+  } // for(unsigned k = 0; k < Nz; k++) {
 
   // Now, print the node information
-  for(int k = 0; k < Nz; k++) {
-    for(int i = 0; i < Nx; i++) {
-      for(int j = 0; j < Ny; j++) {
+  for(unsigned k = 0; k < Nz; k++) {
+    for(unsigned i = 0; i < Nx; i++) {
+      for(unsigned j = 0; j < Ny; j++) {
         printf("Node #%d\n", j + i*Ny + k*Nx*Ny);
         Nodes[j + i*Ny + k*Nx*Ny].Print();
         printf("\n");
-      } // for(int j = 0; j < Ny; j++) {
-    } // for(int i = 0; i < Nx; i++) {
-  } // for(int k = 0; k < Nz; k++) {
+      } // for(unsigned j = 0; j < Ny; j++) {
+    } // for(unsigned i = 0; i < Nx; i++) {
+  } // for(unsigned k = 0; k < Nz; k++) {
 } // void Test::Node(void) {
 
 #endif

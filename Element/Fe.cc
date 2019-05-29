@@ -79,7 +79,7 @@ Element_Errors Element::Move_Fe_To_F(void) const {
 
   // Now, add the local contributions to the force vector (Fe) to F.
   for(int i = 0; i < 24; i++) {
-    const int I = Local_Eq_Num_To_Global_Eq_Num[i];
+    const unsigned I = Local_Eq_Num_To_Global_Eq_Num[i];
     if(I == FIXED_COMPONENT)
       continue;
     else

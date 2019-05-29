@@ -12,7 +12,7 @@ static members. */
 
 
 
-Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
+Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Node_Array_Ptr) {
   /* Function description:
   This function is used to set the static members for the Element class. This
   function also calculates the value of the shape functions (for the master
@@ -33,7 +33,7 @@ Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<doub
   Element::ID = ID_Ptr;
   Element::K = K_Ptr;
   Element::F = F_Ptr;
-  Element::Nodes = Nodes_Ptr;
+  Element::Global_Node_Array = Node_Array_Ptr;
 
 
   //////////////////////////////////////////////////////////////////////////////

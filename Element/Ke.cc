@@ -32,7 +32,7 @@ void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> 
 
   /* Assumption 2:
   This function assumes that the spatial position of each Node is known. This
-  means that Xa, Ya, and Za have all been populated. This is done in the
+  means that the Element_Node array has been populated. This is done in the
   "Set_Up_Element" method.
 
   Since this private method is only called by the Populate_Ke method, and
@@ -57,36 +57,36 @@ void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> 
   double z_Xi = 0, z_Eta = 0, z_Zeta = 0;
 
   for(int Node = 0; Node < 8; Node++) {
-    x_Xi   += Na_Xi  (Node, Point)*Xa[Node];
-    x_Eta  += Na_Eta (Node, Point)*Xa[Node];
-    x_Zeta += Na_Zeta(Node, Point)*Xa[Node];
+    x_Xi   += Na_Xi  (Node, Point)*Element_Nodes[Node].Xa;
+    x_Eta  += Na_Eta (Node, Point)*Element_Nodes[Node].Xa;
+    x_Zeta += Na_Zeta(Node, Point)*Element_Nodes[Node].Xa;
 
-    y_Xi   += Na_Xi  (Node, Point)*Ya[Node];
-    y_Eta  += Na_Eta (Node, Point)*Ya[Node];
-    y_Zeta += Na_Zeta(Node, Point)*Ya[Node];
+    y_Xi   += Na_Xi  (Node, Point)*Element_Nodes[Node].Ya;
+    y_Eta  += Na_Eta (Node, Point)*Element_Nodes[Node].Ya;
+    y_Zeta += Na_Zeta(Node, Point)*Element_Nodes[Node].Ya;
 
-    z_Xi   += Na_Xi  (Node, Point)*Za[Node];
-    z_Eta  += Na_Eta (Node, Point)*Za[Node];
-    z_Zeta += Na_Zeta(Node, Point)*Za[Node];
+    z_Xi   += Na_Xi  (Node, Point)*Element_Nodes[Node].Za;
+    z_Eta  += Na_Eta (Node, Point)*Element_Nodes[Node].Za;
+    z_Zeta += Na_Zeta(Node, Point)*Element_Nodes[Node].Za;
   } // for(int Node = 0; Node < 8; Node++) {
 
 
   /* Now, compute the components of the coefficient matrix. This is done using
   the steps outlined on page 150 of Hughes' book. */
-  Coeff(1,1) = y_Eta*z_Zeta - y_Zeta*z_Eta;
-  Coeff(1,2) = y_Zeta*z_Xi  - y_Xi*z_Zeta;
-  Coeff(1,3) = y_Xi*z_Eta   - y_Eta*z_Xi;
+  Coeff(0,0) = y_Eta*z_Zeta - y_Zeta*z_Eta;
+  Coeff(0,1) = y_Zeta*z_Xi  - y_Xi*z_Zeta;
+  Coeff(0,2) = y_Xi*z_Eta   - y_Eta*z_Xi;
 
-  Coeff(2,1) = z_Eta*x_Zeta - z_Zeta*x_Eta;
-  Coeff(2,2) = x_Xi*z_Zeta  - x_Zeta*z_Xi;
-  Coeff(2,3) = z_Xi*x_Eta   - z_Eta*x_Xi;
+  Coeff(1,0) = z_Eta*x_Zeta - z_Zeta*x_Eta;
+  Coeff(1,1) = x_Xi*z_Zeta  - x_Zeta*z_Xi;
+  Coeff(1,2) = z_Xi*x_Eta   - z_Eta*x_Xi;
 
-  Coeff(3,1) = x_Eta*y_Zeta - x_Zeta*y_Eta;
-  Coeff(3,2) = x_Zeta*y_Xi  - x_Xi*y_Zeta;
-  Coeff(3,3) = x_Xi*y_Eta   - x_Eta*y_Xi;
+  Coeff(2,0) = x_Eta*y_Zeta - x_Zeta*y_Eta;
+  Coeff(2,1) = x_Zeta*y_Xi  - x_Xi*y_Zeta;
+  Coeff(2,2) = x_Xi*y_Eta   - x_Eta*y_Xi;
 
   /* Finally, calculate J (the jacobian determinant) */
-  J = x_Xi*Coeff(1,1) + x_Eta*Coeff(1,2) + x_Zeta*Coeff(1,3);
+  J = x_Xi*Coeff(0,0) + x_Eta*Coeff(0,1) + x_Zeta*Coeff(0,2);
 
   #if defined(COEFFICIENT_MATRIX_MONITOR)
     printf("x_Xi = %6.3lf   x_Eta = %6.3lf   x_Zeta = %6.3lf\n", x_Xi, x_Eta, x_Zeta);
@@ -147,9 +147,9 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Point, const Matri
   //////////////////////////////////////////////////////////////////////////////
   /* First, calculate Na_x, Na_y, Na_z. This is done using the equations on page
   150 of Hughes' book */
-  double Na_x = (Na_Xi(Node, Point)*Coeff(1,1) + Na_Eta(Node, Point)*Coeff(1,2) + Na_Zeta(Node, Point)*Coeff(1,3))/J;
-  double Na_y = (Na_Xi(Node, Point)*Coeff(2,1) + Na_Eta(Node, Point)*Coeff(2,2) + Na_Zeta(Node, Point)*Coeff(2,3))/J;
-  double Na_z = (Na_Xi(Node, Point)*Coeff(3,1) + Na_Eta(Node, Point)*Coeff(3,2) + Na_Zeta(Node, Point)*Coeff(3,3))/J;
+  double Na_x = (Na_Xi(Node, Point)*Coeff(0,0) + Na_Eta(Node, Point)*Coeff(0,1) + Na_Zeta(Node, Point)*Coeff(0,2))/J;
+  double Na_y = (Na_Xi(Node, Point)*Coeff(1,0) + Na_Eta(Node, Point)*Coeff(1,1) + Na_Zeta(Node, Point)*Coeff(1,2))/J;
+  double Na_z = (Na_Xi(Node, Point)*Coeff(2,0) + Na_Eta(Node, Point)*Coeff(2,1) + Na_Zeta(Node, Point)*Coeff(2,2))/J;
 
   /* Now, use these to make Ba_T
   We construct Ba_T rather than Ba because B is stored in Column major order.
@@ -435,7 +435,7 @@ Element_Errors Element::Move_Ke_To_K(void) const {
   some of those components may be fixed. We kept track of this with the
   "FIXED_COMPONENT" constant wen we set up Local_Eq_Num_To_Global_Eq_Num */
   for(int i = 0; i < 24; i++) {
-    const int I = Local_Eq_Num_To_Global_Eq_Num[i];
+    const unsigned I = Local_Eq_Num_To_Global_Eq_Num[i];
     if(I == FIXED_COMPONENT)
       continue;
     else
@@ -446,7 +446,7 @@ Element_Errors Element::Move_Ke_To_K(void) const {
   components that correspond to a global equation (see previous comment) */
   for(int Col = 0; Col < 24; Col++) {
     // Get Global column number, J, associated with the local column number "Col"
-    const int J = Local_Eq_Num_To_Global_Eq_Num[Col];
+    const unsigned J = Local_Eq_Num_To_Global_Eq_Num[Col];
 
     // Check if J corresponds to a fixed component
     if(J == FIXED_COMPONENT)
@@ -454,7 +454,7 @@ Element_Errors Element::Move_Ke_To_K(void) const {
     else
       for(int Row = Col+1; Row < 24; Row++) {
         // Get Global Row number, I, associated with the local row number "Row"
-        const int I = Local_Eq_Num_To_Global_Eq_Num[Row];
+        const unsigned I = Local_Eq_Num_To_Global_Eq_Num[Row];
 
         // Check if I corresponds to a fixed component
         if(I == FIXED_COMPONENT)

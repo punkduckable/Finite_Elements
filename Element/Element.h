@@ -14,7 +14,7 @@ private:
   static Matrix<unsigned> * ID;                  // Points to the ID Matrix
   static Matrix<double> * K;                     // Points to the global stiffness matrix
   static double * F;                             // Points to the global force vector.
-  static Node * Nodes;                           // Points to the array of nodes.
+  static Node * Global_Node_Array;               // Points to the array of nodes.
 
   static Matrix<double> Na;                      // Value of each shape function at each integrating point
   static Matrix<double> Na_Xi;                   // Zeta-partial of each shape function at each integrating point
@@ -37,10 +37,11 @@ private:
   bool Fe_Set_Up = false;
 
   // Node information
-  unsigned int Node_List[8];                     // Global node numbers for the nodes associated with this Element.
-  double Xa[8];                                  // X spatial coordinate of each Node
-  double Ya[8];                                  // Y spatial coordinate of each Node
-  double Za[8];                                  // Z spatial coordinate of each Node
+  struct Node_Data { unsigned int ID;           // Global Node number (array index)
+                double Xa;                      // X spatial coordinate of the node
+                double Ya;                      // Y spatial coordinate of the node
+                double Za; };                   // Z spatial coordinate of the node
+  Node_Data Element_Nodes[8];
 
 
   /* Assembly arrays
@@ -127,7 +128,7 @@ public:
   friend Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,  // Intent: Read
                                                    Matrix<double> * K_Ptr,     // Intend: Read
                                                    double * F_Ptr,             // Intent: Read
-                                                   Node * Nodes_Ptr);          // Intent: Read
+                                                   Node * Node_Array_Ptr);     // Intent: Read
 
   friend Element_Errors Set_Element_Material(const double E,                   // Intent : Read
                                              const double v);                  // Intent : Read
@@ -155,7 +156,7 @@ public:
 Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,           // Intent: Read
                                           Matrix<double> * K_Ptr,              // Intent: Read
                                           double * F_Ptr,                      // Intent: Read
-                                          Node * Nodes_Ptr);                   // Intent: Read
+                                          Node * Node_Array_Ptr);              // Intent: Read
 
 Element_Errors Set_Element_Material(const double E,                            // Intent : Read
                                     const double v);                           // Intent : Read

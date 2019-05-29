@@ -1,6 +1,6 @@
 # Variables
 Comp = g++ -std=c++11
-Flags = -c -Wall -O3
+Flags = -c -Wall -Wsign-compare -Wextra -O3
 
 
 # Core Rules
