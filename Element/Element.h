@@ -38,9 +38,9 @@ private:
 
   // Node information
   struct Node_Data { unsigned int ID;           // Global Node number (array index)
-                double Xa;                      // X spatial coordinate of the node
-                double Ya;                      // Y spatial coordinate of the node
-                double Za; };                   // Z spatial coordinate of the node
+                double Xa;                      // X spatial coordinate (original) of the node
+                double Ya;                      // Y spatial coordinate (original) of the node
+                double Za; };                   // Z spatial coordinate (original) of the node
   Node_Data Element_Nodes[8];
 
 
@@ -78,7 +78,7 @@ private:
   This method computes the spatial partial derivatives (Na_x, Na_y, Na_z),
   uses them to construct Ba, and them moves Ba into B. */
   void Add_Ba_To_B(const unsigned Node,                                        // Intent: Read
-                   const unsigned Point,                                       // Intent: Read
+                   const unsigned Integration_Point,                           // Intent: Read
                    const Matrix<double> & Coeff,                               // Intent: Read
                    const double J,                                             // Intent: Read
                    Matrix<double> & B);                                        // Intent: Write

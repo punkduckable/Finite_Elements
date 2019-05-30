@@ -107,7 +107,7 @@ void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> 
 
 
 
-void Element::Add_Ba_To_B(const unsigned Node, const unsigned Point, const Matrix<double> & Coeff, const double J, Matrix<double> & B) {
+void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point, const Matrix<double> & Coeff, const double J, Matrix<double> & B) {
   /* Function descrpition.
   This function is used to calculate Ba and move Ba into B. This is done using
   the equations on page 150 of Hughes' book and the definition of B, Ba on page
@@ -147,9 +147,9 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Point, const Matri
   //////////////////////////////////////////////////////////////////////////////
   /* First, calculate Na_x, Na_y, Na_z. This is done using the equations on page
   150 of Hughes' book */
-  double Na_x = (Na_Xi(Node, Point)*Coeff(0,0) + Na_Eta(Node, Point)*Coeff(0,1) + Na_Zeta(Node, Point)*Coeff(0,2))/J;
-  double Na_y = (Na_Xi(Node, Point)*Coeff(1,0) + Na_Eta(Node, Point)*Coeff(1,1) + Na_Zeta(Node, Point)*Coeff(1,2))/J;
-  double Na_z = (Na_Xi(Node, Point)*Coeff(2,0) + Na_Eta(Node, Point)*Coeff(2,1) + Na_Zeta(Node, Point)*Coeff(2,2))/J;
+  double Na_x = (Na_Xi(Node, Integration_Point)*Coeff(0,0) + Na_Eta(Node, Integration_Point)*Coeff(0,1) + Na_Zeta(Node, Integration_Point)*Coeff(0,2))/J;
+  double Na_y = (Na_Xi(Node, Integration_Point)*Coeff(1,0) + Na_Eta(Node, Integration_Point)*Coeff(1,1) + Na_Zeta(Node, Integration_Point)*Coeff(1,2))/J;
+  double Na_z = (Na_Xi(Node, Integration_Point)*Coeff(2,0) + Na_Eta(Node, Integration_Point)*Coeff(2,1) + Na_Zeta(Node, Integration_Point)*Coeff(2,2))/J;
 
   /* Now, use these to make Ba_T
   We construct Ba_T rather than Ba because B is stored in Column major order.
@@ -179,7 +179,7 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Point, const Matri
       printf("|\n");
     } // for(int i = 0; i < 3; i++) {
   #endif
-} // void Element::Add_Ba_To_B(const unsigned Node, const unsigned Point, const Matrix<double> & Coeff, const double J, Matrix<double> & B) {
+} // void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point, const Matrix<double> & Coeff, const double J, Matrix<double> & B) {
 
 
 
