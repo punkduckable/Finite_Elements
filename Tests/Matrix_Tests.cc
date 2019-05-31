@@ -4,7 +4,38 @@
 #include "Tests.h"
 #include <stdio.h>
 
-void Test::Matrix_Tests(void) {
+
+void Test::Matrix_Error_Tests(void) {
+  // First, let's make a matrix
+  Matrix<int> M{2, 3, Memory::ROW_MAJOR};
+
+  /* Now, let's try accessing out-of-bounds elements of this matrix, and
+  see what happens. */
+  try {
+    // Try accessing something that is in the 3rd row (M only has 2 rows)
+    printf("Row Out-of-bounds test...\n");
+    M(2,1) = 4;
+  } // try {
+  catch (Matrix_Exceptions::Index_Out_Of_Bounds Err) {
+    printf("Caught an Index_Out_Of_Bounds exception!\n");
+    Err.Msg();
+  } // catch (Matrix_Exceptions::Index_Out_Of_Bounds Err) {
+
+  try {
+    // Try accessing something that is in the 5th column (M only has 3 columns)
+    printf("Column Out-of-bounds test...\n");
+    int x = M(0,4);
+    printf("M(0,4) = %d\n",x);
+  } // try {
+  catch (Matrix_Exceptions::Index_Out_Of_Bounds Err) {
+    printf("Caught an Index_Out_Of_Bounds exception!\n");
+    Err.Msg();
+  } // catch (Matrix_Exceptions::Index_Out_Of_Bounds Err) {
+} // void Test::Matrix_Error_Tests(void) {
+
+
+
+void Test::Matrix_Correctness_Tests(void) {
   printf("Row dominant test:\n");
   unsigned Num_Rows = 3;
   unsigned Num_Cols = 4;
@@ -58,6 +89,6 @@ void Test::Matrix_Tests(void) {
     // End each row with a "|"
     printf(" |\n");
   } // for(unsigned i = 0; i < Num_Rows; i++) {
-} // void Test::Matrix_Tests(void) {
+} // void Test::Matrix_Correctness_Tests(void) {
 
 #endif

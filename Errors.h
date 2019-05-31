@@ -22,4 +22,27 @@ enum class Element_Errors{SUCCESS,
                           BAD_DETERMINANT};
 void Handle_Error(const Element_Errors Error);
 
+
+// Matrix Exceptions
+namespace Matrix_Exceptions {
+class Dimension_Mismatch {
+  private:
+    unsigned M1_Cols;
+    unsigned M2_Rows;
+  public:
+    Dimension_Mismatch(unsigned M1_Cols, unsigned M2_Rows) : M1_Cols(M1_Cols), M2_Rows(M2_Rows) {}
+    void Msg() const;
+}; // class Dimension_Mismatch_Error {
+
+class Index_Out_Of_Bounds {
+  private:
+    unsigned requested_index;
+    unsigned max_index;
+
+  public:
+    Index_Out_Of_Bounds(unsigned requested_index, unsigned max_index) : requested_index(requested_index), max_index(max_index) {}
+    void Msg() const;
+};
+} // namespace Matrix_Exceptions
+
 #endif

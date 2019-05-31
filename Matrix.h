@@ -1,6 +1,8 @@
 #if !defined(MATRIX_HEADER)
 #define MATRIX_HEADER
 
+#include "Errors.h"
+
 enum class Memory{ROW_MAJOR, COLUMN_MAJOR};
 
 template <typename Type>
@@ -26,16 +28,19 @@ public:
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Class methods
+  // Operator overloads
 
   // Write to an element of the matrix
   Type & operator()(const unsigned i,                                          // Intent: Read
                     const unsigned j);                                         // Intent: Read
 
-  // Read an eleent of the matrix
+  // Read an element of the matrix
   Type operator()(const unsigned i,                                            // Intent: Read
                   const unsigned j) const;                                     // Intent: Read
 
+
+  // Matrix-Matrix multiplication
+  //Matrix<type> operator*(const Matrix<Type> & Other) const;
 
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods

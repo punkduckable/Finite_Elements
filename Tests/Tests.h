@@ -10,7 +10,8 @@ namespace Test {
   void Node_Error_Tests(void);
   void Node(void);
 
-  void Matrix_Tests(void);
+  void Matrix_Error_Tests(void);
+  void Matrix_Correctness_Tests(void);
 
   void Element_Error_Tests(void);
   void Element(void);
