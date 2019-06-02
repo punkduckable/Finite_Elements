@@ -275,7 +275,7 @@ Element_Errors Element::Populate_Ke(void) {
     we first populate the main diagional of BT_JD_B, and then the off diagional
     parts (by computing the (i,j) cell of BT_JD_B and then moving it into
     the (j,i) cell. */
-    class Matrix<double> BT_JD_B{25, 24, Memory::COLUMN_MAJOR};
+    class Matrix<double> BT_JD_B{24, 24, Memory::COLUMN_MAJOR};
 
     // Populate diagional cells of BT_JD_B
     for(int j = 0; j < 24; j++) {

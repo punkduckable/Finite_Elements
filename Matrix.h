@@ -23,12 +23,21 @@ public:
          const unsigned Cols_In,                                               // Intent: Read
          const Memory Layout_In);                                              // Intent: Read
 
+  // Deleted Copy constructor
+  Matrix(const Matrix & Other) = delete;
+
+  // Move constructor
+  Matrix(Matrix && Other);
+
   // Destructor
   ~Matrix(void);
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Operator overloads
+
+  Matrix<Type> & operator=(const Matrix<Type> & Other) = delete;     // Delete Copy Assignement operator
+  Matrix<Type> & operator=(Matrix<Type> && Other) = delete;          // Move assignement operator
 
   // Write to an element of the matrix
   Type & operator()(const unsigned i,                                          // Intent: Read
@@ -40,7 +49,7 @@ public:
 
 
   // Matrix-Matrix multiplication
-  //Matrix<type> operator*(const Matrix<Type> & Other) const;
+  Matrix<Type> operator*(const Matrix<Type> & Other) const;
 
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods
@@ -52,24 +61,26 @@ public:
 
   //////////////////////////////////////////////////////////////////////////////
   // Disabled implicit methods
-  /* C++ implicitly defines the = operator and copy constructor. The issue is
-  that both of these implicit methods use a shallow copy. The matrix class has
+  /* C++ implicitly defines the copy assignment operator and copy constructor.
+  Both of these implicit methods use a shallow copy. The matrix class has
   dynamically allocated memory. Therefore, a shallow copy to a temporary
   object could end up de-allocating memory that should not be de-allocated,
   leading to disaster. I do not want either of these to be useable for the
   matrix class.
 
   Further, it really doesn't make any sense (in the context of what my code
-  does) to be able to set matricies equal to one another or to create
-  new matricies using the = operator.
+  does) to be able to assign one matrix to another matrix that is an L-value
+  or to construct a matrix from another L-value Matrix.
 
   Thus, to eliminate potential errors, I explicitly delete both of these methods.
-  If, for whatever reason, I use these methods in the code, their usage
-  will be caught at compile time, not runtime. */
 
-  Matrix(const Matrix<Type> & M_In) = delete;
+  It should be noted that the Matrix class does have a Move constructor and
+  Move Assignement operator. */
 
-  Matrix<Type> & operator=(const Matrix<Type> & M_In) = delete;
+  //////////////////////////////////////////////////////////////////////////////
+  // Other methods
+
+  void Zero(void);
 }; // class Matrix {
 
 #include "Matrix.cc"

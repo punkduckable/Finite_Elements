@@ -1,5 +1,5 @@
 # Variables
-Comp = g++ -std=c++11
+Comp = g++ -std=c++0x
 Flags = -c -Wall -Wsign-compare -Wextra -O3
 
 
@@ -16,7 +16,7 @@ Errors.o: Errors.cc Errors.h
 Main.o: Main.cc ./Tests/Tests.h
 	$(Comp) $(Flags) Main.cc
 
-Matrix.o: Matrix.cc Matrix.h
+Matrix.o: Matrix.cc Matrix.h Errors.h
 	$(Comp) $(Flags) Matrix.cc
 
 Node.o: ./Node/Node.cc ./Node/Node.h Array.h Errors.h
