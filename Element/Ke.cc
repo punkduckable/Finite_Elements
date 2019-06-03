@@ -222,10 +222,8 @@ Element_Errors Element::Populate_Ke(void) {
   } // if(Ke_Set_Up == true) {
 
 
-  // First, set Ke to 0.
-  for(int j = 0; j < 24; j++)
-    for(int i = 0; i < 24; i++)
-      Ke(i,j) = 0;
+  // First, zero out KE
+  Ke.Zero();
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -246,10 +244,11 @@ Element_Errors Element::Populate_Ke(void) {
       return Element_Errors::BAD_DETERMINANT;
     } // if(J == 0) {
 
-    // Calculate j*D
-    for(int i = 0; i < 6; i++)
-      for(int j = 0; j < 6; j++)
-        JD(i,j) = J*D(i,j);
+    /* Calculate J*D
+    Note: D is a row-major matrix, so the product J*D will be stored as a
+    Row-major matrix as well (see Matrix class implementation) */
+    JD = J*D;
+
 
     // Declare B
     class Matrix<double> B{6, 24, Memory::COLUMN_MAJOR};

@@ -16,11 +16,10 @@ void Test::Matrix_Error_Tests(void) {
     // Try accessing something that is in the 3rd row (M only has 2 rows)
     M(2,1) = 4;
   } // try {
-  catch (Matrix_Exceptions::Index_Out_Of_Bounds Err) {
-    printf("Caught an Index_Out_Of_Bounds exception!\n");
-    Err.Msg();
-    printf("\n");
-  } // catch (Matrix_Exceptions::Index_Out_Of_Bounds Err) {
+  catch (Matrix_Exception Err) {
+    printf("Caught a Matrix_Exception!\n");
+    printf("%s",Err.what());
+  } // catch (Matrix_Exception Err) {
 
   printf("\nColumn Out-of-bounds test:\n");
   try {
@@ -28,10 +27,10 @@ void Test::Matrix_Error_Tests(void) {
     int x = M(0,4);
     printf("M(0,4) = %d\n",x);
   } // try {
-  catch (Matrix_Exceptions::Index_Out_Of_Bounds Err) {
-    printf("Caught an Index_Out_Of_Bounds exception!\n");
-    Err.Msg();
-  } // catch (Matrix_Exceptions::Index_Out_Of_Bounds Err) {
+  catch (Matrix_Index_Out_Of_Bounds Err) {
+    printf("Caught a Matrix_Index_Out_Of_Bounds Exception!\n");
+    printf("%s",Err.what());
+  } // catch (Matrix_Index_Out_Of_Bounds Err) {
 
 
 
@@ -43,10 +42,10 @@ void Test::Matrix_Error_Tests(void) {
 
     Matrix<double> M3 = M1*M2;
   } // try {
-  catch (Matrix_Exceptions::Dimension_Mismatch Err) {
-    printf("Caught a dimension-mismatch exception!\n");
-    Err.Msg();
-  } // catch (Matrix_Exceptions::Dimension_Mismatch Err) {
+  catch (Matrix_Dimension_Mismatch Err) {
+    printf("Caught a Matrix_Dimension_Mismatch exception!\n");
+    printf("%s",Err.what());
+  } // catch (Matrix_Dimension_Mismatch Err) {
 } // void Test::Matrix_Error_Tests(void) {
 
 

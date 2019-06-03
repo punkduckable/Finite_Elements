@@ -37,7 +37,7 @@ public:
   // Operator overloads
 
   Matrix<Type> & operator=(const Matrix<Type> & Other) = delete;     // Delete Copy Assignement operator
-  Matrix<Type> & operator=(Matrix<Type> && Other) = delete;          // Move assignement operator
+  Matrix<Type> & operator=(Matrix<Type> && Other);                   // Move assignement operator
 
   // Write to an element of the matrix
   Type & operator()(const unsigned i,                                          // Intent: Read

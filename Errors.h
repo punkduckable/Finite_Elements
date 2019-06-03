@@ -1,6 +1,8 @@
 #if !defined(ERRORS_HEADER)
 #define ERRORS_HEADER
 
+#include <string>
+
 // Node Errors
 enum class Node_Errors {SUCCESS,
                         NODE_NOT_SET_UP, NODE_ALREADY_SET_UP,
@@ -23,26 +25,26 @@ enum class Element_Errors{SUCCESS,
 void Handle_Error(const Element_Errors Error);
 
 
-// Matrix Exceptions
-namespace Matrix_Exceptions {
-class Dimension_Mismatch {
-  private:
-    unsigned M1_Cols;
-    unsigned M2_Rows;
-  public:
-    Dimension_Mismatch(unsigned M1_Cols, unsigned M2_Rows) : M1_Cols(M1_Cols), M2_Rows(M2_Rows) {}
-    void Msg() const;
-}; // class Dimension_Mismatch_Error {
+////////////////////////////////////////////////////////////////////////////////
+// Matrix exceptions
 
-class Index_Out_Of_Bounds {
+// Matrix Exception base class
+class Matrix_Exception {
   private:
-    unsigned requested_index;
-    unsigned max_index;
-
+    const std::string Error_Message;
   public:
-    Index_Out_Of_Bounds(unsigned requested_index, unsigned max_index) : requested_index(requested_index), max_index(max_index) {}
-    void Msg() const;
-};
-} // namespace Matrix_Exceptions
+      Matrix_Exception(const char* Error_Message) : Error_Message(Error_Message) {};
+      const char* what() const { return Error_Message.c_str(); }
+}; // class Matrix_Exception {
+
+class Matrix_Dimension_Mismatch : public Matrix_Exception {
+  public:
+      Matrix_Dimension_Mismatch(const char* Error_Message) : Matrix_Exception(Error_Message) {}
+}; // class Matrix_Dimension_Mismatch : public Matrix_Exception {
+
+class Matrix_Index_Out_Of_Bounds : public Matrix_Exception {
+  public:
+      Matrix_Index_Out_Of_Bounds(const char* Error_Message) : Matrix_Exception(Error_Message) {}
+}; // class Matrix_Index_Out_Of_Bounds : public Matrix_Exception {
 
 #endif

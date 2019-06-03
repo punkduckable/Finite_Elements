@@ -44,8 +44,41 @@ Matrix<Type>::~Matrix(void) {
 
 
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Operator overloads
+
+// Move assignement operator
+template <typename Type>
+Matrix<Type> & Matrix<Type>::operator=(Matrix<Type> && Other) {
+  // First, check for self assignment. If Other is *this, then we're already done!
+  if(this == &Other)
+    return *this;
+
+  /* Now, make sure that Other is compatible with *this. compatability, in this
+  case, means that both matricies have the same dimensions and memory layout */
+  if( Num_Cols != Other.Num_Cols ||
+      Num_Rows != Other.Num_Rows ||
+      Memory_Layout != Other.Memory_Layout) {
+
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Matrix Dimension Mismatch Error: you tried to set one matrix equal to\n"
+            "another (using the move assignement operator) but those matricies are\n"
+            "incompatible. (dimension or memory layout mismatch)\n"
+            "M1.Num_Rows = %d         M2.Num_Rows = %d\n"
+            "M1.Num_Cols = %d         M2.Num_Cols = %d\n",
+            Num_Rows, Other.Num_Rows, Num_Cols, Other.Num_Cols);
+    throw Matrix_Dimension_Mismatch(Error_Message_Buffer);
+  } // if( Num_Cols != Other.Num_Coll }||...
+
+  // Now, transfer ownership of Ar.
+  Ar = Other.Ar;
+  Other.Ar = nullptr;
+
+  return *this;
+} // Type & Matrix<Type>::operator=(Matrix<Type> && Other) {
+
 
 
 // Write to an element of the matrix
@@ -54,17 +87,32 @@ Type & Matrix<Type>::operator()(const unsigned i, const unsigned j) {
   /* Assumptions:
   This function assumes that i < Num_Rows and that j < Num_Cols. If this is
   not the case then an exception is thrown. */
-  if(i >= Num_Rows)
-    throw Matrix_Exceptions::Index_Out_Of_Bounds(i, Num_Rows);
-  else if(j >= Num_Cols)
-    throw Matrix_Exceptions::Index_Out_Of_Bounds(j, Num_Cols);
+  if(i >= Num_Rows) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Matrix Index-out-of-bounds Error: you tried accessing the %dth column\n"
+            "however, this matrix only has %d columns (max allowed column index is %d)\n",
+            i, Num_Rows, Num_Rows-1);
+    throw Matrix_Index_Out_Of_Bounds(Error_Message_Buffer);
+  } // if(i >= Num_Rows) {
+  else if(j >= Num_Cols) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Matrix Index-out-of-bounds Error: you tried accessing the %dth column\n"
+            "however, this matrix only has %d columns (max allowed column index is %d)\n",
+            j, Num_Cols, Num_Cols-1);
+    throw Matrix_Index_Out_Of_Bounds(Error_Message_Buffer);
+  } // else if(j >= Num_Cols) {
 
 
+  // Now, return the requested component.
   if(Memory_Layout == Memory::ROW_MAJOR)
     return Ar[Num_Cols*i + j];
   else // (Memory_Layout == Memory::COLUMN_MAJOR)
     return Ar[i + j*Num_Rows];
 } // Type & Matrix<Type>::operator()(const unsigned i, const unsigned j) {
+
+
 
 // Read an element of the Matrix
 template <typename Type>
@@ -72,10 +120,22 @@ Type Matrix<Type>::operator()(const unsigned i, const unsigned j) const {
   /* Assumptions:
   This function assumes that i < Num_Rows and that j < Num_Cols. If this is
   not the case then an exception is thrown. */
-  if(i >= Num_Rows)
-    throw Matrix_Exceptions::Index_Out_Of_Bounds(i, Num_Rows);
-  else if(j >= Num_Cols)
-    throw Matrix_Exceptions::Index_Out_Of_Bounds(j, Num_Cols);
+  if(i >= Num_Rows) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Matrix Index-out-of-bounds Error: you tried accessing the %dth column\n"
+            "however, this matrix only has %d columns (max allowed column index is %d)\n",
+            i, Num_Rows, Num_Rows-1);
+    throw Matrix_Index_Out_Of_Bounds(Error_Message_Buffer);
+  } // if(i >= Num_Rows) {
+  else if(j >= Num_Cols) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Matrix Index-out-of-bounds Error: you tried accessing the %dth column\n"
+            "however, this matrix only has %d columns (max allowed column index is %d)\n",
+            j, Num_Cols, Num_Cols-1);
+    throw Matrix_Index_Out_Of_Bounds(Error_Message_Buffer);
+  } // else if(j >= Num_Cols) {
 
 
   // Now, return the requested component.
@@ -101,8 +161,16 @@ Matrix<Type> Matrix<Type>::operator*(const Matrix<Type> & Other) const {
   number of columns in *this is the same as the number of rows in Other.
   Matrix multiplication is only defined if this is the case. Thus, if this
   assumption fails then we throw an exception. */
-  if(Num_Cols != Other.Num_Rows)
-    throw Matrix_Exceptions::Dimension_Mismatch(Num_Cols, Other.Num_Rows);
+  if(Num_Cols != Other.Num_Rows) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Matrix Dimension Mismatch Error: you tried to multiply two incompatible matricies\n"
+            "For M1*M2 to be defined, the number of columns of M1 must equal the number of\n"
+            "rows in M2. In this case, M1.Num_Cols = %d and M2.Num_Rows = %d\n",
+            Num_Cols, Other.Num_Rows);
+    throw Matrix_Dimension_Mismatch(Error_Message_Buffer);
+  } // if(Num_Cols != Other.Num_Rows) {
+
 
   /* Now, compute the product depending on the memory layout of *this and
   Other. It should be noted that this memory layout determins the memory
@@ -235,8 +303,8 @@ Matrix<Type> Matrix<Type>::operator*(const Type c) const {
   } // else {
 } // Matrix<Type> Matrix<Type>::operator*(const Type c) const {
 
-template <typename T>
-Matrix<T> operator*(T c, const Matrix<T> & M) {  return M*c; }
+template <typename Type>
+Matrix<Type> operator*(Type c, const Matrix<Type> & M) {  return M*c; }
 
 
 

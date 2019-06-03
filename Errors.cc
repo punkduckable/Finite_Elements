@@ -117,18 +117,4 @@ void Handle_Error(const Element_Errors Error) {
   } // switch(Error) {
 } // void Handle_Error(const Element_Errors Error) {
 
-
-
-// Matrix Exceptions
-void Matrix_Exceptions::Dimension_Mismatch::Msg(void) const {
-  printf("Dimension Mismatch Error: You tried to mutliply two matricies whose dimensions\n");
-  printf("do match. For M1*M2 to be defined, the number of columns of M1 must equal the\n");
-  printf("number of rows of M2. In this case, M1.Num_Cols = %d and M2.Num_Rows = %d\n",M1_Cols, M2_Rows);
-} // void Dimension_Mismatch::Msg(void) const {
-
-void Matrix_Exceptions::Index_Out_Of_Bounds::Msg(void) const {
-  printf("Index out of bounds Error: You tried accessing the row/column with index %d\n", requested_index);
-  printf("but this matrix has %d rows/columns (Max allowed index is %d)\n",max_index, max_index-1);
-} // void Index_Out_Of_Bounds::Msg(void) const {
-
 #endif
