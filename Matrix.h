@@ -51,6 +51,9 @@ public:
   // Matrix-Matrix multiplication
   Matrix<Type> operator*(const Matrix<Type> & Other) const;
 
+  // Matrix-Scalar multiplication
+  Matrix<Type> operator*(const Type c) const;
+
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods
 

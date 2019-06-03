@@ -66,8 +66,6 @@ Type & Matrix<Type>::operator()(const unsigned i, const unsigned j) {
     return Ar[i + j*Num_Rows];
 } // Type & Matrix<Type>::operator()(const unsigned i, const unsigned j) {
 
-
-
 // Read an element of the Matrix
 template <typename Type>
 Type Matrix<Type>::operator()(const unsigned i, const unsigned j) const {
@@ -206,6 +204,43 @@ Matrix<Type> Matrix<Type>::operator*(const Matrix<Type> & Other) const {
 
 
 
+// Scalar-Matrix multiplication
+template <typename Type>
+Matrix<Type> Matrix<Type>::operator*(const Type c) const {
+  /* Function Description:
+  This method (and the next one) define scalar-Matrix multiplication. I
+  wanted to define both "orders" of scalar-matrix multiplication. That is,
+  c*M and M*c. It should be noted that overliaind c*M requires using the
+  'two-argument'operator* overload (see below).
+
+  As usual, to improve performance, the way that the product is computed depends
+  on the memory layout of the matrix involved. */
+
+  if(Memory_Layout == Memory::ROW_MAJOR) {
+    Matrix<Type> Mc{Num_Rows, Num_Cols, Memory::ROW_MAJOR};
+    for(unsigned i = 0; i < Num_Rows; i++)
+      for(unsigned j = 0; j < Num_Cols; j++)
+        Mc.Ar[i*Num_Cols + j] = c*Ar[i*Num_Cols + j];
+
+    return Mc;
+  } // if(Memory_Layout == Memory::ROW_MAJOR) {
+
+  else { // if(Memory_Layout == Memory::COLUMN_MAJOR) {
+    Matrix<Type> Mc{Num_Rows, Num_Cols, Memory::COLUMN_MAJOR};
+    for(unsigned j = 0; j < Num_Cols; j++)
+      for(unsigned i = 0; i < Num_Rows; i++)
+        Mc.Ar[i + j*Num_Rows] = c*Ar[i + j*Num_Rows];
+
+    return Mc;
+  } // else {
+} // Matrix<Type> Matrix<Type>::operator*(const Type c) const {
+
+template <typename T>
+Matrix<T> operator*(T c, const Matrix<T> & M) {  return M*c; }
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,7 +258,7 @@ void Matrix<Type>::Zero(void) {
 
   As is usual, the way that this method works depends on the Memory Layout
   of the matrix (to optimize memory usage). */
-  
+
   if(Memory_Layout == Memory::ROW_MAJOR) {
     for(unsigned i = 0; i < Num_Rows; i++)
       for(unsigned j = 0; j < Num_Cols; j++)

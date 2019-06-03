@@ -6,12 +6,14 @@
 #include "../Matrix.h"
 #include "../Errors.h"
 
+
 namespace Test {
   void Node_Error_Tests(void);
   void Node(void);
 
   void Matrix_Error_Tests(void);
   void Matrix_Correctness_Tests(void);
+  void Print(const Matrix<double> & M);          // Used to print out matricies
 
   void Element_Error_Tests(void);
   void Element(void);

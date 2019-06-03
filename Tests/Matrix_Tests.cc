@@ -57,7 +57,7 @@ void Test::Matrix_Correctness_Tests(void) {
   unsigned Num_Cols = 4;
 
   // First, declare the ROW_MAJOR matrix
-  Matrix<int> M1{Num_Rows, Num_Cols, Memory::ROW_MAJOR};
+  Matrix<double> M1{Num_Rows, Num_Cols, Memory::ROW_MAJOR};
 
   // Populate M1
   printf("Populating matrix... ");
@@ -67,12 +67,7 @@ void Test::Matrix_Correctness_Tests(void) {
   printf("Done!\n");
 
   // Now, print out M1
-  for(unsigned i = 0; i < Num_Rows; i++) {
-    printf("|");
-    for(unsigned j = 0; j < Num_Cols; j++)
-      printf(" %3d ", M1(i,j));
-    printf(" |\n");
-  } // for(unsigned i = 0; i < Num_Rows; i++) {
+  Print(M1);
 
 
 
@@ -91,12 +86,7 @@ void Test::Matrix_Correctness_Tests(void) {
   printf("Done!\n");
 
   // Now, print out M2
-  for(unsigned i = 0; i < Num_Rows; i++) {
-    printf("|");
-    for(unsigned j = 0; j < Num_Cols; j++)
-      printf(" %6.3lf ", M2(i,j));
-    printf(" |\n");
-  } // for(unsigned i = 0; i < Num_Rows; i++) {
+  Print(M2);
 
 
 
@@ -104,47 +94,71 @@ void Test::Matrix_Correctness_Tests(void) {
   Matrix<double> M3{2,4,Memory::COLUMN_MAJOR};
   Matrix<double> M4{4,3,Memory::COLUMN_MAJOR};
 
-  // Populate and Printout M3
+  // Populate and Print M3
   for(unsigned i = 0; i < M3.Get_Num_Rows(); i++)
     for(unsigned j = 0; j < M3.Get_Num_Cols(); j++)
       M3(i,j) = i+j;
 
   printf("M3:\n");
-  for(unsigned i = 0; i < M3.Get_Num_Rows(); i++) {
-    printf("|");
-    for(unsigned j = 0; j < M3.Get_Num_Cols(); j++)
-      printf(" %6.3lf ", M3(i,j));
-    printf(" |\n");
-  } // for(unsigned i = 0; i < M3.Get_Num_Rows(); i++) {
+  Print(M3);
 
-  // Populate and Printout M4
+  // Populate and Print M4
   for(unsigned i = 0; i < M4.Get_Num_Rows(); i++)
     for(unsigned j = 0; j < M4.Get_Num_Cols(); j++)
       M4(i,j) = i+j;
 
   printf("M4:\n");
-  for(unsigned i = 0; i < M4.Get_Num_Rows(); i++) {
-    printf("|");
-    for(unsigned j = 0; j < M4.Get_Num_Cols(); j++)
-      printf(" %6.3lf ", M4(i,j));
-    printf(" |\n");
-  } // for(unsigned i = 0; i < M4.Get_Num_Rows(); i++) {
-    
+  Print(M4);
+
   // Now, compute their product and print it out
   Matrix<double> M5 = M3*M4;
-  printf("M3*M4:\n");
-  for(unsigned i = 0; i < M5.Get_Num_Rows(); i++) {
-    printf("|");
-    for(unsigned j = 0; j < M5.Get_Num_Cols(); j++)
-      printf(" %6.3lf ", M5(i,j));
-    printf(" |\n");
-  } // for(unsigned i = 0; i < M5.Get_Num_Rows(); i++) {
+  printf("M5 = M3*M4:\n");
+  Print(M5);
 
   printf("M5 Memory Layout: ");
   if(M5.Get_Memory_Layout() == Memory::ROW_MAJOR)
     printf("ROW_MAJOR\n");
   else
     printf("COLUMN_MAJOR\n");
+
+
+
+
+  printf("Matrix-scalar multiplication test\n");
+  Matrix<double> M6{4,5, Memory::ROW_MAJOR};
+
+  // Populate and print M6
+  for(unsigned i = 0; i < M6.Get_Num_Rows(); i++)
+    for(unsigned j = 0; j < M6.Get_Num_Cols(); j++)
+      M6(i,j) = 1;
+  printf("M6:\n");
+  Print(M6);
+
+  // compute and print c*M6 and M7 *c
+  Matrix<double> M7 = M6*4.;
+  printf("M7 = 5*M6:\n");
+  Print(M7);
+
+  Matrix<double> M8 = 5.*M7;
+  printf("5*M7:\n");
+  Print(M8);
 } // void Test::Matrix_Correctness_Tests(void) {
+
+
+
+void Test::Print(const Matrix<double> & M) {
+  // Loop through the rows of M, printing out each one.
+  for(unsigned i = 0; i < M.Get_Num_Rows(); i++) {
+    // First, Print out a vertical bar (for the start of the row)
+    printf("|");
+
+    // Now, print out the contents of the ith row
+    for(unsigned j = 0; j < M.Get_Num_Cols(); j++)
+      printf(" %6.3f ", M(i,j));
+
+    // Finish with another vertical bar before moving onto the next row.
+    printf(" |\n");
+  } // for(unsigned i = 0; i < M.Get_Num_Rows(); i++) {
+} // void Test::Print(const Matrix<double> & M) {
 
 #endif
