@@ -4,7 +4,7 @@ Flags = -c -Wall -Wsign-compare -Wextra -O3
 
 
 # Core Rules
-All: Array.o Errors.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o Matrix.cc Matrix.h
+All: Array.o Errors.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o ./Matrix/Matrix.cc ./Matrix/Matrix.h
 	$(Comp) -o FEM Array.o Errors.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o
 
 Array.o: Array.cc Array.h
@@ -22,28 +22,28 @@ Node.o: ./Node/Node.cc ./Node/Node.h Array.h Errors.h
 
 
 # Rules to make the Element class
-Core.o: ./Element/Core.cc ./Element/Element.h ./Node/Node.h Errors.h Matrix.h
+Core.o: ./Element/Core.cc ./Element/Element.h ./Node/Node.h Errors.h ./Matrix/Matrix.h
 	$(Comp) $(Flags) ./Element/Core.cc
 
-Ke.o: ./Element/Ke.cc ./Element/Element.h ./Node/Node.h Errors.h Matrix.h
+Ke.o: ./Element/Ke.cc ./Element/Element.h ./Node/Node.h Errors.h ./Matrix/Matrix.h
 	$(Comp) $(Flags) ./Element/Ke.cc
 
-Fe.o: ./Element/Fe.cc ./Element/Element.h ./Node/Node.h Errors.h Matrix.h
+Fe.o: ./Element/Fe.cc ./Element/Element.h ./Node/Node.h Errors.h ./Matrix/Matrix.h
 	$(Comp) $(Flags) ./Element/Fe.cc
 
-Setup_Class.o: ./Element/Setup_Class.cc ./Element/Element.h ./Node/Node.h Errors.h Matrix.h
+Setup_Class.o: ./Element/Setup_Class.cc ./Element/Element.h ./Node/Node.h Errors.h ./Matrix/Matrix.h
 	$(Comp) $(Flags) ./Element/Setup_Class.cc
 
 
 
 # Rules to make the test object files.
-Element_Tests.o: ./Tests/Element_Tests.cc ./Tests/Tests.h ./Node/Node.h Matrix.h ./Element/Element.h Errors.h
+Element_Tests.o: ./Tests/Element_Tests.cc ./Tests/Tests.h ./Node/Node.h ./Matrix/Matrix.h ./Element/Element.h Errors.h
 	$(Comp) $(Flags) ./Tests/Element_Tests.cc
 
-Matrix_Tests.o: ./Tests/Matrix_Tests.cc ./Tests/Tests.h ./Node/Node.h Matrix.h ./Element/Element.h Errors.h
+Matrix_Tests.o: ./Tests/Matrix_Tests.cc ./Tests/Tests.h ./Node/Node.h ./Matrix/Matrix.h ./Element/Element.h Errors.h
 	$(Comp) $(Flags) ./Tests/Matrix_Tests.cc
 
-Node_Tests.o: ./Tests/Node_Tests.cc ./Tests/Tests.h ./Node/Node.h Matrix.h ./Element/Element.h Errors.h
+Node_Tests.o: ./Tests/Node_Tests.cc ./Tests/Tests.h ./Node/Node.h ./Matrix/Matrix.h ./Element/Element.h Errors.h
 	$(Comp) $(Flags) ./Tests/Node_Tests.cc
 
 

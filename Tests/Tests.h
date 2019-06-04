@@ -3,7 +3,7 @@
 
 #include "../Node/Node.h"
 #include "../Element/Element.h"
-#include "../Matrix.h"
+#include "../Matrix/Matrix.h"
 #include "../Errors.h"
 
 

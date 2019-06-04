@@ -1,7 +1,7 @@
 #if !defined(MATRIX_HEADER)
 #define MATRIX_HEADER
 
-#include "Errors.h"
+#include "../Errors.h"
 
 enum class Memory{ROW_MAJOR, COLUMN_MAJOR};
 

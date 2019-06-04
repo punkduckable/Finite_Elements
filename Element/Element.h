@@ -3,7 +3,7 @@
 
 #include "../Node/Node.h"
 #include "../Errors.h"
-#include "../Matrix.h"
+#include "../Matrix/Matrix.h"
 
 class Element {
 private:
