@@ -72,7 +72,10 @@ Matrix<Type> & Matrix<Type>::operator=(Matrix<Type> && Other) {
     throw Matrix_Dimension_Mismatch(Error_Message_Buffer);
   } // if( Num_Cols != Other.Num_Coll }||...
 
-  // Now, transfer ownership of Ar.
+  // Now, delete our array
+  delete [] Ar;
+
+  // Finally, transfer ownership of Ar.
   Ar = Other.Ar;
   Other.Ar = nullptr;
 

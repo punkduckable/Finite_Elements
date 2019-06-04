@@ -7,22 +7,21 @@
 void Test::Element_Error_Tests(void) {
   // First, lets create some elements.
   class Element El[4];
-  Element_Errors El_Err;
 
   //////////////////////////////////////////////////////////////////////////////
   // Let's check that the "ELEMENT_NOT_SET_UP" Error is handled correctly
 
   printf("\nTrying to set nodes\n");
-  El_Err = El[1].Set_Nodes(0,1,2,3,4,5,6,7);
-  Handle_Error(El_Err);
+  try { El[1].Set_Nodes(0,1,2,3,4,5,6,7); }
+  catch(const Element_Not_Set_Up & Er) { printf("%s\n",Er.what()); }
 
   printf("\nTrying to populate Ke\n");
-  El_Err = El[2].Populate_Ke();
-  Handle_Error(El_Err);
+  try { El[2].Populate_Ke(); }
+  catch(const Element_Not_Set_Up & Er) { printf("%s\n",Er.what()); }
 
   printf("\nTrying to move Ke to K\n");
-  El_Err = El[3].Move_Ke_To_K();
-  Handle_Error(El_Err);
+  try { El[3].Move_Ke_To_K(); }
+  catch(const Element_Not_Set_Up & Er) { printf("%s\n",Er.what()); }
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -104,9 +103,9 @@ void Test::Element_Error_Tests(void) {
   class Matrix<double> K{Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR};
   double * F = new double[Num_Global_Eq];
 
-  // Zero initialize K
-  for(unsigned i = 0; i < Num_Global_Eq; i++)
-    for(unsigned j = 0; j < Num_Global_Eq; j++)
+  // Zero initialize K (Note: K is Column-major)
+  for(unsigned j = 0; j < Num_Global_Eq; j++)
+    for(unsigned i = 0; i < Num_Global_Eq; i++)
       K(i,j) = 0;
 
   // zero initialize F
@@ -116,20 +115,20 @@ void Test::Element_Error_Tests(void) {
 
   // We are now ready to set the static members of the Element class
   printf("\nSetting static members of the Element class\n");
-  El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
-  Handle_Error(El_Err);
+  try { Set_Element_Static_Members(&ID, &K, F, Nodes); }
+  catch(const Element_Exception & Er) { printf("%s\n",Er.what()); }
 
   printf("Attempting to set the static members a second time\n");
-  El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
-  Handle_Error(El_Err);
+  try { Set_Element_Static_Members(&ID, &K, F, Nodes); }
+  catch( const Element_Already_Set_Up & Er) { printf("%s\n",Er.what()); }
 
   printf("\nSetting Element material\n");
-  El_Err = Set_Element_Material(10, .3);
-  Handle_Error(El_Err);
+  try { Set_Element_Material(10, .3); }
+  catch(const Element_Exception & Er) { printf("%s\n",Er.what()); }
 
   printf("Attempting to set Element material a second time\n");
-  El_Err = Set_Element_Material(10, .3);
-  Handle_Error(El_Err);
+  try { Set_Element_Material(10, .3); }
+  catch(const Element_Already_Set_Up & Er) { printf("%s\n",Er.what()); }
 
   // Now, create an array of elements.
   const unsigned Num_Elements = (Nx-1)*(Ny-1)*(Nz-1);
@@ -140,16 +139,16 @@ void Test::Element_Error_Tests(void) {
   // Try using element methods before setting nodes.
 
   printf("\nAttempting to Populate_Ke before setting node list\n");
-  El_Err = Elements[0].Populate_Ke();
-  Handle_Error(El_Err);
+  try { Elements[0].Populate_Ke(); }
+  catch(const Element_Not_Set_Up & Er) { printf("%s\n",Er.what()); }
 
   printf("Attempting to Fill_Ke_With_1s before setting node list\n");
-  El_Err = Elements[0].Fill_Ke_With_1s();
-  Handle_Error(El_Err);
+  try { Elements[0].Fill_Ke_With_1s(); }
+  catch(const Element_Not_Set_Up & Er) { printf("%s\n",Er.what()); }
 
   printf("Attempting to move Ke to K before setting node list\n");
-  El_Err = Elements[0].Move_Ke_To_K();
-  Handle_Error(El_Err);
+  try { Elements[0].Move_Ke_To_K(); }
+  catch(const Element_Not_Set_Up & Er) { printf("%s\n",Er.what()); }
 
   ///////////////////////////////////////////////////////////////////////////////
   // Now, set each element's node list
@@ -175,16 +174,16 @@ void Test::Element_Error_Tests(void) {
   printf("Done!\n");
 
   printf("Attempting to move Ke to K\n");
-  El_Err = Elements[0].Move_Ke_To_K();
-  Handle_Error(El_Err);
+  try { Elements[0].Move_Ke_To_K(); }
+  catch(const Element_Exception & Er) { printf("%s\n",Er.what()); }
 
   printf("Attempting to move Fe to F\n");
-  El_Err = Elements[0].Move_Fe_To_F();
-  Handle_Error(El_Err);
+  try { Elements[0].Move_Fe_To_F(); }
+  catch(const Element_Exception & Er) { printf("%s\n",Er.what()); }
 
   printf("Attempting to populate Fe\n");
-  El_Err = Elements[0].Populate_Fe();
-  Handle_Error(El_Err);
+  try { Elements[0].Populate_Fe(); }
+  catch(const Element_Exception & Er) { printf("%s\n",Er.what()); }
 
   ///////////////////////////////////////////////////////////////////////////////
   // Fill each Ke with 1's
@@ -201,17 +200,17 @@ void Test::Element_Error_Tests(void) {
   } // for(unsigned i = 0; i < Nx-1; i++) {
   printf("Done!\n");
 
-  printf("Attempting to populate Element[0]'s (it's already set)\n");
-  El_Err = Elements[0].Populate_Ke();
-  Handle_Error(El_Err);
+  printf("Attempting to populate Element[0]'s Ke (it's already set)\n");
+  try { Elements[0].Populate_Ke(); }
+  catch(const Element_Already_Set_Up & Er) { printf("%s\n",Er.what()); }
 
   printf("Attempting to fill Element[0]'s Ke with 1's\n");
-  El_Err = Elements[0].Fill_Ke_With_1s();
-  Handle_Error(El_Err);
+  try { Elements[0].Fill_Ke_With_1s(); }
+  catch(const Element_Already_Set_Up & Er) { printf("%s\n",Er.what());}
 
   printf("Attempting to move Fe to F\n");
-  El_Err = Elements[0].Move_Fe_To_F();
-  Handle_Error(El_Err);
+  try { Elements[0].Move_Fe_To_F(); }
+  catch(const Element_Exception & Er) { printf("%s\n",Er.what()); }
 
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -239,8 +238,6 @@ void Test::Element_Error_Tests(void) {
 
 
 void Test::Element(void) {
-  Element_Errors El_Err;
-
   //////////////////////////////////////////////////////////////////////////////
   // Specify dimension
 
@@ -323,9 +320,9 @@ void Test::Element(void) {
   class Matrix<double> K{Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR};
   double * F = new double[Num_Global_Eq];
 
-  // Zero initialize K
-  for(unsigned i = 0; i < Num_Global_Eq; i++)
-    for(unsigned j = 0; j < Num_Global_Eq; j++)
+  // Zero initialize K (note: K is Column-major)
+  for(unsigned j = 0; j < Num_Global_Eq; j++)
+    for(unsigned i = 0; i < Num_Global_Eq; i++)
       K(i,j) = 0;
 
   // zero initialize F
@@ -337,17 +334,17 @@ void Test::Element(void) {
   // Make some elements
 
   // Set up the element class
-  El_Err = Set_Element_Static_Members(&ID, &K, F, Nodes);
-  if(El_Err != Element_Errors::SUCCESS) {
-    Handle_Error(El_Err);
+  try { Set_Element_Static_Members(&ID, &K, F, Nodes); }
+  catch (const Element_Already_Set_Up & Er) {
+    printf("%s\n",Er.what());
     return;
-  } // if(El_Err != Element_Errors::SUCCESS) {
+  } // catch (const Element_Already_Set_Up & Er) {
 
-  El_Err = Set_Element_Material(10, .3);
-  if(El_Err != Element_Errors::SUCCESS) {
-    Handle_Error(El_Err);
+  try { Set_Element_Material(10, .3); }
+  catch (const Element_Exception & Er) {
+    printf("%s\n",Er.what());
     return;
-  } // if(El_Err != Element_Errors::SUCCESS) {
+  } //  catch (const Element_Exception & Er) {
 
   // Create some elements
   const unsigned Num_Elements = (Nx-1)*(Ny-1)*(Nz-1);
@@ -370,7 +367,8 @@ void Test::Element(void) {
         Now, set each Element's Node list. Note, the order that we set these
         nodes is very specific. This is done so that the orientation of the nodes
         in the element matches that on page 124 of Hughes' book. */
-        El_Err = Elements[Element_Index].Set_Nodes(Ny*Nz*i + Nz*j + k,
+        try {
+          Elements[Element_Index].Set_Nodes(Ny*Nz*i + Nz*j + k,
                                                    Ny*Nz*(i+1) + Nz*j + k,
                                                    Ny*Nz*(i+1) + Nz*(j+1) + k,
                                                    Ny*Nz*i + Nz*(j+1) + k,
@@ -378,43 +376,43 @@ void Test::Element(void) {
                                                    Ny*Nz*(i+1) + Nz*j + (k+1),
                                                    Ny*Nz*(i+1) + Nz*(j+1) + (k+1),
                                                    Ny*Nz*i + Nz*(j+1) + (k+1));
-        // Check for error
-        if(El_Err != Element_Errors::SUCCESS) {
-          Handle_Error(El_Err);
+        } // try {
+        catch (const Element_Exception & Er) {
+          printf("%s\n",Er.what());
           return;
-        } // if(El_Err != Element_Errors::SUCCESS) {
+        } // catch (const Element_Exception & Er) {
 
 
         // Populate Ke and check for errors
-        El_Err = Elements[Element_Index].Populate_Ke();
-        if(El_Err != Element_Errors::SUCCESS) {
-          Handle_Error(El_Err);
+        try { Elements[Element_Index].Populate_Ke(); }
+        catch (const Element_Exception & Er) {
+          printf("%s\n",Er.what());
           return;
-        } // if(El_Err != Element_Errors::SUCCESS) {
+        } // catch (const Element_Exception & Er) {
 
 
         // Populate Fe and check for errors
-        El_Err = Elements[Element_Index].Populate_Fe();
-        if(El_Err != Element_Errors::SUCCESS) {
-          Handle_Error(El_Err);
+        try { Elements[Element_Index].Populate_Fe(); }
+        catch (const Element_Exception & Er) {
+          printf("%s\n",Er.what());
           return;
-        } // if(El_Err != Element_Errors::SUCCESS) {
+        } // // catch (const Element_Exception & Er) {
 
 
         // Move Ke to K and check for errors
-        El_Err = Elements[Element_Index].Move_Ke_To_K();
-        if(El_Err != Element_Errors::SUCCESS) {
-          Handle_Error(El_Err);
+        try { Elements[Element_Index].Move_Ke_To_K(); }
+        catch (const Element_Exception & Er) {
+          printf("%s\n",Er.what());
           return;
-        } // if(El_Err != Element_Errors::SUCCESS) {
+        } // // catch (const Element_Exception & Er) {
 
 
         // Move Fe to F and check for errors
-        El_Err = Elements[Element_Index].Move_Fe_To_F();
-        if(El_Err != Element_Errors::SUCCESS) {
-          Handle_Error(El_Err);
+        try { Elements[Element_Index].Move_Fe_To_F(); }
+        catch (const Element_Exception & Er) {
+          printf("%s\n",Er.what());
           return;
-        } // if(El_Err != Element_Errors::SUCCESS) {
+        } // // catch (const Element_Exception & Er) {
 
         Element_Index++;
       } // for(unsigned k = 0; k < Nz-1; k++) {
@@ -424,7 +422,7 @@ void Test::Element(void) {
   // Print results to file.
   Simulation::Print_K_To_File(K);
   Simulation::Print_F_To_File(F, Num_Global_Eq);
-} // void Test::Element_Errors(void) {
+} // void Test::Element(void) {
 
 
 

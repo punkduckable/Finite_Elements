@@ -11,7 +11,7 @@ the functions requried to move Ke to K. */
 //#define COEFFICIENT_MATRIX_MONITOR     // Prints Coeff, J, and Xi, Eta, Zeta partials of x,y,z
 //#define BA_MONITOR                     // Prints each Ba (used to construct B)
 //#define POPULATE_KE_MONITOR            // Prints JD, B, JD*B and B^T*JD*B
-#define KE_MONITOR                     // Prints Ke
+//#define KE_MONITOR                     // Prints Ke
 
 
 
@@ -144,6 +144,7 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point,
   method can't run unless the static members have been set, we should be
   justified in assuming that this assumption is valid. */
 
+
   //////////////////////////////////////////////////////////////////////////////
   /* First, calculate Na_x, Na_y, Na_z. This is done using the equations on page
   150 of Hughes' book */
@@ -183,10 +184,10 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point,
 
 
 
-Element_Errors Element::Populate_Ke(void) {
+void Element::Populate_Ke(void) {
   /* Function description:
   This method is used to populate Ke, the element stiffness matrix. Once
-  this method has run, Ke can be mapped to K and F. */
+  this method has run, Ke can be mapped to K (and Fe can be calculated). */
 
 
   /* Assumption 1:
@@ -200,34 +201,47 @@ Element_Errors Element::Populate_Ke(void) {
 
   /* Assumption 2:
   This function assumes that this Element has been set up. More specificially,
-  this function assumes that the node list and node positions have been set. */
+  this function assumes that the node list and node positions have been set.*/
   if(Element_Set_Up == false) {
-    printf("Error in Element::Populate_Ke\n");
-    return Element_Errors::ELEMENT_NOT_SET_UP;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Exception: Thrown by Element::Populate_Ke\n"
+            "it is impossible to calculate Ke if the element's node list has\n"
+            "not been set. Set_Nodes must be run BEFORE Populate_Ke.\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
   } // if(Element_Set_Up == false) {
+
 
   /* Assumption 3:
   This function assumes that D has been set. This can be tested with the
   "Material_Set" flag. */
   if(Material_Set == false) {
-    printf("Error in Element::Populate_Ke\n");
-    return Element_Errors::MATERIAL_NOT_SET;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Exception: Thrown by Element::Populate_Ke\n"
+            "Ke depends on D. Thus, the element material must be set before\n"
+            "calculating Ke.\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
   } // if(Material_Set == false) {
 
+
   /* Assumption 4:
-  This function also assumes that Ke has not been set already. */
+  Finally, This function assumes that Ke has not been set already. */
   if(Ke_Set_Up == true) {
-    printf("Error in Element::Populate_Ke\n");
-    return Element_Errors::KE_ALREADY_SET_UP;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Already Set Exception: Thrown by Element::Populate_Ke\n"
+            "Once Ke has been calculated, it can not be recalculated.\n");
+    throw Element_Already_Set_Up(Error_Message_Buffer);
   } // if(Ke_Set_Up == true) {
 
+
+  //////////////////////////////////////////////////////////////////////////////
 
   // First, zero out KE
   Ke.Zero();
 
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Cycle through the 8 Integration points
+  // Now, cycle through the 8 Integration points
 
   // First, declare J, Coeff, and jD
   double J;
@@ -238,10 +252,15 @@ Element_Errors Element::Populate_Ke(void) {
     // Find coefficient matrix, J.
     Calculate_Coefficient_Matrix(Point, Coeff, J);
 
-    // Make sure that J is not zero.
+    // Make sure that J is not zero. If it is then throw an exception.
     if(J <= 0) {
-      printf("Error in Populate_Ke!\n");
-      return Element_Errors::BAD_DETERMINANT;
+      char Error_Message_Buffer[500];
+      sprintf(Error_Message_Buffer,
+              "Element Bad Determinant Exception: Thrown in Element::Populate_Ke\n"
+              "The Jacobian determinant, J, must be a strictly positive quantity. However,\n"
+              "when calculating J for integration point %d, we got J = %lf.\n",
+              Point, J);
+      throw Element_Bad_Determinant(Error_Message_Buffer);
     } // if(J == 0) {
 
     /* Calculate J*D
@@ -352,13 +371,11 @@ Element_Errors Element::Populate_Ke(void) {
       printf("|\n");
     } // for(int i = 0; i < 24, i++) {
   #endif
-
-  return Element_Errors::SUCCESS;
-} // Element_Errors Element::Populate_Ke(void) {
+} // void Element::Populate_Ke(void) {
 
 
 
-Element_Errors Element::Fill_Ke_With_1s(void) {
+void Element::Fill_Ke_With_1s(void) {
   /* Function description:
   This function is used for testing purposes. It sets every element of Ke to 1.
   Once this has been done, Ke can be mapped to K. This is used to test that
@@ -367,25 +384,33 @@ Element_Errors Element::Fill_Ke_With_1s(void) {
 
   /* Assumption 1:
   This function assumes that this Element has been set up. More specificially,
-  this function assumes that the node list has been set. */
+  this function assumes that the node list and node positions have been set.*/
   if(Element_Set_Up == false) {
-    printf("Error in Element::Fill_Ke_With_1s\n");
-    return Element_Errors::ELEMENT_NOT_SET_UP;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Exception: Thrown by Element::Fill_Ke_With_1s\n"
+            "it is impossible to calculate Ke if the element's node list has\n"
+            "not been set. Set_Nodes must be run BEFORE Fill_Ke_With_1s.\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
   } // if(Element_Set_Up == false) {
 
 
   /* Assumption 2:
-  This function also assumes that Ke has not been set already. */
+  Finally, This function assumes that Ke has not been set already. */
   if(Ke_Set_Up == true) {
-    printf("Error in Element::Fill_Ke_With_1s\n");
-    return Element_Errors::KE_ALREADY_SET_UP;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Already Set Exception: Thrown by Element::Fill_Ke_With_1s\n"
+            "Once Ke has been calculated, it can not be recalculated.\n");
+    throw Element_Already_Set_Up(Error_Message_Buffer);
   } // if(Ke_Set_Up == true) {
+
 
   //////////////////////////////////////////////////////////////////////////////
 
-  // Fill Ke's with 1's
-  for(int i = 0; i < 24; i++)
-    for(int j = 0; j < 24; j++)
+  // Fill Ke's with 1's (note: Ke is column major)
+  for(int j = 0; j < 24; j++)
+    for(int i = 0; i < 24; i++)
       Ke(i,j) = 1;
 
   // Ke has now been set
@@ -402,13 +427,11 @@ Element_Errors Element::Fill_Ke_With_1s(void) {
       printf("|\n");
     } // for(int i = 0; i < 24, i++) {
   #endif
-
-  return Element_Errors::SUCCESS;
-} // Element_Errors Element::Fill_Ke_With_1s(void) {
+} // void Element::Fill_Ke_With_1s(void) {
 
 
 
-Element_Errors Element::Move_Ke_To_K(void) const {
+void Element::Move_Ke_To_K(void) const {
   /* Function description:
   This fucntion is used to map the element stiffness matrix, Ke, to the global
   stiffness matrix, K. */
@@ -420,10 +443,14 @@ Element_Errors Element::Move_Ke_To_K(void) const {
   has been set.
 
   It is not possible, however, to set up Ke without having the Static members
-  set. Therefore, if Ke is set then both assumptions must be satisified */
+  set. Therefore, if Ke is set then both assumptions must be satisified. */
   if(Ke_Set_Up == false) {
-    printf("Error in Element::Move_Ke_To_K\n");
-    return Element_Errors::KE_NOT_SET_UP;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Exception: Thrown by Element::Move_Ke_To_K\n"
+            "you have to calculate Ke before mapping Ke to K. Populate_Ke must\n"
+            "be run BEFORE Move_Ke_To_K\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
   } // if(Ke_Set_Up == false) {
 
 
@@ -465,8 +492,6 @@ Element_Errors Element::Move_Ke_To_K(void) const {
         (*K)(J,I) += Ke_Row_Col;
       } // for(int Row = Col+1; Row < 24; Row++) {
   } // for(int Col = 0; Col < 24; Col++) {
-
-  return Element_Errors::SUCCESS;
-} // Element_Errors Element::Move_Ke_To_K(void) const {
+} // void Element::Move_Ke_To_K(void) const {
 
 #endif

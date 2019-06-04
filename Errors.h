@@ -77,16 +77,6 @@ class Element_Bad_Determinant : public Element_Exception {
     Element_Bad_Determinant(const char* Error_Message) : Element_Exception(Error_Message) {}
 }; // class Element_Bad_Determinant : public Element_Exception {
 
-enum class Element_Errors{SUCCESS,
-                          STATIC_MEMBERS_NOT_SET, STATIC_MEMBERS_ALREADY_SET,
-                          MATERIAL_NOT_SET, MATERIAL_ALREADY_SET,
-                          ELEMENT_ALREADY_SET_UP, ELEMENT_NOT_SET_UP,
-                          KE_ALREADY_SET_UP, KE_NOT_SET_UP,
-                          FE_ALREADY_SET_UP, FE_NOT_SET_UP,
-                          NODE_ID_INDEX_OUT_OF_BOUNDS,
-                          BAD_DETERMINANT};
-void Handle_Error(const Element_Errors Error);
-
 
 
 

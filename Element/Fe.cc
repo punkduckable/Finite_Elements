@@ -7,10 +7,10 @@ to F. */
 
 #include "Element.h"
 #include <stdio.h>
-#define FE_MONITOR                     // Prints Fe
+//#define FE_MONITOR                     // Prints Fe
 
 
-Element_Errors Element::Populate_Fe(void) {
+void Element::Populate_Fe(void) {
   /* Function Description:
   This function is used to populate Fe, the local force vector.*/
 
@@ -18,19 +18,29 @@ Element_Errors Element::Populate_Fe(void) {
   This function assumes that Ke has been populated. This can be determined
   by the "Ke_Set_Up" flag. */
   if(Ke_Set_Up == false) {
-    printf("Error in Element::Populate_Fe\n");
-    return Element_Errors::KE_NOT_SET_UP;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Exception: Thrown by Element::Populate_Fe\n"
+            "Ke must be computed before computing Fe. You must run Populate_Ke\n"
+            "BEFORE you can run Populate_Fe\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
   } // if(Ke_Set_Up == false) {
+
 
   /* Assumption 2:
   This function assumes that Fe has not already been set up. This can be
   determined with the "Fe_Set_Up" flag */
   if(Fe_Set_Up == true) {
-    printf("Error in Element::Populate_Fe\n");
-    return Element_Errors::FE_ALREADY_SET_UP;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Already Set Up Exception: Thrown by Element::Populate_Fe\n"
+            "Fe has already been set up and shoud only be set once per iteration.\n");
+    throw Element_Already_Set_Up(Error_Message_Buffer);
   } // if(Fe_Set_Up == true) {
 
-  // Loop through the 24 local equations
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Calculate Ke by looping through the 24 local equations
   for(int i = 0; i < 24; i++) {
     // Set Fe to Zero to start
     Fe[i] = 0;
@@ -53,14 +63,12 @@ Element_Errors Element::Populate_Fe(void) {
       printf(" %6.3lf", Fe[i]);
     printf("|\n");
   #endif
-
-  return Element_Errors::SUCCESS;
-} // Element_Errors Elemnet::Populate_Fe(void) {
+} // void Elemnet::Populate_Fe(void) {
 
 
 
 
-Element_Errors Element::Move_Fe_To_F(void) const {
+void Element::Move_Fe_To_F(void) const {
   /* Function description
   This function maps the local force vector, Fe, to the global force vector, F */
 
@@ -73,11 +81,16 @@ Element_Errors Element::Move_Fe_To_F(void) const {
   static members have been set. Therefore, we only need to check if Ke has been
   set to validate both assumptions */
   if(Fe_Set_Up == false) {
-    printf("Error in Move_Fe_To_F\n");
-    return Element_Errors::FE_NOT_SET_UP;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+           "Element Not Set Up Exception: Thrown by Element::Move_Fe_To_F\n"
+           "You must compute Fe before you can map Fe to F. Populate_Fe must\n"
+           "be run BEFORE Move_Fe_to_F\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
   } // if(Fe_Set_Up == false) {
 
-  // Now, add the local contributions to the force vector (Fe) to F.
+  //////////////////////////////////////////////////////////////////////////////
+  // Add the local contributions to the force vector (Fe) to F.
   for(int i = 0; i < 24; i++) {
     const unsigned I = Local_Eq_Num_To_Global_Eq_Num[i];
     if(I == FIXED_COMPONENT)
@@ -85,9 +98,7 @@ Element_Errors Element::Move_Fe_To_F(void) const {
     else
       F[I] += Fe[i];
   } // for(int i = 0; i < 24; i++) {
-
-  return Element_Errors::SUCCESS;
-} // Element_Errors Element::Move_Fe_To_F(void) const {
+} // void Element::Move_Fe_To_F(void) const {
 
 
 #endif

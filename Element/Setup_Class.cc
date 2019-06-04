@@ -12,7 +12,7 @@ static members. */
 
 
 
-Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Node_Array_Ptr) {
+void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Node_Array_Ptr) {
   /* Function description:
   This function is used to set the static members for the Element class. This
   function also calculates the value of the shape functions (for the master
@@ -20,16 +20,19 @@ Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<doub
 
   /* Assumption 1:
   This function is used to set up the Element class. We really only want to be
-  able to do this once. (doing so multiple times would lead to disaster).
-
-  If the Element static members have already been set then we return an error */
+  able to do this once. (doing so multiple times would lead to disaster). */
   if(Element::Static_Members_Set == true) {
-    printf("Error in Element::Set_Element_Static_Members\n");
-    return Element_Errors::STATIC_MEMBERS_ALREADY_SET;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Already Set Up Exception: Thrown by Set_Element_Static_Members\n"
+            "The static members for the element class have already been set. They can\n"
+            "not be set multiple times!\n");
+    throw Element_Already_Set_Up(Error_Message_Buffer);
   } // if(Element::Static_Members_Set == true) {
 
+
   //////////////////////////////////////////////////////////////////////////////
-  // Set Static members
+  // Set some static members
   Element::ID = ID_Ptr;
   Element::K = K_Ptr;
   Element::F = F_Ptr;
@@ -128,13 +131,11 @@ Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<doub
 
   // Static members are now set.
   Element::Static_Members_Set = true;
-
-  return Element_Errors::SUCCESS;
-} // Element_Errors Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
+} // void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
 
 
 
-Element_Errors Set_Element_Material(const double E, const double v) {
+void Set_Element_Material(const double E, const double v) {
   /* Function description:
   This function is designed to set up the D matrix for the element class. This
   matrix is a reduced form of the Elasticity tensor C. D is constructed from C
@@ -146,10 +147,18 @@ Element_Errors Set_Element_Material(const double E, const double v) {
   The input parameter v is the Poisson's ratio for the material */
 
   /* Assumption 1:
-  We assume that the Element material has not already been set */
+  We assume that the Element material has not already been set. In theory,
+  these members could be set multiple times (they don't need to be fixed).
+  However, there is no reason for them to change. Thus, if the user tries
+  resetting the material parameters for whatever reason, they probably made a
+  mistake. */
   if(Element::Material_Set == true) {
-    printf("Error in Set_Element_Material\n");
-    return Element_Errors::MATERIAL_ALREADY_SET;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Already Set Up Exception: Thrown by Set_Element_Material\n"
+            "The material paramaters of the Element class have already been set.\n"
+            "These paramaters should not be changed after being set\n");
+    throw Element_Already_Set_Up(Error_Message_Buffer);
   } // if(Element::Material_Set == true) {
 
   // First, let's calculate lambda and mu.
@@ -184,8 +193,6 @@ Element_Errors Set_Element_Material(const double E, const double v) {
       printf("|\n");
     } // for(int i = 0; i < 6; i++) {
   #endif
-
-  return Element_Errors::SUCCESS;
-} // Element_Errors Set_Element_Material(const double E, const double v) {
+} // void Set_Element_Material(const double E, const double v) {
 
 #endif

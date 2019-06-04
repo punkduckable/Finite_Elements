@@ -43,14 +43,14 @@ Element::~Element(void) {
 ////////////////////////////////////////////////////////////////////////////////
 // Other Element methods
 
-Element_Errors Element::Set_Nodes(const unsigned Node0_ID,
-                                  const unsigned Node1_ID,
-                                  const unsigned Node2_ID,
-                                  const unsigned Node3_ID,
-                                  const unsigned Node4_ID,
-                                  const unsigned Node5_ID,
-                                  const unsigned Node6_ID,
-                                  const unsigned Node7_ID) {
+void Element::Set_Nodes(const unsigned Node0_ID,
+                        const unsigned Node1_ID,
+                        const unsigned Node2_ID,
+                        const unsigned Node3_ID,
+                        const unsigned Node4_ID,
+                        const unsigned Node5_ID,
+                        const unsigned Node6_ID,
+                        const unsigned Node7_ID) {
   /* Function description:
   This function is used to set set up the Element. The passed Node ID's are
   moved into the Node_List, which then uses the ID array to populate the
@@ -67,25 +67,30 @@ Element_Errors Element::Set_Nodes(const unsigned Node0_ID,
 
   /* Assumption 2:
   This function assumes that the Element class has been set up.
-  The element class contains a few static members. One of these, the ID array,
+  The element class contains static members. One of these, the ID array,
   points to the global ID array. We need to have access to this array to set
-  up the Element. Therefore, if these static members have not been set and the
-  user is trying to set this Element's nodes then we need to thrown an error.
-
-  When the static members are set, a flag called "Static_Members_Set" gets
-  flipped to true. Therefore, if this flag is true then the assumption is
-  satisified.  */
+  up the Element. Therefore, if the static members have not been set then we
+  throw a "Element_Not_Set_Up" exception. */
   if(Static_Members_Set == false) {
-    printf("Error in Element::Set_Nodes\n");
-    return Element_Errors::STATIC_MEMBERS_NOT_SET;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Exception: Thrown by Element::Set_Nodes\n"
+            "the element class static members (namely the ID array) must be\n"
+            "before you can set an element's nodes. This is because Set_Nodes\n"
+            "relies on the ID array to set up the element.\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
   } // if(Static_Members_Set == false) {
 
   /* Assumptions 3:
-  This function also assumes that this specific element has not has its nodes
-  set already. */
+  This function also assumes that the nodes for this specific element have not
+  been set. If this is not the case then an Element_Already_Set_Up exception is
+  thrown. */
   if(Element_Set_Up == true) {
-    printf("Error in Element::Set_Nodes\n");
-    return Element_Errors::ELEMENT_ALREADY_SET_UP;
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Already Set Up Exception: Thrown by Element::Set_Nodes\n"
+            "Once an element's nodes have been set, they can not be changed.\n");
+    throw Element_Already_Set_Up(Error_Message_Buffer);
   } // if(Element_Set_Up == true) {
 
   //////////////////////////////////////////////////////////////////////////////
@@ -197,8 +202,6 @@ Element_Errors Element::Set_Nodes(const unsigned Node0_ID,
       printf("%5.2lf ", Prescribed_Positions[i]);
     printf("\n");
   #endif
-
-  return Element_Errors::SUCCESS;
-} // Element_Errors Element::Set_Nodes(const unsigned Node1_ID,
+} // void Element::Set_Nodes(const unsigned Node1_ID,
 
 #endif
