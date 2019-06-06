@@ -1,6 +1,8 @@
 #if !defined(ARRAY_HEADER)
 #define ARRAY_HEADER
 
+#include "Errors.h"
+
 template <typename Type>
 class Array_3 {
 

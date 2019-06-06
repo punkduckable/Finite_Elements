@@ -66,7 +66,7 @@ void Test::Element_Error_Tests(void) {
         cell of ID with a -1 */
         for(unsigned Comp = 0; Comp < 3; Comp++) {
           bool Has_BC;
-          Nodes[Node_Index].Get_Has_BC(Comp, Has_BC);
+          Has_BC = Nodes[Node_Index].Get_Has_BC(Comp);
 
           if(Has_BC == false) {
             ID(Node_Index, Comp) = Num_Global_Eq;
@@ -285,7 +285,7 @@ void Test::Element(void) {
         cell of ID with a -1 */
         for(unsigned Comp = 0; Comp < 3; Comp++) {
           bool Has_BC;
-          Nodes[Node_Index].Get_Has_BC(Comp, Has_BC);
+          Has_BC = Nodes[Node_Index].Get_Has_BC(Comp);
 
           if(Has_BC == false) {
             ID(Node_Index, Comp) = Num_Global_Eq;

@@ -4,14 +4,11 @@ Flags = -c -Wall -Wsign-compare -Wextra -O3
 
 
 # Core Rules
-All: Array.o Errors.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o ./Matrix/Matrix.cc ./Matrix/Matrix.h
-	$(Comp) -o FEM Array.o Errors.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o
+All: Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o ./Matrix/Matrix.cc ./Matrix/Matrix.h
+	$(Comp) -o FEM Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o
 
 Array.o: Array.cc Array.h
 	$(Comp) $(Flags) Array.cc
-
-Errors.o: Errors.cc Errors.h
-	$(Comp) $(Flags) Errors.cc
 
 Main.o: Main.cc ./Tests/Tests.h
 	$(Comp) $(Flags) Main.cc

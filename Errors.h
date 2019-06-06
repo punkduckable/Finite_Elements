@@ -87,16 +87,6 @@ class Node_Already_Set_Up : public Node_Exception {
 
 
 
-// Node errors
-enum class Node_Errors {SUCCESS,
-                        NODE_NOT_SET_UP, NODE_ALREADY_SET_UP,
-                        BC_ALREADY_SET,
-                        INDEX_OUT_OF_BOUNDS};
-
-void Handle_Error(const Node_Errors Error);
-
-
-
 
 
 

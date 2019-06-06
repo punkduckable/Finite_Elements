@@ -3,7 +3,7 @@
 
 int main() {
   //Test::Node_Errors();
-  Test::Element_Error_Tests();
+  Test::Node_Error_Tests();
 
   return 0;
 } // int main() {
