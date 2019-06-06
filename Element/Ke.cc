@@ -11,7 +11,7 @@ the functions requried to move Ke to K. */
 //#define COEFFICIENT_MATRIX_MONITOR     // Prints Coeff, J, and Xi, Eta, Zeta partials of x,y,z
 //#define BA_MONITOR                     // Prints each Ba (used to construct B)
 //#define POPULATE_KE_MONITOR            // Prints JD, B, JD*B and B^T*JD*B
-//#define KE_MONITOR                     // Prints Ke
+#define KE_MONITOR                     // Prints Ke
 
 
 
@@ -243,10 +243,11 @@ void Element::Populate_Ke(void) {
 
   // Now, cycle through the 8 Integration points
 
-  // First, declare J, Coeff, and jD
+  // First, declare J, Coeff, and JD_B (which will store (jD)*B)
   double J;
   class Matrix<double> Coeff{3, 3, Memory::ROW_MAJOR};
   class Matrix<double> JD{6, 6, Memory::ROW_MAJOR};
+  class Matrix<double> JD_B{6, 24, Memory::COLUMN_MAJOR};
 
   for(int Point = 0; Point < 8; Point++) {
     // Find coefficient matrix, J.
@@ -263,30 +264,17 @@ void Element::Populate_Ke(void) {
       throw Element_Bad_Determinant(Error_Message_Buffer);
     } // if(J == 0) {
 
-    /* Calculate J*D
-    Note: D is a row-major matrix, so the product J*D will be stored as a
-    Row-major matrix as well (see Matrix class implementation) */
-    JD = J*D;
-
-
-    // Declare B
+    // Declare, Construct B
     class Matrix<double> B{6, 24, Memory::COLUMN_MAJOR};
-
-    // Now construct B
     for(int Node = 0; Node < 8; Node++)
       Add_Ba_To_B(Node, Point, Coeff, J, B);
 
-    // Calculate JD*B
-    class Matrix<double> JD_B{6, 24, Memory::COLUMN_MAJOR};
-
-    for(int j = 0; j < 24; j++) {
-      for(int i = 0; i < 6; i++) {
-        JD_B(i,j) = 0;
-
-        for(int k = 0; k < 6; k++)
-          JD_B(i,j) += JD(i,k)*B(k,j);
-      } // for(int i = 0; i < 6; i++) {
-    } // for(int j = 0; j < 24; j++) {
+    /* Calculate JD*B
+    Note: D is a row-major matrix, so the product J*D will be Row-major as well.
+    Thus, the product JD*B is the product of a Row and Column major matrix. As
+    such, my code will save this as a column major matrix. */
+    JD = J*D;
+    JD_B = JD*B;
 
     /* Now compute B^T*JD*B (this will be added into Ke).
     We expect this matrix to be symmetric. Therefore to minimuze computations,
@@ -324,36 +312,16 @@ void Element::Populate_Ke(void) {
 
     #if defined(POPULATE_KE_MONITOR)
       printf("JD:\n");
-      for(int i = 0; i < 6; i++) {
-        printf("| ");
-        for(int j = 0; j < 6; j++)
-          printf("%5.2lf ", JD(i,j));
-        printf("|\n");
-      } // for(int i = 0; i < 6; i++) {
+      Print_Matrix_Of_Doubles(JD);
 
       printf("B:\n");
-      for(int i = 0; i < 6; i++) {
-        printf("| ");
-        for(int j = 0; j < 24; j++)
-          printf("%5.2lf ", B(i,j));
-        printf("|\n");
-      } // for(int i = 0; i < 6; i++) {
+      Print_Matrix_Of_Doubles(B);
 
       printf("JD_B:\n");
-      for(int i = 0; i < 6; i++) {
-        printf("| ");
-        for(int j = 0; j < 24; j++)
-          printf("%5.2lf ", JD_B(i,j));
-        printf("|\n");
-      } // for(int i = 0; i < 6; i++) {
+      Print_Matrix_Of_Doubles(JD_B);
 
       printf("BT_JD_B:\n");
-      for(int i = 0; i < 24; i++) {
-        printf("| ");
-        for(int j = 0; j < 24; j++)
-          printf("%5.2lf ", BT_JD_B(i,j));
-        printf("|\n");
-      } // for(int i = 0; i < 24; i++) {
+      Print_Matrix_Of_Doubles(BT_JD_B);
     #endif
   } // for(int Point = 0; Point < 8; Point++) {
 
@@ -362,14 +330,7 @@ void Element::Populate_Ke(void) {
 
   #if defined(KE_MONITOR)
     printf("Element stiffness matrix:\n");
-    for(int i = 0; i < 24; i++) {
-      printf("| ");
-
-      for(int j = 0; j < 24; j++)
-        printf("%8.1e ", Ke(i,j));
-
-      printf("|\n");
-    } // for(int i = 0; i < 24, i++) {
+    Print_Matrix_Of_Doubles(Ke);
   #endif
 } // void Element::Populate_Ke(void) {
 
@@ -418,14 +379,7 @@ void Element::Fill_Ke_With_1s(void) {
 
   #if defined(KE_MONITOR)
     printf("Element stiffness matrix:\n");
-    for(int i = 0; i < 24; i++) {
-      printf("| ");
-
-      for(int j = 0; j < 24; j++)
-        printf("%6.2lf ", Ke(i,j));
-
-      printf("|\n");
-    } // for(int i = 0; i < 24, i++) {
+    Print_Matrix_Of_Doubles(Ke);
   #endif
 } // void Element::Fill_Ke_With_1s(void) {
 

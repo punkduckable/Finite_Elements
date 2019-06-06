@@ -186,12 +186,7 @@ void Set_Element_Material(const double E, const double v) {
 
   #if defined(SETUP_MONITOR)
     printf("D:\n");
-    for(int i = 0; i < 6; i++) {
-      printf("| ");
-      for(int j = 0; j < 6; j++)
-        printf("%9.3e ", Element::D(i,j));
-      printf("|\n");
-    } // for(int i = 0; i < 6; i++) {
+    Print_Matrix_Of_Doubles(Element::D, 9, 3);
   #endif
 } // void Set_Element_Material(const double E, const double v) {
 

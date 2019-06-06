@@ -204,4 +204,46 @@ void Element::Set_Nodes(const unsigned Node0_ID,
   #endif
 } // void Element::Set_Nodes(const unsigned Node1_ID,
 
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Other methods
+
+void Print_Matrix_Of_Doubles(const Matrix<double> & M, unsigned width, unsigned precision) {
+  /* Function Description:
+  This function prints the given matrix of doubles to the terminal. This
+  function should, in general, only be used for debugging and testing purposes.
+
+  Both width and precision are defaulted. You should only supply these
+  parameters if the defaulted values are unsatisfactory. witdh is the number of
+  characters used to print each element of the matrix. precision is the number
+  of characters after the decimal place. By default, width = 8, precision = 1.
+
+  This method is ONLY defined for matricies of doubles. It should be noted that
+  there is only one way to print out a matrix to the screen (row-by-row). As
+  such, this method will run faster for Row-major matrix than for Column-major
+  ones. */
+
+  const unsigned Num_Rows = M.Get_Num_Rows();
+  const unsigned Num_Cols = M.Get_Num_Cols();
+
+  /* First, construct the print format (using the passed parameters).
+  Note: there is a reason for the triple %. The first two print a % sign (for
+  whatever reason, that's how you print a % sign in a string with other
+  characters). The third % marks the start of %d, which instructs scanf to place
+  the first paramter, width, there. Confusing, but it works. */
+  char Format_Buffer[20];
+  sprintf(Format_Buffer, "%%%d.%de ", width, precision);
+
+  for(unsigned i = 0; i < Num_Rows; i++) {
+    printf("| ");
+    for(unsigned j = 0; j < Num_Cols; j++) {
+      printf(Format_Buffer, M(i,j));
+    } // for(unsigned j = 0; j < Num_Cols; j++) {
+    printf("|\n");
+  } // for(unsigned i = 0; i < Num_Rows; i++) {
+} // void Print_Matrix_Of_Doubles(const Matrix<double> & M, unsigned width, unsigned precision) {
+
 #endif

@@ -161,4 +161,9 @@ void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,                     /
 void Set_Element_Material(const double E,                                      // Intent : Read
                           const double v);                                     // Intent : Read
 
+// Print out a matrix of doubles. (used for debugging/testing/monitors)
+void Print_Matrix_Of_Doubles(const Matrix<double> & M,                         // Intent: Read
+                             unsigned width = 8,                               // Intent: Read
+                             unsigned precision = 1);                          // Intent: Read
+
 #endif
