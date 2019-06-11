@@ -311,6 +311,55 @@ Matrix<Type> operator*(Type c, const Matrix<Type> & M) {  return M*c; }
 
 
 
+// Compund Matrix-Matrix addition
+template <typename Type>
+Matrix<Type> & Matrix<Type>::operator+=(const Matrix<Type> & Other) {
+  /* Function Description:
+  This function defines compound matrix-matrix ddition. */
+
+  /* Assumptions: Matrix-Matrix addition is only defined if both matricies have
+  the same dimensions. */
+  if(Num_Rows != Other.Num_Rows || Num_Cols != Other.Num_Cols) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Matrix Dimension Mismatch Error: Thrown by Matrix<Type>::operator+=\n"
+            "M1 += M2  is only defined if both matricies have the same dimensions\n"
+            "In this case, M1.Num_Rows = %d, M2.Num_Rows = %d, M1.Num_Cols = %d, M2.Num_Cols = %d\n",
+            Num_Rows, Other.Num_Rows, Num_Cols, Other.Num_Cols);
+    throw Matrix_Dimension_Mismatch(Error_Message_Buffer);
+  } // if(Num_Rows != Other.Num_Rows || Num_Cols != Other.Num_Cols) {
+
+
+  /* Now, perform the addition. I use the memory layout of *this to determine
+  how to do the addition. If the two matricies use different memory layout then
+  there is no way to optimize the addition. However, the memory layout of both
+  matricies is needed to determine how to access the two matricies. */
+  if(Memory_Layout == Memory::ROW_MAJOR) {
+    if(Other.Memory_Layout == Memory::ROW_MAJOR)
+      for(unsigned i = 0; i < Num_Rows; i++)
+        for(unsigned j = 0; j < Num_Cols; j++)
+          Ar[i*Num_Cols + j] += Other.Ar[i*Num_Cols + j];
+    else // if(Other.Memory_Layout == Memory::COLUMN_MAJOR)
+      for(unsigned i = 0; i < Num_Rows; i++)
+        for(unsigned j = 0; j < Num_Cols; j++)
+          Ar[i*Num_Cols + j] += Other.Ar[i + j*Num_Rows];
+  } // if(Memory_Layout == Memory::ROW_MAJOR) {
+  else { // if(Memory_Layout == COLUMN_MAJOR)
+    if(Other.Memory_Layout == Memory::ROW_MAJOR)
+      for(unsigned j = 0; j < Num_Cols; j++)
+        for(unsigned i = 0; i < Num_Rows; i++)
+          Ar[i + j*Num_Rows] += Other.Ar[i*Num_Cols + j];
+    else // if(Other.Memory_Layout == Memory::COLUMN_MAJOR)
+      for(unsigned j = 0; j < Num_Cols; j++)
+        for(unsigned i = 0; i < Num_Rows; i++)
+          Ar[i + j*Num_Rows] += Other.Ar[i + j*Num_Rows];
+  } // else {
+
+  return *this;
+} // Matrix<Type> & operator+=(const Matrix<Type> & Other) const {
+
+
+
 
 
 

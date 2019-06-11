@@ -48,11 +48,9 @@ public:
                   const unsigned j) const;                                     // Intent: Read
 
 
-  // Matrix-Matrix multiplication
   Matrix<Type> operator*(const Matrix<Type> & Other) const;
-
-  // Matrix-Scalar multiplication
   Matrix<Type> operator*(const Type c) const;
+  Matrix<Type> & operator+=(const Matrix<Type> & Other);
 
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods

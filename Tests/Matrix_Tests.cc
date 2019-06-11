@@ -122,8 +122,7 @@ void Test::Matrix_Correctness_Tests(void) {
 
 
 
-
-  printf("Matrix-scalar multiplication test\n");
+  printf("\nMatrix-scalar multiplication test:\n");
   Matrix<double> M6{4,5, Memory::ROW_MAJOR};
 
   // Populate and print M6
@@ -141,6 +140,34 @@ void Test::Matrix_Correctness_Tests(void) {
   Matrix<double> M8 = 5.*M7;
   printf("5*M7:\n");
   Print(M8);
+
+
+
+  printf("\nCompound Matrix=Matrix Addition test:\n");
+
+  // Initialize and populate M9
+  Matrix<double> M9{5, 4, Memory::COLUMN_MAJOR};
+  M9.Zero();
+  for(int i = 0; i < 4; i++)
+    M9(i,i) = 1;
+
+  // Print M9
+  printf("M9:\n");
+  Print(M9);
+
+  // Initialize and populate M10
+  Matrix<double> M10{5, 4, Memory::COLUMN_MAJOR};
+  M10.Zero();
+  for(int i = 0; i < 4; i++)
+    M10(i,i) = i;
+
+  // Print M10
+  printf("M10:\n");
+  Print(M10);
+
+  M9 += M10;
+  printf("M9 after += M10\n");
+  Print(M9);
 } // void Test::Matrix_Correctness_Tests(void) {
 
 

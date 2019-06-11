@@ -326,10 +326,8 @@ void Element::Populate_Ke(void) {
       } // for(int i = 0; i < 24; i++) {
     } // for(int j = 0; j < 6; j++) {
 
-    // Now move BT_JD_B to KE.
-    for(int j = 0; j < 24; j++)
-      for(int i = 0; i < 24; i++)
-        Ke(i,j) += BT_JD_B(j,i);
+    // Now add BT_JD_B to KE.
+    Ke += BT_JD_B;
 
     // Ke has now been set
     Ke_Set_Up = true;
