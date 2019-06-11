@@ -131,12 +131,10 @@ class Element_Exception {
 }; // class Element_Exception {
 
 
-
 class Element_Not_Set_Up : public Element_Exception {
   public:
     Element_Not_Set_Up(const char* Error_Message) : Element_Exception(Error_Message) {}
 }; // class Element_Not_Set_Up : public Element_Errors {
-
 
 
 class Element_Already_Set_Up : public Element_Exception {
@@ -145,11 +143,16 @@ class Element_Already_Set_Up : public Element_Exception {
 }; // class Element_Already_Set_Up : public Element_Errors {
 
 
-
 class Element_Bad_Determinant : public Element_Exception {
   public:
     Element_Bad_Determinant(const char* Error_Message) : Element_Exception(Error_Message) {}
 }; // class Element_Bad_Determinant : public Element_Exception {
+
+
+class Element_Index_Out_Of_Bounds : public Element_Exception {
+  public:
+    Element_Index_Out_Of_Bounds(const char* Error_Message) : Element_Exception(Error_Message) {}
+}; // class Element_Index_Out_Of_Bounds : public Element_Exception {
 
 
 

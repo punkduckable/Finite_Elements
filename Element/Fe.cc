@@ -57,6 +57,7 @@ void Element::Populate_Fe(void) {
   // Fe is now set up
   Fe_Set_Up = true;
 
+
   #if defined(FE_MONITOR)
     printf("FE = |");
     for(int i = 0; i < 24; i++)

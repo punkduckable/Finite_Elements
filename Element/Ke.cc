@@ -23,21 +23,27 @@ void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> 
 
   /* Assumption 1:
   This function assumes that "Point" is the index of an integration point.
-  Therefore, we assume that Point is in the set {0,1,2... 7}.
-
-  Since this private method is only called by the Populate_Ke method, and that
-  method should only call this function with indicies of 0, 1, 2... 7, we will
-  assume that this assumption is valid.*/
-
+  Therefore, we assume that Point is in the set {0,1,2... 7}. */
+  if(Point > 7) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Index Out Of Bounds Error: Thrown by Element::Calculate_Coefficient_Matrix\n"
+            "The Point index must be in {0,1,... 7}. However, requested Point index is %d\n",
+            Point);
+    throw Element_Index_Out_Of_Bounds(Error_Message_Buffer);
+  } // if(Node > 7) {
 
   /* Assumption 2:
   This function assumes that the spatial position of each Node is known. This
-  means that the Element_Node array has been populated. This is done in the
-  "Set_Up_Element" method.
-
-  Since this private method is only called by the Populate_Ke method, and
-  that method can not run unless the Element is set up, we assume that
-  this assumption is valid. */
+  means that the Element_Node array has been populated. */
+  if(Element_Set_Up == false) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Error: Thrown by Element::Calculate_Coefficient_Matrix\n"
+            "The element's nodes must be set up before we can calculate the Coefficient Matrix.\n"
+            "In other words, Set_Nodes must be run BEFORE calling Calculate_Coefficient_Matrix\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
+  } // if(Element_Set_Up == false) {
 
 
   /* Assumption 3:
@@ -47,9 +53,17 @@ void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> 
 
   Since this private method is only called by Populate_Ke, this assumption
   should be valid */
+  if(Static_Members_Set == false) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Error: Thrown by Element::Calculate_Coefficient_Matrix\n"
+            "The Element's Static Members must be set before calculating the coefficient Matrix\n"
+            "In other words, Set_Element_Static_Members must run BEFORE Calculate_Coefficient_Matrix\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
+  } // if(Static_Members_Set == false) {
+
 
   //////////////////////////////////////////////////////////////////////////////
-
   /* First, calculate the x, y, and z partials (with respect to Xi, Eta, and
   Zeta) at the passed Integration point. */
   double x_Xi = 0, x_Eta = 0, x_Zeta = 0;
@@ -88,6 +102,7 @@ void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> 
   /* Finally, calculate J (the jacobian determinant) */
   J = x_Xi*Coeff(0,0) + x_Eta*Coeff(0,1) + x_Zeta*Coeff(0,2);
 
+
   #if defined(COEFFICIENT_MATRIX_MONITOR)
     printf("x_Xi = %6.3lf   x_Eta = %6.3lf   x_Zeta = %6.3lf\n", x_Xi, x_Eta, x_Zeta);
     printf("y_Xi = %6.3lf   y_Eta = %6.3lf   y_Zeta = %6.3lf\n", y_Xi, y_Eta, y_Zeta);
@@ -118,11 +133,15 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point,
   This function assumes that the Node index is in {0, 1, 2,... 7}. This is
   because those are the only nodes in the Master element. Anything outside
   of this range would cause an index out of bounds error when reading from
-  Na_Xi, Na_Eta, and Na_Zeta.
-
-  Since this private method is only called by the Populate_Ke method, and
-  that method has been written to only call this function with Node indicies
-  in {0,1,2... 7}, we will assume that this assumption is valid */
+  Na_Xi, Na_Eta, and Na_Zeta. */
+  if(Node > 7) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Index Out Of Bounds Error: Thrown by Element::Add_Ba_To_B\n"
+            "The Node index must be in {0,1,... 7}. However, requested Node index is %d\n",
+            Node);
+    throw Element_Index_Out_Of_Bounds(Error_Message_Buffer);
+  } // if(Node > 7) {
 
 
   /* Assumption 2:
@@ -138,11 +157,15 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point,
 
   /* Assumption 3:
   This function assumes that Na_Xi, Na_Eta, and Na_Zeta have been set up. This
-  happens when the Element static members are set (by Set_Element_Static_Members)
-
-  Since this private method is only called by the Populate_Ke method, and that
-  method can't run unless the static members have been set, we should be
-  justified in assuming that this assumption is valid. */
+  happens when the Element static members are set (by Set_Element_Static_Members) */
+  if(Static_Members_Set == false) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Error: Thrown by Element::Add_Ba_To_B\n"
+            "It is not possible to add Ba to B if the static members (namely Na_Xi, Na_Eta,\n"
+            "Na_Zeta) have been set up. Set_Element_Static_Members must run BEFORE Add_Ba_To_B\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
+  } // if(Static_Members_Set == false) {
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -170,6 +193,7 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point,
   for(int j = 0; j < 3; j++)
     for(int i = 0; i < 6; i++)
       B(i, j + 3*Node) = Ba_T[j*6 + i];
+
 
   #if defined(BA_MONITOR)
     printf("Ba_T:\n");
@@ -237,7 +261,6 @@ void Element::Populate_Ke(void) {
 
 
   //////////////////////////////////////////////////////////////////////////////
-
   // First, zero out KE
   Ke.Zero();
 
@@ -308,9 +331,11 @@ void Element::Populate_Ke(void) {
       for(int i = 0; i < 24; i++)
         Ke(i,j) += BT_JD_B(j,i);
 
+    // Ke has now been set
+    Ke_Set_Up = true;
 
 
-    #if defined(POPULATE_KE_MONITOR)
+  #if defined(POPULATE_KE_MONITOR)
       printf("JD:\n");
       Print_Matrix_Of_Doubles(JD);
 
@@ -324,9 +349,6 @@ void Element::Populate_Ke(void) {
       Print_Matrix_Of_Doubles(BT_JD_B);
     #endif
   } // for(int Point = 0; Point < 8; Point++) {
-
-  // Ke has now been set
-  Ke_Set_Up = true;
 
   #if defined(KE_MONITOR)
     printf("Element stiffness matrix:\n");
@@ -368,7 +390,6 @@ void Element::Fill_Ke_With_1s(void) {
 
 
   //////////////////////////////////////////////////////////////////////////////
-
   // Fill Ke's with 1's (note: Ke is column major)
   for(int j = 0; j < 24; j++)
     for(int i = 0; i < 24; i++)
@@ -376,6 +397,7 @@ void Element::Fill_Ke_With_1s(void) {
 
   // Ke has now been set
   Ke_Set_Up = true;
+
 
   #if defined(KE_MONITOR)
     printf("Element stiffness matrix:\n");
@@ -408,7 +430,7 @@ void Element::Move_Ke_To_K(void) const {
   } // if(Ke_Set_Up == false) {
 
 
-
+  //////////////////////////////////////////////////////////////////////////////
   /* First, move the diagional cells of Ke to K. We only move the components
   that correspond to a global equation. Recall that Ke has a row for each
   component of each of the 8 nodes in this Element's Node list, even though

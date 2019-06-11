@@ -85,6 +85,10 @@ void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Pt
     } // for(int Node = 0; Node < 8; Node++) {
   } // for(int Point = 0; Point < 8; Point++) {
 
+  // Static members are now set.
+  Element::Static_Members_Set = true;
+
+
   #if defined(SETUP_MONITOR)
     printf("Integration points:\n");
     for(int i = 0; i < 8; i++)
@@ -127,10 +131,6 @@ void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Pt
       printf("|\n");
     } // for(int i = 0; i < 8; i++) {
   #endif
-
-
-  // Static members are now set.
-  Element::Static_Members_Set = true;
 } // void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
 
 
@@ -183,6 +183,7 @@ void Set_Element_Material(const double E, const double v) {
 
   // Material has now been set
   Element::Material_Set = true;
+
 
   #if defined(SETUP_MONITOR)
     printf("D:\n");
