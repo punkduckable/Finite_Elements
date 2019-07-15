@@ -5,8 +5,8 @@ Flags = -c -Wall -Wsign-compare -Wextra -O3
 
 
 # Core Rules
-All: Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o Compress_K.o ./Matrix/Matrix.h
-	$(Comp) -o FEM Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o Compress_K.o
+All: Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o Compress_K.o Pardiso_Tests.o ./Matrix/Matrix.h
+	$(Comp) -o FEM Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o Compress_K.o Pardiso_Tests.o
 
 Array.o: Array.cc Array.h
 	$(Comp) $(Flags) Array.cc
@@ -52,6 +52,9 @@ Matrix_Tests.o: ./Matrix/Matrix_Tests.cc ./Matrix/Matrix_Tests.h ./Matrix/Matrix
 # Rules for the Pardiso directory
 Compress_K.o: ./Pardiso/Compress_K.cc ./Pardiso/Compress_K.h ./Matrix/Matrix.h
 	$(Comp) $(Flags) ./Pardiso/Compress_K.cc
+
+Pardiso_Tests.o: ./Pardiso/Pardiso_Tests.cc ./Pardiso/Pardiso_Tests.h ./Matrix/Matrix.h
+	$(Comp) $(Flags) ./Pardiso/Pardiso_Tests.cc
 
 
 

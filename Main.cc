@@ -1,9 +1,9 @@
 // Needed to run the tests.
-#include "Element/Element_Tests.h"
+#include "Pardiso/Pardiso_Tests.h"
 
 int main() {
   //Test::Node_Errors();
-  Test::Element();
+  Test::Compress_Matrix();
 
   return 0;
 } // int main() {

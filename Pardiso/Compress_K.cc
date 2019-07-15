@@ -72,7 +72,7 @@ Compressed_Matrix::Compressed_Matrix(const Matrix<double> & M) {
     printf("]\n");
 
     printf("A:  [");
-    for(unsigned j = 0; j < n_JA; j++) { printf(" %lf ", A[j]); }
+    for(unsigned j = 0; j < n_JA; j++) { printf(" %5.1lf ", A[j]); }
     printf("]\n");
   #endif
 } // Compressed_Matrix::Compressed_Matrix(const Matrix<T> & M) {
