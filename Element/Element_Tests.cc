@@ -1,8 +1,10 @@
 #if !defined(ELEMENT_TESTS_SOURCE)
 #define ELEMENT_TESTS_SOURCE
 
-#include "Tests.h"
 #include <stdio.h>
+#include "Element_Tests.h"
+
+
 
 void Test::Element_Error_Tests(void) {
   // First, lets create some elements.
@@ -231,8 +233,8 @@ void Test::Element_Error_Tests(void) {
   printf("Done!\n");
 
   // In theory, K and F should now be set. Let's check. Print K, F to a file
-  Simulation::Print_K_To_File(K, Simulation::Printing_Mode::INTEGER);
-  Simulation::Print_F_To_File(F, Num_Global_Eq);
+  Test::Print_K_To_File(K, Test::Printing_Mode::INTEGER);
+  Test::Print_F_To_File(F, Num_Global_Eq);
 } // void Test::Element_Error_Tests(void) {
 
 
@@ -420,15 +422,15 @@ void Test::Element(void) {
   } // for(unsigned i = 0; i < Nx-1; i++)
 
   // Print results to file.
-  Simulation::Print_K_To_File(K);
-  Simulation::Print_F_To_File(F, Num_Global_Eq);
+  Test::Print_K_To_File(K);
+  Test::Print_F_To_File(F, Num_Global_Eq);
 } // void Test::Element(void) {
 
 
 
 
 
-void Simulation::Print_K_To_File(const Matrix<double> & K, const Printing_Mode Mode) {
+void Test::Print_K_To_File(const Matrix<double> & K, const Printing_Mode Mode) {
   // First, open a new file
   FILE * File = fopen("K.txt","w");
 
@@ -453,11 +455,11 @@ void Simulation::Print_K_To_File(const Matrix<double> & K, const Printing_Mode M
 
   // All done. Close the file
   fclose(File);
-} // void Simulation::Print_K_To_File(const Matrix<double> & K) {
+} // void Test::Print_K_To_File(const Matrix<double> & K) {
 
 
 
-void Simulation::Print_F_To_File(const double * F, const unsigned Num_Global_Eq) {
+void Test::Print_F_To_File(const double * F, const unsigned Num_Global_Eq) {
   // First, open a new file.
   FILE * File = fopen("F.txt","w");
 
@@ -469,6 +471,6 @@ void Simulation::Print_F_To_File(const double * F, const unsigned Num_Global_Eq)
 
   // All done, close the file
   fclose(File);
-} // void Simulation::Print_F_To_File(const double * F, const unsigned Num_Global_Eq) {
+} // void Test::Print_F_To_File(const double * F, const unsigned Num_Global_Eq) {
 
 #endif

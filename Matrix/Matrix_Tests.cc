@@ -1,8 +1,9 @@
 #if !defined(MATRIX_TESTS_SOURCE)
 #define MATRIX_TESTS_SOURCE
 
-#include "Tests.h"
+#include "Matrix_Tests.h"
 #include <stdio.h>
+
 
 
 void Test::Matrix_Error_Tests(void) {
