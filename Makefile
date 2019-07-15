@@ -5,7 +5,7 @@ Flags = -c -Wall -Wsign-compare -Wextra -O3
 
 
 # Core Rules
-All: Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o Compress_K.o ./Matrix/Matrix.cc ./Matrix/Matrix.h
+All: Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o Compress_K.o ./Matrix/Matrix.h
 	$(Comp) -o FEM Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o Compress_K.o
 
 Array.o: Array.cc Array.h
