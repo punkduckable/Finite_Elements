@@ -14,12 +14,12 @@ OBJS =    Main.o \
 PATH_OBJS = $(patsubst %,obj/%,$(OBJS))
 
 # All
-All: $(PATH_OBJS) FEM
+All: $(PATH_OBJS) bin/FEM
 
 
 # Core rules
-FEM: $(PATH_OBJS)
-	$(Comp) $(LIBS) $(PATH_OBJS) -o FEM
+bin/FEM: $(PATH_OBJS)
+	$(Comp) $(LIBS) $(PATH_OBJS) -o ./bin/FEM
 
 obj/Main.o: Main.cc ./Element/Element_Tests.h ./Matrix/Matrix_Tests.h ./Node/Node_Tests.h
 	$(Comp) $(Flags) Main.cc -o ./obj/Main.o
@@ -80,4 +80,4 @@ obj/Pardiso_Tests.o: ./Pardiso/Pardiso_Tests.cc ./Pardiso/Pardiso_Tests.h ./Matr
 
 # Clean up!
 Clean:
-	rm ./obj/*.o FEM K.txt F.txt
+	rm ./obj/*.o ./bin/FEM K.txt F.txt
