@@ -1,17 +1,25 @@
 # Variables
 Comp = g++-9
 Flags = -c -Wall -Wsign-compare -Wextra -O2 -std=c++11
-TARGET = FEM
-OBJS = Array.o Main.o Node.o Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o Matrix_Tests.o Node_Tests.o Compress_K.o Pardiso_Tests.o
+LIBS =   -L. -lpardiso600-MACOS-X86-64 \
+         -L/usr/local/Cellar/lapack/3.8.0_2/lib -llapack.3.8.0 \
+         -L/usr/local/Cellar/lapack/3.8.0_2/lib -lblas.3.8.0 \
+         -L/opt/intel/compilers_and_libraries_2019.4.233/mac/compiler/lib/ -liomp5
+OBJS =    Main.o \
+					Array.o \
+					Matrix_Tests.o \
+          Node.o Node_Tests.o \
+					Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
+	        Compress_K.o Pardiso_Solve.o Pardiso_Tests.o
 PATH_OBJS = $(patsubst %,obj/%,$(OBJS))
 
 # All
-All: $(PATH_OBJS) $(TARGET)
+All: $(PATH_OBJS) FEM
 
 
 # Core rules
-$(TARGET): $(PATH_OBJS)
-	$(Comp) -o FEM $(PATH_OBJS)
+FEM: $(PATH_OBJS)
+	$(Comp) $(LIBS) $(PATH_OBJS) -o FEM
 
 obj/Main.o: Main.cc ./Element/Element_Tests.h ./Matrix/Matrix_Tests.h ./Node/Node_Tests.h
 	$(Comp) $(Flags) Main.cc -o ./obj/Main.o
@@ -61,8 +69,12 @@ obj/Matrix_Tests.o: ./Matrix/Matrix_Tests.cc ./Matrix/Matrix_Tests.h ./Matrix/Ma
 obj/Compress_K.o: ./Pardiso/Compress_K.cc ./Pardiso/Compress_K.h ./Matrix/Matrix.h
 	$(Comp) $(Flags) ./Pardiso/Compress_K.cc -o ./obj/Compress_K.o
 
+obj/Pardiso_Solve.o: ./Pardiso/Pardiso_Solve.cc ./Pardiso/Pardiso_Solve.h ./Matrix/Matrix.h ./Pardiso/Compress_K.h
+	$(Comp) $(Flags) ./Pardiso/Pardiso_Solve.cc -o ./obj/Pardiso_Solve.o
+
 obj/Pardiso_Tests.o: ./Pardiso/Pardiso_Tests.cc ./Pardiso/Pardiso_Tests.h ./Matrix/Matrix.h
 	$(Comp) $(Flags) ./Pardiso/Pardiso_Tests.cc -o ./obj/Pardiso_Tests.o
+
 
 
 

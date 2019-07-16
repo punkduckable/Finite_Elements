@@ -21,11 +21,12 @@ class Compressed_Matrix {
     Compressed_Matrix(const Matrix<double> & M);
     ~Compressed_Matrix();
 
-    // IA, JA, and A (see Pardiso notes and manual)
-    unsigned* IA;
-    unsigned n_IA;
-    unsigned* JA;
-    unsigned n_JA;
+    /* IA, JA, and A (see Pardiso notes and manual). These are all ints because
+    pardiso expects them to be ints */
+    int* IA;
+    int n_IA;
+    int* JA;
+    int n_JA;
     double* A;
 };
 

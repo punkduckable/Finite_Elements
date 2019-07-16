@@ -11,9 +11,9 @@ Compressed_Matrix::Compressed_Matrix(const Matrix<double> & M) {
 
   /* First, let's determine n_IA. This is just the number of rows in M plus 1.
   allocate IA. Once we know this information, we can allocate IA. */
-  unsigned n = M.Get_Num_Rows();
+  int n = (int)M.Get_Num_Rows();
   n_IA = n + 1;
-  IA = new unsigned[n_IA];
+  IA = new int[n_IA];
 
   /* Now, let's determine n_JA.
 
@@ -22,17 +22,17 @@ Compressed_Matrix::Compressed_Matrix(const Matrix<double> & M) {
   elements in M (which is the number of rows in A) plus the number of non-zero
   upper triangular elements in M. */
   n_JA = n;
-  for(unsigned i = 0; i < n-1; i++) {
-    for(unsigned j = i+1; j < n; j++) {
+  for(int i = 0; i < n-1; i++) {
+    for(int j = i+1; j < n; j++) {
       if(M(i,j) != 0) { n_JA++; }
-    } // for(unsigned j = i+1; j < n; j++) {
-  } // for(unsigned i = 0; i < n-1; i++) {
+    } // for(int j = i+1; j < n; j++) {
+  } // for(int i = 0; i < n-1; i++) {
 
   /* We can now populate the last element of IA (which is n_JA) */
   IA[n] = n_JA;
 
   /* Now that we know n_Ja, we can allocate JA and A. */
-  JA = new unsigned[n_JA];
+  JA = new int[n_JA];
   A = new double[n_JA];
 
   /* Finally, let's populate IA, JA, and A.
@@ -44,8 +44,8 @@ Compressed_Matrix::Compressed_Matrix(const Matrix<double> & M) {
   JA[j] holds the column number of the jth component in A.
 
   A holds the compressed version of matrix M (see Pardiso notes/manual) */
-  unsigned k = 0;            // Keeps track of how many things have been added to JA/A
-  for(unsigned i = 0; i < n; i++) {
+  int k = 0;            // Keeps track of how many things have been added to JA/A
+  for(int i = 0; i < n; i++) {
     /* First, add the ith diagional element of M to A/JA/IA */
     IA[i] = k;
     JA[k] = i;
@@ -53,26 +53,26 @@ Compressed_Matrix::Compressed_Matrix(const Matrix<double> & M) {
     k++;
 
     /* Now add the non-zero off diagional elements of M into A and JA. */
-    for(unsigned j = i+1; j < n; j++) {
+    for(int j = i+1; j < n; j++) {
       if(M(i,j) != 0) {
         JA[k] = j;
         A[k] = M(i,j);
         k++;
       } // if(M(i,j) != 0) {
-    } // for(unsigned j = i+1; j < n; j++) {
-  } // for(unsigned i = 0; i < n; i++) {
+    } // for(int j = i+1; j < n; j++) {
+  } // for(int i = 0; i < n; i++) {
 
   #if defined(COMPRESS_K_MONITOR)
     printf("IA: [");
-    for(unsigned i = 0; i < n_IA; i++) { printf(" %u ", IA[i]); }
+    for(int i = 0; i < n_IA; i++) { printf(" %u ", IA[i]); }
     printf("]\n");
 
     printf("JA: [");
-    for(unsigned j = 0; j < n_JA; j++) { printf(" %d ", JA[j]); }
+    for(int j = 0; j < n_JA; j++) { printf(" %d ", JA[j]); }
     printf("]\n");
 
     printf("A:  [");
-    for(unsigned j = 0; j < n_JA; j++) { printf(" %5.1lf ", A[j]); }
+    for(int j = 0; j < n_JA; j++) { printf(" %5.1lf ", A[j]); }
     printf("]\n");
   #endif
 } // Compressed_Matrix::Compressed_Matrix(const Matrix<T> & M) {
