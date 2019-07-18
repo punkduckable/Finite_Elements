@@ -2,7 +2,6 @@
 #include "Pardiso/Pardiso_Tests.h"
 
 int main() {
-  //Test::Node_Errors();
   Test::Compress_Matrix();
 
   return 0;

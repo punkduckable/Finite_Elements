@@ -129,26 +129,6 @@ void Node::Set_BC(const unsigned Component, const double BC_In) {
 
 
 
-void Node::Update_Position_Using_BCs(void) {
-  /* Function Description:
-  This function is used to update the current position of the node using the
-  Prescribed Position BCs. This function transfers any prescribed boundary BCs
-  to the Position vector. This function, in general, should be called after
-  each time step (when we're updating the nodal positions).
-
-  This function also resets the BC's (Has_BC is set to all false) */
-
-  /* Cycle through the components. If a particular component has a BC, set
-  the position to that value and then reset Has_BC. */
-  for(int i = 0; i < 3; i++)
-    if(Has_BC[i] == true) {
-      Position[i] = BC[i];
-      Has_BC[i] = false;
-    } // if(Has_BC[i] == true) {
-} // void Node::Update_Position_Using_BCs(void) {
-
-
-
 
 
 

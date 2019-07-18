@@ -18,7 +18,7 @@ void Test::Compress_Matrix(void) {
                          7, 0, 0, 9, 7, 0,11, 0,
                          0, 0, 5, 0, 0, 5, 0, 5};
 
-  Matrix<double> M_Matrix{8, 8, Memory::ROW_MAJOR};
+  Matrix<double> M_Matrix{8, 8, Memory::COLUMN_MAJOR};
   for(unsigned i = 0; i < 8; i++) {
     for(unsigned j = 0; j < 8; j++) {
       M_Matrix(i,j) = M_Array[i*8 + j];

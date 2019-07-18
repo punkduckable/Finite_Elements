@@ -21,11 +21,8 @@ public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor
 
-  // Default constructor
-  Node(void);
-
-  // Do nothing destructor.
-  ~Node(void) {};
+  Node(void);                /* Default constructor */
+  ~Node(void) {};            /* Do nothing destructor */
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -37,12 +34,12 @@ public:
   operator. Thus, I explicitly delete these methods */
 
   Node(const Node & Node_In) = delete;
-
   Node & operator=(const Node & Node_In) = delete;
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Set Original position of the Node (used for construction of K)
+
   void Set_Original_Position(const Array_3<double> Original_Position_In); // Intent: Read
 
 
@@ -56,9 +53,6 @@ public:
   // Sets a Particular component of the BC's
   void Set_BC(const unsigned component,                                        // Intent: Read
               const double BC_In);                                             // Intent: Read
-
-  // Updates positions using the prescribed position BCs
-  void Update_Position_Using_BCs(void);
 
 
   //////////////////////////////////////////////////////////////////////////////

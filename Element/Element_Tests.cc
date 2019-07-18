@@ -239,6 +239,8 @@ void Test::Element_Error_Tests(void) {
 
 
 
+
+
 void Test::Element(void) {
   //////////////////////////////////////////////////////////////////////////////
   // Specify dimension
@@ -268,8 +270,7 @@ void Test::Element(void) {
         // Set the Node's original position + BC's
         Nodes[Node_Index].Set_Original_Position({INS*i, INS*j, INS*k});
 
-        if(k == 0)
-          Nodes[Node_Index].Set_BC(1,INS*j+1);
+        if(k == 0) { Nodes[Node_Index].Set_BC(1,INS*j+1); }
 
         Node_Index++;
       } // for(unsigned k = 0; k < Nz; k++) {

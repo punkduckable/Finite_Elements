@@ -1,6 +1,6 @@
 # Variables
-Comp = g++-9
-Flags = -c -Wall -Wsign-compare -Wextra -O2 -std=c++11
+COMPILER = g++-9
+CFLAGS = -c -Wall -Wsign-compare -Wextra -O2 -std=c++11
 LIBS =   -L. -lpardiso600-MACOS-X86-64 \
          -L/usr/local/Cellar/lapack/3.8.0_2/lib -llapack.3.8.0 \
          -L/usr/local/Cellar/lapack/3.8.0_2/lib -lblas.3.8.0 \
@@ -23,61 +23,61 @@ All: $(PATH_OBJS) bin/FEM
 
 # Core rules
 bin/FEM: $(PATH_OBJS)
-	$(Comp) $(LIBS) $(PATH_OBJS) -o $@
+	$(COMPILER) $(LIBS) $(PATH_OBJS) -o $@
 
 obj/Main.o: Main.cc Element_Tests.h Matrix_Tests.h Node_Tests.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 
 
 # Rules to make the Array class.
 obj/Array.o: Array.cc Array.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 
 
 # Rules for the Node class.
 obj/Node.o: Node.cc Node.h Array.h Errors.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 obj/Node_Tests.o: Node_Tests.cc Node_Tests.h Node.h Errors.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 
 
 # Rules for the Element class
 obj/Core.o: Core.cc Element.h Node.h Errors.h Matrix.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 obj/Ke.o: Ke.cc Element.h Node.h Errors.h Matrix.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 obj/Fe.o: Fe.cc Element.h Node.h Errors.h Matrix.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 obj/Setup_Class.o: Setup_Class.cc Element.h Node.h Errors.h Matrix.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 obj/Element_Tests.o: Element_Tests.cc Element_Tests.h Element.h Errors.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 
 
 # Rules for the matrix class.
 obj/Matrix_Tests.o: Matrix_Tests.cc Matrix_Tests.h Matrix.h Errors.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 
 
 # Rules for the Pardiso directory
 obj/Compress_K.o: Compress_K.cc Compress_K.h Matrix.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 obj/Pardiso_Solve.o: Pardiso_Solve.cc Pardiso_Solve.h Matrix.h Compress_K.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 obj/Pardiso_Tests.o: Pardiso_Tests.cc Pardiso_Tests.h Matrix.h
-	$(Comp) $(Flags) $< -o $@
+	$(COMPILER) $(CFLAGS) $< -o $@
 
 
 
