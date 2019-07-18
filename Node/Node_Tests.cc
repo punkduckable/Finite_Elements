@@ -16,25 +16,29 @@ void Test::Node_Error_Tests(void) {
 
   // Try to update the Node before it has been set up
   printf("Trying to update Node position before setting the node up...\n");
-  try { Node.Update_Position(1, 37); }
+  try { Node.Update_Position_Component(1, 37); }
   catch(const Node_Exception & Er) { printf("%s",Er.what()); }
 
   // Try Using the getter methods before the node has been set up.
   printf("Trying to get Has_BC information...\n");
-  bool Has_BC;
-  try { Has_BC = Node.Get_Has_BC(3); }
+  try {
+    bool Has_BC = Node.Get_Has_BC(3);
+    printf("Has_BC for component 3 = %u", Has_BC);
+  } // try {
   catch(const Node_Not_Set_Up & Er) { printf("%s",Er.what()); }
   catch(const Array_Index_Out_Of_Bounds & Er) { printf("%s",Er.what()); }
 
-  printf("Trying to get Original Position...\n");
-  Array_3<double> Ar;
-  try { Ar = Node.Get_Original_Position(); }
+  printf("Trying to get y component of Position...\n");
+  try {
+    double Comp = Node.Get_Position_Component(1);
+    printf("y Component of position is %lf\n", Comp);
+  } // try {
   catch(const Node_Not_Set_Up & Er) { printf("%s",Er.what()); }
 
 
-  // Set the Node Original Position, BC's
-  printf("\nSetting Node Original Position:\n ");
-  try { Node.Set_Original_Position({0,0,0}); }
+  // Set the Node position, BC's
+  printf("\nSetting Node Position:\n ");
+  try { Node.Set_Position({0,0,0}); }
   catch(const Node_Exception & Er) { printf("%s",Er.what()); }
 
   printf("Setting Node BCs:\n ");
@@ -48,21 +52,21 @@ void Test::Node_Error_Tests(void) {
   printf("\n");
 
 
-  // Try setting BC's and Original Position again.
+  // Try setting Position again.
   printf("\nTrying to set Position a second time...\n");
-  try { Node.Set_Original_Position({1,2,3}); }
+  try { Node.Set_Position({1,2,3}); }
   catch(const Node_Already_Set_Up & Er) { printf("%s",Er.what()); }
 
   // Print out current Node information
-  printf("After trying to set Original position twice:\n");
+  printf("After trying to set Position twice:\n");
   Node.Print();
   printf("\n");
 
 
 
   // Modifiying node position
-  printf("\nUpdating node position: ");
-  try { Node.Update_Position(0, 37); }
+  printf("\nUpdating Node Position: ");
+  try { Node.Update_Position_Component(0, 37); }
   catch(const Node_Exception & Er) { printf("%s",Er.what()); }
 
   // Print new Node information
@@ -72,12 +76,15 @@ void Test::Node_Error_Tests(void) {
 
   // Try setting an out of bounds component of position
   printf("\nTrying to set out of bounds component of position...\n");
-  try { Node.Update_Position(3,37); }
+  try { Node.Update_Position_Component(3,37); }
   catch(const Array_Index_Out_Of_Bounds & Er) { printf("%s",Er.what()); }
 
   // Try getting out of bounds Fixed_Component information
   printf("Trying to get out of bounds Fixed_Component info\n");
-  try { Has_BC = Node.Get_Has_BC(5); }
+  try {
+    bool Has_BC = Node.Get_Has_BC(5);
+    printf("Does component 5 has a BC? %u", Has_BC);
+  }
   catch(const Array_Index_Out_Of_Bounds & Er) { printf("%s",Er.what()); }
 
   // Print Node's information
@@ -125,7 +132,7 @@ void Test::Node(void) {
       for(unsigned j = 0; j < Ny; j++) {
         double y_pos = j*Intra_Nodal_Spacing;
 
-        Nodes[j + i*Ny + k*Nx*Ny].Set_Original_Position({x_pos, y_pos, z_pos});
+        Nodes[j + i*Ny + k*Nx*Ny].Set_Position({x_pos, y_pos, z_pos});
 
         if(j == 0)
           Nodes[j + i*Ny + k*Nx*Ny].Set_BC(1,.5);

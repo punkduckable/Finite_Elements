@@ -32,7 +32,7 @@ int Pardiso_Solve(const Matrix<double> & K, double* x, double* F) {
     int      maxfct = 1;        /* Maximum number of numerical factorizations.  */
     int      mnum = 1;	        /* Which factorization to use. */
     int      error = 0;         /* Error code. Initialize to zero. */
-    int      msglvl = 1;        /* Print statistical information  */
+    int      msglvl = 0;        /* Print statistical information  */
     int      phase;             /* Phase of the solution (see Pardiso manual) */
     int      solver = 0;        /* use sparse direct solver */
     int      num_procs;         /* Number of processors. */

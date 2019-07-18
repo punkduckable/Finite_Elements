@@ -50,7 +50,7 @@ void Test::Element_Error_Tests(void) {
     for(unsigned j = 0; j < Ny; j++) {
       for(unsigned k = 0; k < Nz; k++) {
         // Set the Node's original position + BC's
-        Nodes[Node_Index].Set_Original_Position({INS*i, INS*j, INS*k});
+        Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k});
 
         Node_Index++;
       } // for(unsigned k = 0; k < Nz; k++) {
@@ -268,9 +268,9 @@ void Test::Element(void) {
     for(unsigned j = 0; j < Ny; j++) {
       for(unsigned k = 0; k < Nz; k++) {
         // Set the Node's original position + BC's
-        Nodes[Node_Index].Set_Original_Position({INS*i, INS*j, INS*k});
+        Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k});
 
-        if(k == 0) { Nodes[Node_Index].Set_BC(1,INS*j+1); }
+        if(k == 0) { Nodes[Node_Index].Set_BC(1,INS*j); }
 
         Node_Index++;
       } // for(unsigned k = 0; k < Nz; k++) {
@@ -319,22 +319,18 @@ void Test::Element(void) {
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Set up K
+  // Set up K, F, and x (the solution vector)
   class Matrix<double> K{Num_Global_Eq, Num_Global_Eq, Memory::COLUMN_MAJOR};
-  double * F = new double[Num_Global_Eq];
+  double* F = new double[Num_Global_Eq];
+  double* x = new double[Num_Global_Eq];
 
-  // Zero initialize K (note: K is Column-major)
-  for(unsigned j = 0; j < Num_Global_Eq; j++)
-    for(unsigned i = 0; i < Num_Global_Eq; i++)
-      K(i,j) = 0;
-
-  // zero initialize F
-  for(unsigned i = 0; i < Num_Global_Eq; i++)
-    F[i] = 0;
+  // Zero initialize K and F
+  K.Zero();
+  for(unsigned i = 0; i < Num_Global_Eq; i++) { F[i] = 0; }
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Make some elements
+  // Set up element class and make some elements
 
   // Set up the element class
   try { Set_Element_Static_Members(&ID, &K, F, Nodes); }
@@ -372,13 +368,13 @@ void Test::Element(void) {
         in the element matches that on page 124 of Hughes' book. */
         try {
           Elements[Element_Index].Set_Nodes(Ny*Nz*i + Nz*j + k,
-                                                   Ny*Nz*(i+1) + Nz*j + k,
-                                                   Ny*Nz*(i+1) + Nz*(j+1) + k,
-                                                   Ny*Nz*i + Nz*(j+1) + k,
-                                                   Ny*Nz*i + Nz*j + (k+1),
-                                                   Ny*Nz*(i+1) + Nz*j + (k+1),
-                                                   Ny*Nz*(i+1) + Nz*(j+1) + (k+1),
-                                                   Ny*Nz*i + Nz*(j+1) + (k+1));
+                                            Ny*Nz*(i+1) + Nz*j + k,
+                                            Ny*Nz*(i+1) + Nz*(j+1) + k,
+                                            Ny*Nz*i + Nz*(j+1) + k,
+                                            Ny*Nz*i + Nz*j + (k+1),
+                                            Ny*Nz*(i+1) + Nz*j + (k+1),
+                                            Ny*Nz*(i+1) + Nz*(j+1) + (k+1),
+                                            Ny*Nz*i + Nz*(j+1) + (k+1));
         } // try {
         catch (const Element_Exception & Er) {
           printf("%s\n",Er.what());
@@ -425,6 +421,25 @@ void Test::Element(void) {
   // Print results to file.
   Test::Print_K_To_File(K);
   Test::Print_F_To_File(F, Num_Global_Eq);
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Solve for x in Kx = F.
+  Pardiso_Solve(K, x, F);
+
+  printf("x = [");
+  for(unsigned i = 0; i < Num_Global_Eq; i++) { printf(" %lf", x[i]); }
+  printf(" ]\n");
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Report final node positions
+
+  for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
+    printf("Node %d: [ ", Node_Index);
+    for(unsigned Comp = 0; Comp < 3; Comp++) { printf("%5.2lf ", Nodes[Node_Index].Get_Position_Component(Comp)); }
+    printf("]\n");
+  } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
 } // void Test::Element(void) {
 
 

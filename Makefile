@@ -11,7 +11,7 @@ OBJS =    Main.o \
 					Matrix_Tests.o \
           Node.o Node_Tests.o \
 					Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
-	        Compress_K.o Pardiso_Solve.o Pardiso_Tests.o
+	        Compress_K.o Pardiso_Solve.o Pardiso_Tests.o Pardiso_Error.o
 PATH_OBJS = $(patsubst %,obj/%,$(OBJS))
 VPATH = ./bin ./obj ./Matrix ./Node ./Element ./Pardiso
 
@@ -58,7 +58,7 @@ obj/Fe.o: Fe.cc Element.h Node.h Errors.h Matrix.h
 obj/Setup_Class.o: Setup_Class.cc Element.h Node.h Errors.h Matrix.h
 	$(COMPILER) $(CFLAGS) $< -o $@
 
-obj/Element_Tests.o: Element_Tests.cc Element_Tests.h Element.h Errors.h
+obj/Element_Tests.o: Element_Tests.cc Element_Tests.h Element.h Errors.h Pardiso_Solve.h
 	$(COMPILER) $(CFLAGS) $< -o $@
 
 
@@ -73,10 +73,13 @@ obj/Matrix_Tests.o: Matrix_Tests.cc Matrix_Tests.h Matrix.h Errors.h
 obj/Compress_K.o: Compress_K.cc Compress_K.h Matrix.h
 	$(COMPILER) $(CFLAGS) $< -o $@
 
-obj/Pardiso_Solve.o: Pardiso_Solve.cc Pardiso_Solve.h Matrix.h Compress_K.h
+obj/Pardiso_Solve.o: Pardiso_Solve.cc Pardiso_Solve.h Matrix.h Compress_K.h Pardiso.h
 	$(COMPILER) $(CFLAGS) $< -o $@
 
 obj/Pardiso_Tests.o: Pardiso_Tests.cc Pardiso_Tests.h Matrix.h
+	$(COMPILER) $(CFLAGS) $< -o $@
+
+obj/Pardiso_Error.o: Pardiso_Error.cc Pardiso.h
 	$(COMPILER) $(CFLAGS) $< -o $@
 
 

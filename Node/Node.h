@@ -6,17 +6,12 @@
 #include <math.h>
 
 class Node {
-// Elements need to be able to access the private Node members.
-friend class Element;
-
 private:
   // Core members of the Node class
-  Array_3<double> Original_Position;             // Initial spatial position of Node     Units : M
-  bool Original_Position_Set_Up = false;         // Prevents Original position from being overwritten.
+  Array_3<double> Position;                      // Spatial position of Node     Units : M
+  bool Position_Set_Up = false;                  // Makes sure that Position isn't set twice
 
-  Array_3<double> Position;                      // Current Spatial position of the Node Units : M
   Array_3<bool> Has_BC;                          // ith component is true if the Node has a BC in that component
-  Array_3<double> BC;                            // Prescribed Boundary Conditions       Units : M
 public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor
@@ -38,17 +33,17 @@ public:
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Set Original position of the Node (used for construction of K)
+  // Set the position of the Node (used for construction of K)
 
-  void Set_Original_Position(const Array_3<double> Original_Position_In); // Intent: Read
+  void Set_Position(const Array_3<double> Position_In); // Intent: Read
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Update Node methods
 
-  // Updates the current (spatial) position of the node
-  void Update_Position(const unsigned int component,                           // Intent: Read
-                       const double New_Position);                             // Intent: Read
+  // Updates a component of the spatial position of the node
+  void Update_Position_Component(const unsigned int component,                 // Intent: Read
+                                 const double New_Position);                   // Intent: Read
 
   // Sets a Particular component of the BC's
   void Set_BC(const unsigned component,                                        // Intent: Read
@@ -58,11 +53,8 @@ public:
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods
 
-  bool Get_Has_BC(const unsigned index) const;                                 // Intent: Read
-
-  const Array_3<double> & Get_Current_Position(void) const;
-
-  const Array_3<double> & Get_Original_Position(void) const;
+  bool Get_Has_BC(const unsigned Index) const;                                 // Intent: Read
+  double Get_Position_Component(const unsigned Index) const;                   // Intent: Read
 
 
   //////////////////////////////////////////////////////////////////////////////

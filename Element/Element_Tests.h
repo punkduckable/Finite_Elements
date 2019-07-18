@@ -3,6 +3,7 @@
 
 #include "../Errors.h"
 #include "Element.h"
+#include "../Pardiso/Pardiso_Solve.h"
 
 namespace Test {
   void Element_Error_Tests(void);

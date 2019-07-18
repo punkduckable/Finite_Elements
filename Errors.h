@@ -86,6 +86,11 @@ class Node_Already_Set_Up : public Node_Exception {
 }; // class Node_Already_Set_Up : public Node_Exception {
 
 
+class Fixed_Component : public Node_Exception {
+  public:
+    Fixed_Component(const char * Error_Message) : Node_Exception(Error_Message) {}
+}; // class Fixed_Component : public Node_Exception {
+
 
 
 

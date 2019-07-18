@@ -7,7 +7,7 @@ constructors, destructor, and Node_Set_Up */
 
 #include "Element.h"
 #include <stdio.h>
-#define ELEMENT_MONITOR                // Prints Node list and Node positions
+//#define ELEMENT_MONITOR                // Prints Node list and Node positions
 
 
 
@@ -116,9 +116,9 @@ void Element::Set_Nodes(const unsigned Node0_ID,
   unsigned Eq_Num = 0;
   for(int Node = 0; Node < 8; Node++) {
     // First, set the X, Y, and Z components of this node's position.
-    Element_Nodes[Node].Xa = Global_Node_Array[Element_Nodes[Node].ID].Original_Position(0);
-    Element_Nodes[Node].Ya = Global_Node_Array[Element_Nodes[Node].ID].Original_Position(1);
-    Element_Nodes[Node].Za = Global_Node_Array[Element_Nodes[Node].ID].Original_Position(2);
+    Element_Nodes[Node].Xa = Global_Node_Array[Element_Nodes[Node].ID].Get_Position_Component(0);
+    Element_Nodes[Node].Ya = Global_Node_Array[Element_Nodes[Node].ID].Get_Position_Component(1);
+    Element_Nodes[Node].Za = Global_Node_Array[Element_Nodes[Node].ID].Get_Position_Component(2);
 
     // Now, get the Global node number
     const unsigned Global_Node_Number = Element_Nodes[Node].ID;
@@ -146,7 +146,7 @@ void Element::Set_Nodes(const unsigned Node0_ID,
       int Global_Eq_Number = (*ID)(Global_Node_Number, Component);
       if(Global_Eq_Number == -1) {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = FIXED_COMPONENT;
-        Prescribed_Positions[Eq_Num] = Global_Node_Array[Element_Nodes[Node].ID].BC(Component);
+        Prescribed_Positions[Eq_Num] = Global_Node_Array[Element_Nodes[Node].ID].Get_Position_Component(Component);
       } // if(Global_Eq_Number == -1) {
       else {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = Global_Eq_Number;
