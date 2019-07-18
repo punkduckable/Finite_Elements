@@ -437,7 +437,13 @@ void Test::Element(void) {
 
   for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
     printf("Node %d: [ ", Node_Index);
-    for(unsigned Comp = 0; Comp < 3; Comp++) { printf("%5.2lf ", Nodes[Node_Index].Get_Position_Component(Comp)); }
+    for(unsigned Comp = 0; Comp < 3; Comp++) {
+      /* If the current position is fixed (has a BC) then display the Node's
+      position. Otherwise, display the result from the Pardiso solve. */
+      unsigned I = ID(Node_Index, Comp);
+      if(I == (unsigned)-1) { printf("%5.2lf ", Nodes[Node_Index].Get_Position_Component(Comp)); }
+      else { printf("%5.2lf ", x[I] ); }
+    } // for(unsigned Comp = 0; Comp < 3; Comp++) {
     printf("]\n");
   } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
 } // void Test::Element(void) {
