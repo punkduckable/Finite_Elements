@@ -245,7 +245,7 @@ void Test::Element(void) {
   //////////////////////////////////////////////////////////////////////////////
   // Specify dimension
 
-  // First, specify the dimensions of the object that we're creating
+  // First, specify the number of nodes in each direction
   const unsigned Nx = 2;
   const unsigned Ny = 2;
   const unsigned Nz = 2;
@@ -270,7 +270,18 @@ void Test::Element(void) {
         // Set the Node's original position + BC's
         Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k});
 
-        if(k == 0) { Nodes[Node_Index].Set_BC(1,INS*j); }
+        /* Constrain nodes in the yz plane in the x direction */
+        if(i == 0) { Nodes[Node_Index].Set_BC(0,0); }
+
+        /* Constrain nodes in the xz plane in the y direction */
+        if(j == 0) { Nodes[Node_Index].Set_BC(1,0); }
+
+        /* Constrain nodes in the xy plane in the z direction */
+        if(k == 0) { Nodes[Node_Index].Set_BC(2,0); }
+
+        printf("Node %d: [ ", Node_Index);
+        for(unsigned comp = 0; comp < 3; comp++) { printf("%5.2lf ", Nodes[Node_Index].Get_Position_Component(comp)); }
+        printf("]\n");
 
         Node_Index++;
       } // for(unsigned k = 0; k < Nz; k++) {
@@ -442,7 +453,7 @@ void Test::Element(void) {
       position. Otherwise, display the result from the Pardiso solve. */
       unsigned I = ID(Node_Index, Comp);
       if(I == (unsigned)-1) { printf("%5.2lf ", Nodes[Node_Index].Get_Position_Component(Comp)); }
-      else { printf("%5.2lf ", x[I] ); }
+      else { printf("%5.2lf ", x[I] + Nodes[Node_Index].Get_Position_Component(Comp) ); }
     } // for(unsigned Comp = 0; Comp < 3; Comp++) {
     printf("]\n");
   } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
