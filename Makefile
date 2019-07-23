@@ -1,10 +1,13 @@
 # Variables
 COMPILER :=   g++-9
 CFLAGS := 	 -c -Wall -Wsign-compare -Wextra -O2 -std=c++11
-LIBS :=      -L. -lpardiso600-MACOS-X86-64 \
-             -L/usr/local/Cellar/lapack/3.8.0_2/lib -llapack.3.8.0 \
-             -L/usr/local/Cellar/lapack/3.8.0_2/lib -lblas.3.8.0 \
-             -L/opt/intel/compilers_and_libraries_2019.4.233/mac/compiler/lib/ -liomp5
+
+LIBS :=      -L/usr/local/Cellar/lapack/3.8.0_2/lib \
+             -lblas.3.8.0 \
+             -llapack.3.8.0 \
+             -L/opt/intel/compilers_and_libraries_2019.4.233/mac/compiler/lib/ \
+             -liomp5 \
+             ./libpardiso600-MACOS-X86-64.dylib
 R_PATH :=    -Wl,-rpath,$$ORIGIN -Wl,-rpath,/opt/intel/compilers_and_libraries_2019.4.233/mac/compiler/lib/
 
 OBJS :=       Main.o \
