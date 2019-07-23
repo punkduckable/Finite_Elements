@@ -14,37 +14,26 @@ void Test::Node_Error_Tests(void) {
   // First, declare a Node
   class Node Node;
 
-  // Try to update the Node before it has been set up
-  printf("Trying to update Node position before setting the node up...\n");
-  try { Node.Update_Position_Component(1, 37); }
-  catch(const Node_Exception & Er) { printf("%s",Er.what()); }
-
-  // Try Using the getter methods before the node has been set up.
-  printf("Trying to get Has_BC information...\n");
-  try {
-    bool Has_BC = Node.Get_Has_BC(3);
-    printf("Has_BC for component 3 = %u", Has_BC);
-  } // try {
-  catch(const Node_Not_Set_Up & Er) { printf("%s",Er.what()); }
-  catch(const Array_Index_Out_Of_Bounds & Er) { printf("%s",Er.what()); }
-
-  printf("Trying to get y component of Position...\n");
-  try {
-    double Comp = Node.Get_Position_Component(1);
-    printf("y Component of position is %lf\n", Comp);
-  } // try {
-  catch(const Node_Not_Set_Up & Er) { printf("%s",Er.what()); }
-
-
   // Set the Node position, BC's
   printf("\nSetting Node Position:\n ");
-  try { Node.Set_Position({0,0,0}); }
+  try {
+    Node.Set_Position_Component(0, 123.2932);
+    Node.Set_Position_Component(1, 5820.4829);
+    Node.Set_Position_Component(2, 193.28492);
+  } // try {
   catch(const Node_Exception & Er) { printf("%s",Er.what()); }
 
-  printf("Setting Node BCs:\n ");
-  try { Node.Set_BC(1,.5); }
+  printf("Setting y Bc to .5:\n ");
+  try { Node.Set_BC_Component(1,.5); }
   catch(const Node_Exception & Er) { printf("%s",Er.what()); }
 
+  printf("Setting Node Force vector to <1, 2, 3>");
+  try {
+    Node.Set_Force_Component(0, 1);
+    Node.Set_Force_Component(1, 2);
+    Node.Set_Force_Component(2, 3);
+  } // try {
+  catch(const Node_Exception & Er) { printf("%s", Er.what()); }
 
   // Print out Node information
   printf("After set up:\n");
@@ -52,31 +41,27 @@ void Test::Node_Error_Tests(void) {
   printf("\n");
 
 
-  // Try setting Position again.
-  printf("\nTrying to set Position a second time...\n");
-  try { Node.Set_Position({1,2,3}); }
-  catch(const Node_Already_Set_Up & Er) { printf("%s",Er.what()); }
-
-  // Print out current Node information
-  printf("After trying to set Position twice:\n");
-  Node.Print();
-  printf("\n");
-
-
-
   // Modifiying node position
-  printf("\nUpdating Node Position: ");
-  try { Node.Update_Position_Component(0, 37); }
+  printf("\nUpdating Node Position to <1,2,3>: ");
+  try {
+    Node.Set_Position_Component(0, 1);
+    Node.Set_Position_Component(1, 2);
+    Node.Set_Position_Component(2, 3);
+  } // try {
   catch(const Node_Exception & Er) { printf("%s",Er.what()); }
 
   // Print new Node information
-  printf("After setting 0 component of Node's position:\n");
+  printf("After updating positio:n\n");
   Node.Print();
   printf("\n");
 
   // Try setting an out of bounds component of position
   printf("\nTrying to set out of bounds component of position...\n");
-  try { Node.Update_Position_Component(3,37); }
+  try { Node.Set_Position_Component(3,37); }
+  catch(const Array_Index_Out_Of_Bounds & Er) { printf("%s",Er.what()); }
+
+  printf("\nTrying to set an out of bounds force component...\n");
+  try { Node.Set_Force_Component(19, 2930); }
   catch(const Array_Index_Out_Of_Bounds & Er) { printf("%s",Er.what()); }
 
   // Try getting out of bounds Fixed_Component information
@@ -84,11 +69,11 @@ void Test::Node_Error_Tests(void) {
   try {
     bool Has_BC = Node.Get_Has_BC(5);
     printf("Does component 5 has a BC? %u", Has_BC);
-  }
+  } // try {
   catch(const Array_Index_Out_Of_Bounds & Er) { printf("%s",Er.what()); }
 
   // Print Node's information
-  printf("After trying to modify current position:\n");
+  printf("After trying to set invalid components:\n");
   Node.Print();
   printf("\n");
 
@@ -132,10 +117,12 @@ void Test::Node(void) {
       for(unsigned j = 0; j < Ny; j++) {
         double y_pos = j*Intra_Nodal_Spacing;
 
-        Nodes[j + i*Ny + k*Nx*Ny].Set_Position({x_pos, y_pos, z_pos});
+        Nodes[j + i*Ny + k*Nx*Ny].Set_Position_Component(0, x_pos);
+        Nodes[j + i*Ny + k*Nx*Ny].Set_Position_Component(1, y_pos);
+        Nodes[j + i*Ny + k*Nx*Ny].Set_Position_Component(2, z_pos);
 
         if(j == 0)
-          Nodes[j + i*Ny + k*Nx*Ny].Set_BC(1,.5);
+          Nodes[j + i*Ny + k*Nx*Ny].Set_BC_Component(1,.5);
       } // for(unsigned j = 0; j < Ny; j++) {
     } // for(unsigned i = 0; i < Nx; i++) {
   } // for(unsigned k = 0; k < Nz; k++) {

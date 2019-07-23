@@ -9,8 +9,7 @@ class Node {
 private:
   // Core members of the Node class
   Array_3<double> Position;                      // Spatial position of Node     Units : M
-  bool Position_Set_Up = false;                  // Makes sure that Position isn't set twice
-
+  Array_3<double> Force;                         // Force acting on the node.
   Array_3<bool> Has_BC;                          // ith component is true if the Node has a BC in that component
 public:
   //////////////////////////////////////////////////////////////////////////////
@@ -30,31 +29,29 @@ public:
 
   Node(const Node & Node_In) = delete;
   Node & operator=(const Node & Node_In) = delete;
-
-
+  
   //////////////////////////////////////////////////////////////////////////////
-  // Set the position of the Node (used for construction of K)
-
-  void Set_Position(const Array_3<double> Position_In); // Intent: Read
-
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Update Node methods
+  // Methods to update node's properties.
 
   // Updates a component of the spatial position of the node
-  void Update_Position_Component(const unsigned int component,                 // Intent: Read
-                                 const double New_Position);                   // Intent: Read
+  void Set_Position_Component(const unsigned component,                        // Intent: Read
+                              const double Position_In);                       // Intent: Read
 
   // Sets a Particular component of the BC's
-  void Set_BC(const unsigned component,                                        // Intent: Read
-              const double BC_In);                                             // Intent: Read
+  void Set_BC_Component(const unsigned component,                              // Intent: Read
+                        const double BC_In);                                   // Intent: Read
+
+  // Set the Node's force vector
+  void Set_Force_Component(const unsigned component,                           // Intent: Read
+                           const double Force_In);                             // Intent: Read
 
 
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods
 
-  bool Get_Has_BC(const unsigned Index) const;                                 // Intent: Read
-  double Get_Position_Component(const unsigned Index) const;                   // Intent: Read
+  bool Get_Has_BC(const unsigned component) const;                             // Intent: Read
+  double Get_Position_Component(const unsigned component) const;               // Intent: Read
+  double Get_Force_Component(const unsigned component) const;                  // Intent: Read
 
 
   //////////////////////////////////////////////////////////////////////////////

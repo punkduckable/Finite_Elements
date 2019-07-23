@@ -47,10 +47,15 @@ void Test::Element_Error_Tests(void) {
   // Set up Node positions and BC's
   unsigned Node_Index = 0;
   for(unsigned i = 0; i < Nx; i++) {
+    double x_pos = INS*i;
     for(unsigned j = 0; j < Ny; j++) {
+      double y_pos = INS*j;
       for(unsigned k = 0; k < Nz; k++) {
-        // Set the Node's original position + BC's
-        Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k});
+        double z_pos = INS*k;
+
+        Nodes[Node_Index].Set_Position_Component(0, x_pos);
+        Nodes[Node_Index].Set_Position_Component(1, y_pos);
+        Nodes[Node_Index].Set_Position_Component(2, z_pos);
 
         Node_Index++;
       } // for(unsigned k = 0; k < Nz; k++) {
@@ -265,23 +270,23 @@ void Test::Element(void) {
   // Set up Node positions and BC's
   unsigned Node_Index = 0;
   for(unsigned i = 0; i < Nx; i++) {
+    double x_pos = INS*i;
     for(unsigned j = 0; j < Ny; j++) {
+      double y_pos = INS*j;
       for(unsigned k = 0; k < Nz; k++) {
-        // Set the Node's original position + BC's
-        Nodes[Node_Index].Set_Position({INS*i, INS*j, INS*k});
+        double z_pos = INS*k;
 
         /* Constrain nodes in the yz plane in the x direction */
-        if(i == 0) { Nodes[Node_Index].Set_BC(0,0); }
+        if(i == 0) { Nodes[Node_Index].Set_BC_Component(0,0); }
+        else { Nodes[Node_Index].Set_Position_Component(0, x_pos); }
 
         /* Constrain nodes in the xz plane in the y direction */
-        if(j == 0) { Nodes[Node_Index].Set_BC(1,0); }
+        if(j == 0) { Nodes[Node_Index].Set_BC_Component(1,0); }
+        else { Nodes[Node_Index].Set_Position_Component(1, y_pos); }
 
         /* Constrain nodes in the xy plane in the z direction */
-        if(k == 0) { Nodes[Node_Index].Set_BC(2,0); }
-
-        printf("Node %d: [ ", Node_Index);
-        for(unsigned comp = 0; comp < 3; comp++) { printf("%5.2lf ", Nodes[Node_Index].Get_Position_Component(comp)); }
-        printf("]\n");
+        if(k == 0) { Nodes[Node_Index].Set_BC_Component(2,0); }
+        else { Nodes[Node_Index].Set_Position_Component(2, z_pos); }
 
         Node_Index++;
       } // for(unsigned k = 0; k < Nz; k++) {
