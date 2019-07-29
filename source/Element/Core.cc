@@ -141,16 +141,16 @@ void Element::Set_Nodes(const unsigned Node0_ID,
       for mapping Ke to K)
 
       If the corresponding global equation is fixed, then we set the Eq_Num'th
-      component of Prescribed_Positions to the associated fixed position.
-      Otherwise, the Eq_Num'th component of Prescribed_Positions is set to 0*/
+      component of Prescribed_Displacements to the associated fixed position.
+      Otherwise, the Eq_Num'th component of Prescribed_Displacements is set to 0*/
       int Global_Eq_Number = (*ID)(Global_Node_Number, Component);
       if(Global_Eq_Number == -1) {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = FIXED_COMPONENT;
-        Prescribed_Positions[Eq_Num] = Global_Node_Array[Element_Nodes[Node].ID].Get_Position_Component(Component);
+        Prescribed_Displacements[Eq_Num] = Global_Node_Array[Element_Nodes[Node].ID].Get_Displacement_Component(Component);
       } // if(Global_Eq_Number == -1) {
       else {
         Local_Eq_Num_To_Global_Eq_Num[Eq_Num] = Global_Eq_Number;
-        Prescribed_Positions[Eq_Num] = 0;
+        Prescribed_Displacements[Eq_Num] = 0;
       } // else {
 
       // Increment equation number
@@ -197,9 +197,9 @@ void Element::Set_Nodes(const unsigned Node0_ID,
     printf("\n");
 
 
-    printf("Prescribed Positions: ");
+    printf("Prescribed Displacements: ");
     for(int i = 0; i < 24; i++)
-      printf("%5.2lf ", Prescribed_Positions[i]);
+      printf("%5.2lf ", Prescribed_Displacements[i]);
     printf("\n");
   #endif
 } // void Element::Set_Nodes(const unsigned Node1_ID,

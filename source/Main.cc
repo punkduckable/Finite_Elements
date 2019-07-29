@@ -1,8 +1,8 @@
 // Needed to run the tests.
-#include "Node/Node_Tests.h"
+#include "Element/Element_Tests.h"
 
 int main() {
-  Test::Node_Error_Tests();
+  Test::Element();
 
   return 0;
 } // int main() {

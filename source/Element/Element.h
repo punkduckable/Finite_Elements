@@ -48,11 +48,12 @@ private:
   Local_Eq_Num_To_Global_Eq_Num is used to map Ke into K. */
   unsigned Local_Eq_Num_To_Global_Eq_Num[24];    // Stores the global equation # associated with each local equation
 
-  /* Prescribed positions array. If the ith local equation corresponds to a
-  fixed position then the ith component of this array stores the associated
-  prescribed BC. Otherwise (if the equation corresponds to a free component),
-  the ith component of this array is zero */
-  double Prescribed_Positions[24];
+  /* Prescribed displacements array. If the ith local equation corresponds to a
+  degree of freedom with a prescribed displacement boundary conditition then the
+  ith component of this array stores the associated prescribed BC. Otherwise (if
+  the equation corresponds to a free component), the ith component of this array
+  is zero */
+  double Prescribed_Displacements[24];
 
 
   // Local element stiffness matrix, Force Vector

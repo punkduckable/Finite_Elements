@@ -276,17 +276,23 @@ void Test::Element(void) {
       for(unsigned k = 0; k < Nz; k++) {
         double z_pos = INS*k;
 
+        // Set the Node's position
+        Nodes[Node_Index].Set_Position_Component(0, x_pos);
+        Nodes[Node_Index].Set_Position_Component(1, y_pos);
+        Nodes[Node_Index].Set_Position_Component(2, z_pos);
+
         /* Constrain nodes in the yz plane in the x direction */
         if(i == 0) { Nodes[Node_Index].Set_BC_Component(0,0); }
-        else { Nodes[Node_Index].Set_Position_Component(0, x_pos); }
 
         /* Constrain nodes in the xz plane in the y direction */
         if(j == 0) { Nodes[Node_Index].Set_BC_Component(1,0); }
-        else { Nodes[Node_Index].Set_Position_Component(1, y_pos); }
 
         /* Constrain nodes in the xy plane in the z direction */
         if(k == 0) { Nodes[Node_Index].Set_BC_Component(2,0); }
-        else { Nodes[Node_Index].Set_Position_Component(2, z_pos); }
+
+
+        /* Stretch the +x face by 1/2 ISP */
+        if(i == Nx-1) { Nodes[Node_Index].Set_BC_Component(0, .5*INS); }
 
         Node_Index++;
       } // for(unsigned k = 0; k < Nz; k++) {
@@ -457,8 +463,11 @@ void Test::Element(void) {
       /* If the current position is fixed (has a BC) then display the Node's
       position. Otherwise, display the result from the Pardiso solve. */
       unsigned I = ID(Node_Index, Comp);
-      if(I == (unsigned)-1) { printf("%5.2lf ", Nodes[Node_Index].Get_Position_Component(Comp)); }
-      else { printf("%5.2lf ", x[I] + Nodes[Node_Index].Get_Position_Component(Comp) ); }
+      double Final_Position =  Nodes[Node_Index].Get_Position_Component(Comp);
+      if(I == (unsigned)-1) { Final_Position += Nodes[Node_Index].Get_Displacement_Component(Comp); }
+      else { Final_Position += x[I];  }
+
+      printf("%5.2lf ", Final_Position);
     } // for(unsigned Comp = 0; Comp < 3; Comp++) {
     printf("]\n");
   } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
