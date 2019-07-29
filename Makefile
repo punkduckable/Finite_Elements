@@ -17,7 +17,7 @@ OBJS :=       Main.o \
 					    Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
 	            Compress_K.o Pardiso_Solve.o Pardiso_Tests.o Pardiso_Error.o
 PATH_OBJS :=  $(patsubst %,obj/%,$(OBJS))
-VPATH :=    ./bin ./obj ./Matrix ./Node ./Element ./Pardiso
+VPATH :=    ./bin ./obj ./source ./source/Matrix ./source/Node ./source/Element ./source/Pardiso
 
 
 
