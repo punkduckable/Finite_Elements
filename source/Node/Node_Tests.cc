@@ -23,7 +23,7 @@ void Test::Node_Error_Tests(void) {
   } // try {
   catch(const Node_Exception & Er) { printf("%s",Er.what()); }
 
-  printf("Setting y Bc to .5:\n ");
+  printf("Setting y displacement BC to .5:\n ");
   try { Node.Set_BC_Component(1,.5); }
   catch(const Node_Exception & Er) { printf("%s",Er.what()); }
 
@@ -33,6 +33,10 @@ void Test::Node_Error_Tests(void) {
     Node.Set_Force_Component(1, 2);
     Node.Set_Force_Component(2, 3);
   } // try {
+  catch(const Node_Exception & Er) { printf("%s", Er.what()); }
+
+  printf("Setting Node x displacement to 3");
+  try { Node.Set_Displacement_Component(0, 3); }
   catch(const Node_Exception & Er) { printf("%s", Er.what()); }
 
   // Print out Node information
@@ -64,6 +68,10 @@ void Test::Node_Error_Tests(void) {
   try { Node.Set_Force_Component(19, 2930); }
   catch(const Array_Index_Out_Of_Bounds & Er) { printf("%s",Er.what()); }
 
+  printf("\nTrying to set an out of bounds displacement component...\n");
+  try { Node.Set_Displacement_Component(19, 2930); }
+  catch(const Array_Index_Out_Of_Bounds & Er) { printf("%s",Er.what()); }
+
   // Try getting out of bounds Fixed_Component information
   printf("Trying to get out of bounds Fixed_Component info\n");
   try {
@@ -76,6 +84,10 @@ void Test::Node_Error_Tests(void) {
   printf("After trying to set invalid components:\n");
   Node.Print();
   printf("\n");
+
+  printf("Trying to set the y displacement (which has a fixed BC displacement)\n");
+  try { Node.Set_Displacement_Component(1, 10); }
+  catch(const Fixed_Component & Er) { printf("%s",Er.what()); }
 
   printf("\nTest complete\n");
 } // void Test::Node_Eror_Tests(void) {

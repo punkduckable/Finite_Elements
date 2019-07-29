@@ -8,8 +8,9 @@
 class Node {
 private:
   // Core members of the Node class
-  Array_3<double> Position;                      // Spatial position of Node     Units : M
-  Array_3<double> Force;                         // Force acting on the node.
+  Array_3<double> Position;                      // Initial Spatial position of Node     Units : M
+  Array_3<double> Displacement;                  // Displacement of the node             Units : M
+  Array_3<double> Force;                         // Force acting on the node.            Units : N
   Array_3<bool> Has_BC;                          // ith component is true if the Node has a BC in that component
 public:
   //////////////////////////////////////////////////////////////////////////////
@@ -29,28 +30,32 @@ public:
 
   Node(const Node & Node_In) = delete;
   Node & operator=(const Node & Node_In) = delete;
-  
+
   //////////////////////////////////////////////////////////////////////////////
   // Methods to update node's properties.
 
-  // Updates a component of the spatial position of the node
+  // Set a particular component of the spatial position of the node
   void Set_Position_Component(const unsigned component,                        // Intent: Read
                               const double Position_In);                       // Intent: Read
 
-  // Sets a Particular component of the BC's
+  // Sets a particular component of the BC's
   void Set_BC_Component(const unsigned component,                              // Intent: Read
                         const double BC_In);                                   // Intent: Read
 
-  // Set the Node's force vector
+  // Set a particular component of the Node's Force vector
   void Set_Force_Component(const unsigned component,                           // Intent: Read
                            const double Force_In);                             // Intent: Read
 
+  // Set a particular component of the Node's Displacement vector.
+  void Set_Displacement_Component(const unsigned component,                    // Intent: Read
+                                  const double Displacement_In);               // Intent: Read
 
   //////////////////////////////////////////////////////////////////////////////
   // Getter methods
 
   bool Get_Has_BC(const unsigned component) const;                             // Intent: Read
   double Get_Position_Component(const unsigned component) const;               // Intent: Read
+  double Get_Displacement_Component(const unsigned component) const;           // Intent: Read
   double Get_Force_Component(const unsigned component) const;                  // Intent: Read
 
 
