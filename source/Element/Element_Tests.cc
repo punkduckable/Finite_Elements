@@ -292,6 +292,7 @@ void Test::Element(void) {
 
 
         /* Stretch the +x face by 1/2 ISP */
+        if(i == Nx-1) { Nodes[Node_Index].Set_Force_Component(0, .005); }
         if(i == Nx-1) { Nodes[Node_Index].Set_BC_Component(0, .5*INS); }
 
         Node_Index++;
@@ -439,6 +440,21 @@ void Test::Element(void) {
       } // for(unsigned k = 0; k < Nz-1; k++) {
     } // for(unsigned j = 0; j < Ny-1; j++)
   } // for(unsigned i = 0; i < Nx-1; i++)
+
+
+  /* Now, add in the point force contributions to F. */
+  for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
+    for(unsigned component = 0; component < 3; component++) {
+      /* Check if this node's component has a force applied to it and is free
+      (does not have a prescribed BC). If so then we add that force into the
+      corresponding component of F. We determine the corresponding component
+      using the ID array. */
+      unsigned I = ID(Node_Index, component);
+      double Force = Nodes[Node_Index].Get_Force_Component(component);
+      if((I != (unsigned)-1) && (Force != 0) ) { F[I] += Force; }
+    } // for(unsigned component = 0; component < 3; component++) {
+  } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
+
 
   // Print results to file.
   Test::Print_K_To_File(K);
