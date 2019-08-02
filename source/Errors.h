@@ -3,18 +3,25 @@
 
 #include <string>
 
+/* Note: The organization of my exception classes.
+I define, in this file, several different 'categories' of exceptions. There are
+Matrix exceptions, Element Exceptions, and so on. For each category of exception,
+there is a parent exception class (such as Matrix_Exception). All other
+exceptions for that category are derived from the parent. As such, an exception
+handler for the parent exception class will catch any exception in that category.
+With that said, you can (and should) write handlers for specific children classes
+whenever possible.
+
+Note: How to use the exception classes
+All exception objects are initialized with the message that you want to print
+out when the exception is caught.*/
+
 ////////////////////////////////////////////////////////////////////////////////
 // Array Exceptions
 
-/* Here I define the Array class exceptions. Each Array exception class is
-derived from the Array_Exception class. As such, a Array_Exception handler will
-catch every type of Array exception. With that said, you can (and should) write
-handlers for specific types of Array exceptions when possible.
-
-Note: all exception objects should be initialized with the message that you want
-to print when the exception is caught.
+/* Here I define the Array exception class and its children.
 ________________________________________________________________________________
-                        Description of the subclasses:
+              Description of the Array Exception class children:
 Array_Index_Out_Of_Bounds: This exception is thrown whenever the user tries to
 read or write to a component with an invalid index (the requested index is
 too big) */
@@ -37,20 +44,12 @@ class Array_Index_Out_Of_Bounds : public Array_Exception {
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Node Exceptions
 
-/* Here I define the Node exception classes. Each Node exception class is
-derived from the Node_Exception class. As such, a Node_Exception handler will
-catch every type of Node exception. With that said, you can (and should) write
-handlers for specific types of Node exceptions when possible.
-
-Note: all exception objects should be initialized with the message that you want
-to print when the exception is caught.
-
+/* Here I define the Node exception class and its children.
 ________________________________________________________________________________
-                        Description of the subclasses:
+              Description of the Node Exception class children:
 
 Node_Not_Set_Up: This exception is thrown whenever the user runs a method
 that requires data that has not yet been set. Many methods in the node
@@ -62,7 +61,10 @@ Node_Already_Set_Up: On the flip side, this exception is thrown whenever
 the user tries to set a data member that has already been set (and should not
 be set again). The Node's boundary conditions, for example, should only be set
 once. A "Node_Already_Set_Up" exception basically says "you tried to set
-something that has already been set and should not be modified". */
+something that has already been set and should not be modified".
+
+Fixed_Component: The user tried to modify a component of the Node's position
+that is fixed by a displacment BC. */
 
 // Node exception base class
 class Node_Exception {
@@ -98,15 +100,9 @@ class Fixed_Component : public Node_Exception {
 ////////////////////////////////////////////////////////////////////////////////
 // Element Exceptions
 
-/* Here I define the Element exception classes. Each Element exception class is
-derived from the Element_Exception class. As such, an Element_Exception handler
-will catch every type of Element exception. With that said, you can (and should)
-write handlers for specific types of Element exceptions when possible.
-
-Note: All exception objects should be initialized with the message that you want
-to print out when the exception is caught.
+/* Here I define the Element exception class and its children.
 ________________________________________________________________________________
-                        Description of the subclasses:
+              Description of the Element Exception class children:
 
 Element_Not_Set_Up: This exception is thrown whenever the user runs a method
 that requires data that has not yet been set up. Many methods in the Element
@@ -163,19 +159,12 @@ class Element_Index_Out_Of_Bounds : public Element_Exception {
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // Matrix exceptions
 
-/* Here I define the Matrix class exceptions. Each Matrix exception class is
-derived from Matrix_Exception. As such, a Matrix_Exception handler will
-catch every type of Matrix exception. With that said, you can (and should)
-write handlers for specific types of Matrix exceptions when possibl.
-
-Note: All exception objects should be initialized with the message that you want to
-print out when the exception is caught.
+/* Here I define the Matrix exception class and its children.
 ________________________________________________________________________________
-                        Description of the subclasses:
+              Description of the Matrix Exception class children:
 
 Matrix_Dimension_Mismatch: This exception is thrown whenever an operation
 involving two matricies is not possible because the two matricies are
@@ -193,22 +182,51 @@ class Matrix_Exception {
   private:
     const std::string Error_Message;
   public:
-      Matrix_Exception(const char* Error_Message) : Error_Message(Error_Message) {};
-      const char* what() const { return Error_Message.c_str(); }
+    Matrix_Exception(const char* Error_Message) : Error_Message(Error_Message) {};
+    const char* what() const { return Error_Message.c_str(); }
 }; // class Matrix_Exception {
 
 
 
 class Matrix_Dimension_Mismatch : public Matrix_Exception {
   public:
-      Matrix_Dimension_Mismatch(const char* Error_Message) : Matrix_Exception(Error_Message) {}
+    Matrix_Dimension_Mismatch(const char* Error_Message) : Matrix_Exception(Error_Message) {}
 }; // class Matrix_Dimension_Mismatch : public Matrix_Exception {
 
 
 
 class Matrix_Index_Out_Of_Bounds : public Matrix_Exception {
   public:
-      Matrix_Index_Out_Of_Bounds(const char* Error_Message) : Matrix_Exception(Error_Message) {}
+    Matrix_Index_Out_Of_Bounds(const char* Error_Message) : Matrix_Exception(Error_Message) {}
 }; // class Matrix_Index_Out_Of_Bounds : public Matrix_Exception {
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// IO Exceptions
+
+/* Here I define the Input/Output (IO) exception class and its children.
+________________________________________________________________________________
+              Description of the IO Exception class children:
+File_Not_Found: This exception is thrown whenever the code is unable to open a
+requested file. This could be because the file does not exist or because the
+file name is erronious. */
+
+class IO_Exception {
+  private:
+    const std::string Error_Message;
+  public:
+    IO_Exception(const char* Error_Message) : Error_Message(Error_Message) {};
+    const char* what() const { return Error_Message.c_str(); }
+}; // class IO_Exception {
+
+
+
+class File_Not_Found: public IO_Exception {
+  public:
+    File_Not_Found(const char* Error_Message) : IO_Exception(Error_Message) {}
+}; // class File_Not_Found: public IO_Exception {
 
 #endif

@@ -1,23 +1,24 @@
 # Variables
-COMPILER :=   g++-9
-CFLAGS := 	 -c -Wall -Wsign-compare -Wextra -O2 -std=c++11
+COMPILER :=    g++-9
+CFLAGS := 	  -c -Wall -Wsign-compare -Wextra -O2 -std=c++11
 
-LIBS :=      -L/usr/local/Cellar/lapack/3.8.0_2/lib \
-             -lblas.3.8.0 \
-             -llapack.3.8.0 \
-             -L/opt/intel/compilers_and_libraries_2019.4.233/mac/compiler/lib/ \
-             -liomp5 \
+LIBS :=       -L/usr/local/Cellar/lapack/3.8.0_2/lib \
+              -lblas.3.8.0 \
+              -llapack.3.8.0 \
+              -L/opt/intel/compilers_and_libraries_2019.4.233/mac/compiler/lib/ \
+              -liomp5 \
              ./libpardiso600-MACOS-X86-64.dylib
-R_PATH :=    -Wl,-rpath,$$ORIGIN -Wl,-rpath,/opt/intel/compilers_and_libraries_2019.4.233/mac/compiler/lib/
+R_PATH :=     -Wl,-rpath,$$ORIGIN -Wl,-rpath,/opt/intel/compilers_and_libraries_2019.4.233/mac/compiler/lib/
 
-OBJS :=       Main.o \
-					    Array.o \
-					    Matrix_Tests.o \
-              Node.o Node_Tests.o \
-					    Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
-	            Compress_K.o Pardiso_Solve.o Pardiso_Tests.o Pardiso_Error.o
-PATH_OBJS :=  $(patsubst %,obj/%,$(OBJS))
-VPATH :=    ./bin ./obj ./source ./source/Matrix ./source/Node ./source/Element ./source/Pardiso
+OBJS :=        Main.o \
+					     Array.o \
+					     Matrix_Tests.o \
+               Node.o Node_Tests.o \
+					     Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
+	             Compress_K.o Pardiso_Solve.o Pardiso_Tests.o Pardiso_Error.o \
+							 inp_reader.o
+PATH_OBJS := $(patsubst %,obj/%,$(OBJS))
+VPATH :=     ./bin ./obj ./source ./source/Matrix ./source/Node ./source/Element ./source/Pardiso ./source/IO
 
 
 
@@ -84,6 +85,12 @@ obj/Pardiso_Tests.o: Pardiso_Tests.cc Pardiso_Tests.h Matrix.h
 	$(COMPILER) $(CFLAGS) $< -o $@
 
 obj/Pardiso_Error.o: Pardiso_Error.cc Pardiso.h
+	$(COMPILER) $(CFLAGS) $< -o $@
+
+
+
+# Rules for IO
+obj/inp_reader.o: inp_reader.cc inp_reader.h Errors.h
 	$(COMPILER) $(CFLAGS) $< -o $@
 
 
