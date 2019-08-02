@@ -251,9 +251,9 @@ void Test::Element(void) {
   // Specify dimension
 
   // First, specify the number of nodes in each direction
-  const unsigned Nx = 2;
-  const unsigned Ny = 2;
-  const unsigned Nz = 2;
+  const unsigned Nx = 8;
+  const unsigned Ny = 8;
+  const unsigned Nz = 8;
   const unsigned Num_Nodes = Nx*Ny*Nz;
   const double INS = .1;                         // Inter-nodal spacing         Units: M
 
@@ -293,7 +293,7 @@ void Test::Element(void) {
 
         /* Stretch the +x face by 1/2 ISP */
         if(i == Nx-1) { Nodes[Node_Index].Set_Force_Component(0, .005); }
-        if(i == Nx-1) { Nodes[Node_Index].Set_BC_Component(0, .5*INS); }
+        if(i == Nx-1) { Nodes[Node_Index].Set_BC_Component(0, -INS); }
 
         Node_Index++;
       } // for(unsigned k = 0; k < Nz; k++) {
@@ -483,7 +483,7 @@ void Test::Element(void) {
       if(I == (unsigned)-1) { Final_Position += Nodes[Node_Index].Get_Displacement_Component(Comp); }
       else { Final_Position += x[I];  }
 
-      printf("%5.2lf ", Final_Position);
+      printf("%6.3lf ", Final_Position);
     } // for(unsigned Comp = 0; Comp < 3; Comp++) {
     printf("]\n");
   } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
@@ -495,7 +495,7 @@ void Test::Element(void) {
 
 void Test::Print_K_To_File(const Matrix<double> & K, const Printing_Mode Mode) {
   // First, open a new file
-  FILE * File = fopen("K.txt","w");
+  FILE * File = fopen("./IO/K.txt","w");
 
   // Get the number of Rows, Columns for K
   const unsigned Num_Rows = K.Get_Num_Rows();
@@ -524,7 +524,7 @@ void Test::Print_K_To_File(const Matrix<double> & K, const Printing_Mode Mode) {
 
 void Test::Print_F_To_File(const double * F, const unsigned Num_Global_Eq) {
   // First, open a new file.
-  FILE * File = fopen("F.txt","w");
+  FILE * File = fopen("./IO/F.txt","w");
 
   // Now, print the contents of F to the file.
   fprintf(File, "| ");

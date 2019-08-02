@@ -90,4 +90,4 @@ obj/Pardiso_Error.o: Pardiso_Error.cc Pardiso.h
 
 # Clean up!
 Clean:
-	rm ./obj/*.o ./bin/FEM K.txt F.txt
+	rm ./obj/*.o ./bin/FEM ./IO/*.txt
