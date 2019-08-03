@@ -3,6 +3,7 @@
 
 #include "../Node/Node.h"
 #include "../Errors.h"
+#include "../Array.h"
 #include "../Matrix/Matrix.h"
 
 class Element {
@@ -41,24 +42,25 @@ private:
                      double Xa;                 // X spatial coordinate (original) of the node
                      double Ya;                 // Y spatial coordinate (original) of the node
                      double Za; };              // Z spatial coordinate (original) of the node
-  Node_Data Element_Nodes[8];
+  Array<Node_Data, 8> Element_Nodes;
 
 
   /* Assembly arrays
-  Local_Eq_Num_To_Global_Eq_Num is used to map Ke into K. */
-  unsigned Local_Eq_Num_To_Global_Eq_Num[24];    // Stores the global equation # associated with each local equation
+  Local_Eq_Num_To_Global_Eq_Num is used to map Ke into K.
+  This array stores the global equation # associated with each local equation */
+  Array<unsigned, 24> Local_Eq_Num_To_Global_Eq_Num;
 
   /* Prescribed displacements array. If the ith local equation corresponds to a
   degree of freedom with a prescribed displacement boundary conditition then the
   ith component of this array stores the associated prescribed BC. Otherwise (if
   the equation corresponds to a free component), the ith component of this array
   is zero */
-  double Prescribed_Displacements[24];
+  Array<double, 24> Prescribed_Displacements;
 
 
   // Local element stiffness matrix, Force Vector
   Matrix<double> Ke{24, 24, Memory::COLUMN_MAJOR};
-  double Fe[24];
+  Array<double, 24> Fe;
 
 
   /* Calculate Coefficient matrix, Determinant.

@@ -8,10 +8,10 @@
 class Node {
 private:
   // Core members of the Node class
-  Array_3<double> Position;                      // Initial Spatial position of Node     Units : M
-  Array_3<double> Displacement;                  // Displacement of the node             Units : M
-  Array_3<double> Force;                         // Force acting on the node.            Units : N
-  Array_3<bool> Has_BC;                          // ith component is true if the Node has a BC in that component
+  Array<double,3> Position;                      // Initial Spatial position of Node     Units : M
+  Array<double,3> Displacement;                  // Displacement of the node             Units : M
+  Array<double,3> Force;                         // Force acting on the node.            Units : N
+  Array<bool,3> Has_BC;                          // ith component is true if the Node has a BC in that component
 public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor

@@ -41,16 +41,19 @@ void Element::Populate_Fe(void) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Calculate Ke by looping through the 24 local equations
-  for(int i = 0; i < 24; i++) {
-    // Set Fe to Zero to start
-    Fe[i] = 0;
 
+  // First, zero out Fe.
+  Fe.Fill(0);
+
+  // Now, populate Fe.
+  for(int i = 0; i < 24; i++) {
     /* Now, cycle through the 24 equations. If the jth local equation
     corresponds to a fixed position then add its contribution to Fe.
     Note: Fe[i] = Sum(over equations corresponding to prescribed positions of -Ke[i,j]*Prescribed_Displacements[j]) */
     for(int j = 0; j < 24; j++) {
-      if(Local_Eq_Num_To_Global_Eq_Num[j] == FIXED_COMPONENT)
+      if(Local_Eq_Num_To_Global_Eq_Num[j] == FIXED_COMPONENT) {
         Fe[i] -= Ke(i,j)*Prescribed_Displacements[j];
+      } // if(Local_Eq_Num_To_Global_Eq_Num[j] == FIXED_COMPONENT) {
     } // for(int j = 0; j < 24; j++) {
   } // for(int i = 0; i < 24; i++) {
 

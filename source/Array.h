@@ -1,71 +1,72 @@
 #if !defined(ARRAY_HEADER)
 #define ARRAY_HEADER
 
+#include <stdio.h>
+#include <assert.h>
 #include "Errors.h"
 
-template <typename Type>
-class Array_3 {
-
-friend class Node;
-friend class Element;
-
-private:
-  // The actual array.
-  Type Ar[3];
 
 
-  /* Quicker access methods. These ones do not run an index check. This access
-  method is therefore faster but less safe. Thus, it is a private method */
+template <typename T, unsigned n>
+class Array {
+  private:
+    // The actual array.
+    T Ar[n];
 
-  // For reading an element of the array
-  Type operator[](const unsigned int Index) const {
-    return Ar[Index];
-  } //   Type operator[](const unsigned int Index) const {
+  public:
+    //////////////////////////////////////////////////////////////////////////////
+    // Constructors, destructor
 
-  // For writing to an element of the array
-  Type & operator[](const unsigned int Index) {
-    return Ar[Index];
-  } // Type & operator[](const unsigned int Index) {
-
-
-public:
-  //////////////////////////////////////////////////////////////////////////////
-  // Constructors, destructor
-
-  // Constructors
-  Array_3(void) {}                               // Default constructor
-
-  Array_3(const Array_3<Type> & Ar_In);          // Copy constructor           // Intent: Read
-
-  Array_3(const Type Ar_In[3]);                  // Create Array_3 from Array  // Intent: Read
-
-  Array_3(const Type a,                          // Specify components         // Intent: Read
-          const Type b,                                                        // Intent: Read
-          const Type c);                                                       // Intent: Read
+    // Constructors
+    Array(void) {}                                         // Do nothing default constructor
+    Array(const T Array_In[n]) {                           // Create an Array object from a regular Array
+      for(unsigned i = 0; i < n; i++) { (*this).Ar[i] = Array_In[i]; }
+    } // Array(const T Array_In[n]) {
+    Array(const Array<T, n> & Array_In) {                  // Copy constructor
+      for(unsigned i = 0; i < n; i++) { (*this).Ar[i] = Array_In.Ar[i]; }
+    } // Array(const Array<T, n> & Ar_In) {
+    Array(Array<T, n>&& Ar_In) = delete;                   // Deleted move constructor
 
 
-  // Copy constructor
-
-  // Initialize using a 3 component array
-
-  // Destructor
-  ~Array_3(void) {}
+    // Do nothing destructor
+    ~Array(void) {}
 
 
-  //////////////////////////////////////////////////////////////////////////////
-  // Operator overloading
+    //////////////////////////////////////////////////////////////////////////////
+    // Operator overloading
 
-  /* Used to read an element of the Array. */
-  Type operator()(const unsigned int Index) const;
+    // Read an element of the array
+    T operator[](const unsigned Index) const {
+      assert(Index < n);
+      return Ar[Index];
+    } // T operator[](const unsigned Index) const {
 
-  /* Used to write to an element of the Array. */
-  Type & operator()(const unsigned int Index);
+    // Write to an element of the array
+    T & operator[](const unsigned Index) {
+      assert(Index < n);
+      return Ar[Index];
+    } // T & operator[](const unsigned Index) {
 
-  /* Used to set one Array equal to another */
-  Array_3<Type> & operator=(Array_3<Type> Ar_In);
-};  // class Array_3 {
 
-// Needed because of weird junk with templates
-#include "Array.cc"
+    Array<T,n> & operator=(Array<T, n> Array_In) {         // Copy assignment operator
+      for(unsigned i = 0; i < n; i++) { Ar[i] = Array_In.Ar[i]; }
+      return *this;
+    }
+    Array<T,n> & operator=(Array<T,n> && Ar_In) = delete;  // Deleted move assignment operator
+
+
+    //////////////////////////////////////////////////////////////////////////////
+    // Other methods
+
+    /* Determine the size of the array (number of elements) */
+    unsigned GetSize(void) const { return n; }
+
+
+    /* Fill the array with a set value */
+    void Fill(T Value) {
+      for(unsigned i = 0; i < n; i++) { Ar[i] = Value; }
+    } // void Fill(T Value) {
+};  // class Array {
+
 
 #endif

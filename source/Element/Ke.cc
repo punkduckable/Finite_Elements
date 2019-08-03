@@ -27,10 +27,10 @@ void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> 
   if(Point > 7) {
     char Error_Message_Buffer[500];
     sprintf(Error_Message_Buffer,
-            "Element Index Out Of Bounds Error: Thrown by Element::Calculate_Coefficient_Matrix\n"
+            "Array Index Out Of Bounds Error: Thrown by Element::Calculate_Coefficient_Matrix\n"
             "The Point index must be in {0,1,... 7}. However, requested Point index is %d\n",
             Point);
-    throw Element_Index_Out_Of_Bounds(Error_Message_Buffer);
+    throw Array_Index_Out_Of_Bounds(Error_Message_Buffer);
   } // if(Node > 7) {
 
   /* Assumption 2:
@@ -137,10 +137,10 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point,
   if(Node > 7) {
     char Error_Message_Buffer[500];
     sprintf(Error_Message_Buffer,
-            "Element Index Out Of Bounds Error: Thrown by Element::Add_Ba_To_B\n"
+            "Array Index Out Of Bounds Error: Thrown by Element::Add_Ba_To_B\n"
             "The Node index must be in {0,1,... 7}. However, requested Node index is %d\n",
             Node);
-    throw Element_Index_Out_Of_Bounds(Error_Message_Buffer);
+    throw Array_Index_Out_Of_Bounds(Error_Message_Buffer);
   } // if(Node > 7) {
 
 

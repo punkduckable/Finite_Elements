@@ -3,7 +3,7 @@
 
 #include "inp_reader.h"
 
-void IO::Read::inp(const std::string & File_Name, class std::list<std::array<double, 3>> & Node_Positions, class std::list<std::array<unsigned,8>> & Element_Node_Lists) {
+void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions, class std::list<Array<unsigned,8>> & Element_Node_Lists) {
   /* File description:
   This function is designed to read in node positions and element connectivity
   from an .inp file. This information is turn returned through the Node_Positions
@@ -59,7 +59,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<std::array<dou
           /* Otherwise, read in node position from the buffer and push it onto
           the Node_Positions list. */
           int n;                                 // Throw away to hold the node number.
-          std::array<double,3> Position;         // Hold the current node position
+          Array<double,3> Position;         // Hold the current node position
           sscanf(buffer,
                  "%d,%lf,%lf,%lf",
                  &n, &Position[0], &Position[1], &Position[2]);
@@ -96,7 +96,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<std::array<dou
           /* Otherwise, read in element node lists from the buffer and push it
           onto the Element_Node_Lists list. */
           int n;                                 // Throw away to hold the element number.
-          std::array<unsigned,8> Node_List;      // Hold the current element position
+          Array<unsigned,8> Node_List;      // Hold the current element position
           sscanf(buffer,
                  "%d,%u,%u,%u,%u,%u,%u,%u,%u",
                  &n, &Node_List[0], &Node_List[1], &Node_List[2], &Node_List[3], &Node_List[4], &Node_List[5], &Node_List[6], &Node_List[7]);
@@ -119,7 +119,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<std::array<dou
   //////////////////////////////////////////////////////////////////////////////
   // All done! Close the file.
   File.close();
-} // void IO::Read::inp(const std::string & File_Name, class std::list<double[3]> & Node_Positions...
+} // void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions...
 
 
 #endif

@@ -11,7 +11,6 @@ LIBS :=       -L/usr/local/Cellar/lapack/3.8.0_2/lib \
 R_PATH :=     -Wl,-rpath,$$ORIGIN -Wl,-rpath,/opt/intel/compilers_and_libraries_2019.4.233/mac/compiler/lib/
 
 OBJS :=        Main.o \
-					     Array.o \
 					     Matrix_Tests.o \
                Node.o Node_Tests.o \
 					     Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
@@ -26,17 +25,12 @@ VPATH :=     ./bin ./obj ./source ./source/Matrix ./source/Node ./source/Element
 All: $(PATH_OBJS) bin/FEM
 
 
+
 # Core rules
 bin/FEM: $(PATH_OBJS)
 	$(COMPILER) $(PATH_OBJS) $(R_PATH) $(LIBS) -o $@
 
 obj/Main.o: Main.cc Element_Tests.h Matrix_Tests.h Node_Tests.h
-	$(COMPILER) $(CFLAGS) $< -o $@
-
-
-
-# Rules to make the Array class.
-obj/Array.o: Array.cc Array.h
 	$(COMPILER) $(CFLAGS) $< -o $@
 
 
