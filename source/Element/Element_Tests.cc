@@ -376,9 +376,6 @@ void Test::Element(void) {
   //////////////////////////////////////////////////////////////////////////////
   // Find K, F
 
-  // Make a matrix to store all the node lists
-  class Matrix<unsigned> Node_Lists{Num_Elements, 8, Memory::ROW_MAJOR};
-
   /* Cycle through the elements. For each element, supply the nodes, compute Ke (and Fe)
   and then move Ke (and Fe) into K (and F)*/
   unsigned Element_Index = 0;

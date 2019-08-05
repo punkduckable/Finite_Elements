@@ -51,7 +51,7 @@ class Array {
     Array<T,n> & operator=(Array<T, n> Array_In) {         // Copy assignment operator
       for(unsigned i = 0; i < n; i++) { Ar[i] = Array_In.Ar[i]; }
       return *this;
-    }
+    } // Array<T,n> & operator=(Array<T, n> Array_In) {
     Array<T,n> & operator=(Array<T,n> && Ar_In) = delete;  // Deleted move assignment operator
 
 
@@ -67,6 +67,5 @@ class Array {
       for(unsigned i = 0; i < n; i++) { Ar[i] = Value; }
     } // void Fill(T Value) {
 };  // class Array {
-
 
 #endif
