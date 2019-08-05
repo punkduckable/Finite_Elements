@@ -42,7 +42,7 @@ void Test::Element_Error_Tests(void) {
 
   // Node array, ID array
   class Node Nodes[Num_Nodes];
-  class Matrix<unsigned> ID{Num_Nodes, 3, Memory::ROW_MAJOR};
+  class Matrix<int> ID{Num_Nodes, 3, Memory::ROW_MAJOR};
 
   // Set up Node positions and BC's
   unsigned Node_Index = 0;
@@ -72,8 +72,7 @@ void Test::Element_Error_Tests(void) {
         to populate ID. If the current component is not being used, fill that
         cell of ID with a -1 */
         for(unsigned Comp = 0; Comp < 3; Comp++) {
-          bool Has_BC;
-          Has_BC = Nodes[Node_Index].Get_Has_BC(Comp);
+          bool Has_BC = Nodes[Node_Index].Get_Has_BC(Comp);
 
           if(Has_BC == false) {
             ID(Node_Index, Comp) = Num_Global_Eq;
@@ -81,8 +80,7 @@ void Test::Element_Error_Tests(void) {
             // Increment number of equations by 1.
             Num_Global_Eq++;
           } // for(unsigned Comp = 0; Comp < 3; Comp++) {
-          else
-            ID(Node_Index, Comp) = -1;           // Note: ID is an unsigned matrix. (unsigned)-1 is the largest unsigned integer
+          else { ID(Node_Index, Comp) = -1; }
         } // for(unsigned Comp = 0; Comp < 3; Comp++) {
 
         Node_Index++;
@@ -95,11 +93,7 @@ void Test::Element_Error_Tests(void) {
   printf("\nID array: \n");
   for(unsigned i = 0; i < Num_Nodes; i++) {
     printf("| ");
-    for(int j = 0; j < 3; j++)
-      /* Note, even though ID is a matrix of unsigned integers, I print ID(i,j)
-      as a signed integer so that any components set to -1 show up as -1 rather
-      than some nonsense large number. */
-      printf(" %3d ", ID(i,j));
+    for(int j = 0; j < 3; j++) { printf(" %3d ", ID(i,j)); }
     printf("|\n");
   } // for(unsigned i = 0; i < Num_Nodes; i++) {
 
@@ -265,7 +259,7 @@ void Test::Element(void) {
   class Node Nodes[Num_Nodes];
 
   // Create the ID Array
-  class Matrix<unsigned> ID{Num_Nodes, 3, Memory::ROW_MAJOR};
+  class Matrix<int> ID{Num_Nodes, 3, Memory::ROW_MAJOR};
 
   // Set up Node positions and BC's
   unsigned Node_Index = 0;
@@ -290,6 +284,11 @@ void Test::Element(void) {
         /* Constrain nodes in the xy plane in the z direction */
         if(k == 0) { Nodes[Node_Index].Set_BC_Component(2,0); }
 
+        /* Constrain the +x face in the y and z directions */
+        if(i == Nx-1) {
+          Nodes[Node_Index].Set_BC_Component(1, 0);
+          Nodes[Node_Index].Set_BC_Component(2, 0);
+        } // if(i == Nx-1) {
 
         /* Stretch the +x face by 1/2 ISP */
         if(i == Nx-1) { Nodes[Node_Index].Set_Force_Component(0, .005); }
@@ -310,8 +309,7 @@ void Test::Element(void) {
         to populate ID. If the current component is not being used, fill that
         cell of ID with a -1 */
         for(unsigned Comp = 0; Comp < 3; Comp++) {
-          bool Has_BC;
-          Has_BC = Nodes[Node_Index].Get_Has_BC(Comp);
+          bool Has_BC = Nodes[Node_Index].Get_Has_BC(Comp);
 
           if(Has_BC == false) {
             ID(Node_Index, Comp) = Num_Global_Eq;
@@ -319,8 +317,7 @@ void Test::Element(void) {
             // Increment number of equations by 1.
             Num_Global_Eq++;
           } // for(unsigned Comp = 0; Comp < 3; Comp++) {
-          else
-            ID(Node_Index, Comp) = -1;           // Note: ID is an unsigned matrix. (unsigned)-1 is the largest unsigned integer
+          else { ID(Node_Index, Comp) = -1; }
         } // for(unsigned Comp = 0; Comp < 3; Comp++) {
 
         Node_Index++;
@@ -332,11 +329,7 @@ void Test::Element(void) {
   printf("\nID array: \n");
   for(unsigned i = 0; i < Num_Nodes; i++) {
     printf("| ");
-    for(unsigned j = 0; j < 3; j++)
-      /* Note, even though ID is a matrix of unsigned integers, I print ID(i,j)
-      as a signed integer so that any components set to -1 show up as -1 rather
-      than some nonsense large number. */
-      printf(" %3d ", ID(i,j));
+    for(unsigned j = 0; j < 3; j++) { printf(" %3d ", ID(i,j)); }
     printf("|\n");
   } // for(unsigned i = 0; i < Num_Nodes; i++) {
 
@@ -377,16 +370,16 @@ void Test::Element(void) {
   // Find K, F
 
   /* Cycle through the elements. For each element, supply the nodes, compute Ke (and Fe)
-  and then move Ke (and Fe) into K (and F)*/
+  and then move Ke (and Fe) into K (and F). Watch for exceptions.  */
   unsigned Element_Index = 0;
-  for(unsigned i = 0; i < Nx-1; i++) {
-    for(unsigned j = 0; j < Ny-1; j++) {
-      for(unsigned k = 0; k < Nz-1; k++) {
-        /* Set Element Nodes:
-        Now, set each Element's Node list. Note, the order that we set these
-        nodes is very specific. This is done so that the orientation of the nodes
-        in the element matches that on page 124 of Hughes' book. */
-        try {
+  try {
+    for(unsigned i = 0; i < Nx-1; i++) {
+      for(unsigned j = 0; j < Ny-1; j++) {
+        for(unsigned k = 0; k < Nz-1; k++) {
+          /* Set Element Nodes:
+          Now, set each Element's Node list. Note, the order that we set these
+          nodes is very specific. This is done so that the orientation of the nodes
+          in the element matches that on page 124 of Hughes' book. */
           Elements[Element_Index].Set_Nodes(Ny*Nz*i + Nz*j + k,
                                             Ny*Nz*(i+1) + Nz*j + k,
                                             Ny*Nz*(i+1) + Nz*(j+1) + k,
@@ -395,50 +388,28 @@ void Test::Element(void) {
                                             Ny*Nz*(i+1) + Nz*j + (k+1),
                                             Ny*Nz*(i+1) + Nz*(j+1) + (k+1),
                                             Ny*Nz*i + Nz*(j+1) + (k+1));
-        } // try {
-        catch (const Element_Exception & Er) {
-          printf("%s\n",Er.what());
-          return;
-        } // catch (const Element_Exception & Er) {
+
+          // Populate Ke, Fe
+          Elements[Element_Index].Populate_Ke();
+          Elements[Element_Index].Populate_Fe();
 
 
-        // Populate Ke and check for errors
-        try { Elements[Element_Index].Populate_Ke(); }
-        catch (const Element_Exception & Er) {
-          printf("%s\n",Er.what());
-          return;
-        } // catch (const Element_Exception & Er) {
+          // Move Ke to K and Fe to F
+          Elements[Element_Index].Move_Ke_To_K();
+          Elements[Element_Index].Move_Fe_To_F();
+
+          Element_Index++;
+        } // for(unsigned k = 0; k < Nz-1; k++) {
+      } // for(unsigned j = 0; j < Ny-1; j++)
+    } // for(unsigned i = 0; i < Nx-1; i++)
+  } // try {
+  catch (const Element_Exception & Er) {
+    printf("%s\n",Er.what());
+    return;
+  } // // catch (const Element_Exception & Er) {
 
 
-        // Populate Fe and check for errors
-        try { Elements[Element_Index].Populate_Fe(); }
-        catch (const Element_Exception & Er) {
-          printf("%s\n",Er.what());
-          return;
-        } // // catch (const Element_Exception & Er) {
-
-
-        // Move Ke to K and check for errors
-        try { Elements[Element_Index].Move_Ke_To_K(); }
-        catch (const Element_Exception & Er) {
-          printf("%s\n",Er.what());
-          return;
-        } // // catch (const Element_Exception & Er) {
-
-
-        // Move Fe to F and check for errors
-        try { Elements[Element_Index].Move_Fe_To_F(); }
-        catch (const Element_Exception & Er) {
-          printf("%s\n",Er.what());
-          return;
-        } // // catch (const Element_Exception & Er) {
-
-        Element_Index++;
-      } // for(unsigned k = 0; k < Nz-1; k++) {
-    } // for(unsigned j = 0; j < Ny-1; j++)
-  } // for(unsigned i = 0; i < Nx-1; i++)
-
-
+  //////////////////////////////////////////////////////////////////////////////
   /* Now, add in the point force contributions to F. */
   for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
     for(unsigned component = 0; component < 3; component++) {
@@ -453,7 +424,8 @@ void Test::Element(void) {
   } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
 
 
-  // Print results to file.
+  //////////////////////////////////////////////////////////////////////////////
+  // Print F and K to file
   Test::Print_K_To_File(K);
   Test::Print_F_To_File(F, Num_Global_Eq);
 
@@ -475,9 +447,9 @@ void Test::Element(void) {
     for(unsigned Comp = 0; Comp < 3; Comp++) {
       /* If the current position is fixed (has a BC) then display the Node's
       position. Otherwise, display the result from the Pardiso solve. */
-      unsigned I = ID(Node_Index, Comp);
+      int I = ID(Node_Index, Comp);
       double Final_Position =  Nodes[Node_Index].Get_Position_Component(Comp);
-      if(I == (unsigned)-1) { Final_Position += Nodes[Node_Index].Get_Displacement_Component(Comp); }
+      if(I == -1) { Final_Position += Nodes[Node_Index].Get_Displacement_Component(Comp); }
       else { Final_Position += x[I];  }
 
       printf("%6.3lf ", Final_Position);

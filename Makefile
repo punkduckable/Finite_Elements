@@ -19,9 +19,12 @@ OBJS :=        Main.o \
                Node.o Node_Tests.o \
 					     Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
 	             Compress_K.o Pardiso_Solve.o Pardiso_Tests.o Pardiso_Error.o \
-							 inp_reader.o
+							 inp_reader.o \
+							 Simulation.o
 PATH_OBJS := $(patsubst %,obj/%,$(OBJS))
-VPATH :=     ./bin ./obj ./source ./source/Node ./source/Element ./source/Pardiso ./source/IO ./test
+VPATH :=     ./bin ./obj ./source \
+              ./source/Node ./source/Element ./source/Pardiso ./source/IO ./source/Simulation \
+							./test
 
 
 
@@ -89,6 +92,12 @@ obj/Pardiso_Error.o: Pardiso_Error.cc Pardiso.h
 
 # Rules for IO
 obj/inp_reader.o: inp_reader.cc inp_reader.h Errors.h
+	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
+
+
+
+# Rules for SIMULATION_HEADER
+obj/Simulation.o: Simulation.cc Simulation.h Errors.h Matrix.h Array.h Node.h Element.h inp_reader.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 

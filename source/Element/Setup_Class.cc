@@ -12,7 +12,7 @@ static members. */
 
 
 
-void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Node_Array_Ptr) {
+void Set_Element_Static_Members(Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Node_Array_Ptr) {
   /* Function description:
   This function is used to set the static members for the Element class. This
   function also calculates the value of the shape functions (for the master
@@ -131,7 +131,7 @@ void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Pt
       printf("|\n");
     } // for(int i = 0; i < 8; i++) {
   #endif
-} // void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
+} // void Set_Element_Static_Members(Matrix<int> * ID_Ptr, Matrix<double> * K_Ptr, double * F_Ptr, Node * Nodes_Ptr) {
 
 
 

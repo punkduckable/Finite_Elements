@@ -12,7 +12,7 @@ private:
   // Static members
 
   static bool Static_Members_Set;                // True if the static members have been set
-  static Matrix<unsigned> * ID;                  // Points to the ID Matrix
+  static Matrix<int> * ID;                       // Points to the ID Matrix
   static Matrix<double> * K;                     // Points to the global stiffness matrix
   static double * F;                             // Points to the global force vector.
   static Node * Global_Node_Array;               // Points to the array of nodes.
@@ -128,7 +128,7 @@ public:
 
 
 
-  friend void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,            // Intent: Read
+  friend void Set_Element_Static_Members(Matrix<int> * ID_Ptr,            // Intent: Read
                                          Matrix<double> * K_Ptr,               // Intend: Read
                                          double * F_Ptr,                       // Intent: Read
                                          Node * Node_Array_Ptr);               // Intent: Read
@@ -156,7 +156,7 @@ public:
   Element & operator=(const Element & El) = delete;
 }; // class Element {
 
-void Set_Element_Static_Members(Matrix<unsigned> * ID_Ptr,                     // Intent: Read
+void Set_Element_Static_Members(Matrix<int> * ID_Ptr,                          // Intent: Read
                                 Matrix<double> * K_Ptr,                        // Intent: Read
                                 double * F_Ptr,                                // Intent: Read
                                 Node * Node_Array_Ptr);                        // Intent: Read

@@ -15,7 +15,7 @@ constructors, destructor, and Node_Set_Up */
 // Declare Elements static members
 
 bool Element::Static_Members_Set  = false;
-Matrix<unsigned> * Element::ID;
+Matrix<int> * Element::ID;
 Matrix<double> * Element::K;
 double * Element::F;
 Node * Element::Global_Node_Array;
