@@ -1,8 +1,8 @@
 #if !defined(NODE_HEADER)
 #define NODE_HEADER
 
-#include "../Errors.h"
-#include "../Array.h"
+#include "Errors.h"
+#include "Array.h"
 #include <math.h>
 
 class Node {

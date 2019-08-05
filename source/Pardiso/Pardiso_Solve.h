@@ -4,7 +4,7 @@
 #define PARDISO_MONITOR
 
 #include <stdio.h>
-#include "../Matrix.h"
+#include "Matrix.h"
 #include "Compress_K.h"
 #include "Pardiso.h"
 

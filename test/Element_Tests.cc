@@ -251,9 +251,9 @@ void Test::Element(void) {
   // Specify dimension
 
   // First, specify the number of nodes in each direction
-  const unsigned Nx = 8;
-  const unsigned Ny = 8;
-  const unsigned Nz = 8;
+  const unsigned Nx = 3;
+  const unsigned Ny = 3;
+  const unsigned Nz = 3;
   const unsigned Num_Nodes = Nx*Ny*Nz;
   const double INS = .1;                         // Inter-nodal spacing         Units: M
 

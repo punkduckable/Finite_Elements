@@ -1,8 +1,8 @@
 #if !defined(INP_READER_HEADER)
 #define INP_READER_HEADER
 
-#include "../Errors.h"
-#include "../Array.h"
+#include "Errors.h"
+#include "Array.h"
 #include <string.h>
 #include <fstream>
 #include <list>

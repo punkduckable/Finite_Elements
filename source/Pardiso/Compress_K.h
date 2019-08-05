@@ -1,7 +1,7 @@
 #if !defined(COMPRESS_K_HEADER)
 #define COMPRESS_K_HEADER
 
-#include "../Matrix.h"
+#include "Matrix.h"
 #include <assert.h>
 
 #define COMPRESS_K_MONITOR
