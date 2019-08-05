@@ -4,7 +4,7 @@
 #include "../Node/Node.h"
 #include "../Errors.h"
 #include "../Array.h"
-#include "../Matrix/Matrix.h"
+#include "../Matrix.h"
 
 class Element {
 private:

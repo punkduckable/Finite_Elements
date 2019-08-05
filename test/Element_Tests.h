@@ -1,9 +1,9 @@
 #if !defined(ELEMENT_TESTS_HEADER)
 #define ELEMENT_TESTS_HEADER
 
-#include "../Errors.h"
-#include "Element.h"
-#include "../Pardiso/Pardiso_Solve.h"
+#include "../Source/Errors.h"
+#include "../Source/Element/Element.h"
+#include "../Source/Pardiso/Pardiso_Solve.h"
 
 namespace Test {
   void Element_Error_Tests(void);

@@ -1,8 +1,8 @@
 #if !defined(MATRIX_TESTS_HEADER)
 #define MATRIX_TESTS_HEADER
 
-#include "../Errors.h"
-#include "Matrix.h"
+#include "../Source/Errors.h"
+#include "../Source/Matrix.h"
 
 namespace Test {
   void Matrix_Error_Tests(void);
