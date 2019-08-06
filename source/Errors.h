@@ -223,4 +223,12 @@ class File_Not_Found: public IO_Exception {
     File_Not_Found(const char* Error_Message) : IO_Exception(Error_Message) {}
 }; // class File_Not_Found: public IO_Exception {
 
+
+
+class Cant_Open_File : public IO_Exception {
+  public:
+    Cant_Open_File(const char* Error_Message) : IO_Exception(Error_Message) {}
+}; // class Cant_Open_File : public IO_Exception {
+
+
 #endif

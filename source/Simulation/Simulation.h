@@ -11,8 +11,11 @@
 #include "Node/Node.h"
 #include "Element/Element.h"
 #include "IO/inp_reader.h"
+#include "IO/KFX_Writer.h"
+#include "Pardiso/Pardiso_Solve.h"
 
 #define ID_MONITOR
+#define SIMULATION_MONITOR
 
 using std::list;
 

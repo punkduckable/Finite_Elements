@@ -73,6 +73,37 @@ void Simulation::From_File(const std::string & File_Name) {
     printf("%s\n",Er.what());
     throw;
   } // catch (const Element_Exception & Er) {
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  /* Solve for x in Kx = F. */
+  Pardiso_Solve(K, x, F);
+
+  #if defined(SIMULATION_MONITOR)
+    // Print K, F, x to file
+    try {
+      IO::Write::K_To_File(K);
+      IO::Write::F_To_File(F, Num_Global_Eq);
+      IO::Write::x_To_File(x, Num_Global_Eq);
+    } // try {
+    catch(const Cant_Open_File & Er) { printf("%s\n",Er.what()); }
+
+    for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
+      printf("Node %d: [ ", Node_Index);
+      for(unsigned Comp = 0; Comp < 3; Comp++) {
+        /* If the current position is fixed (has a BC) then display the Node's
+        position. Otherwise, display the result from the Pardiso solve. */
+        int I = ID(Node_Index, Comp);
+        double Final_Position =  Nodes[Node_Index].Get_Position_Component(Comp);
+
+        if(I == -1) { Final_Position += Nodes[Node_Index].Get_Displacement_Component(Comp); }
+        else { Final_Position += x[I];  }
+
+        printf("%6.3lf ", Final_Position);
+      } // for(unsigned Comp = 0; Comp < 3; Comp++) {
+      printf("]\n");
+    } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
+  #endif
 } // void Simulation::From_File(const std::string & File_Name) {
 
 
@@ -166,7 +197,7 @@ unsigned Simulation::SetUp_ID_Num_Global_Eq(class Matrix<int> & ID, const Node* 
 
 
 
-class Element* Process_Element_List(class list<Array<unsigned, 8>> & Element_Node_Lists, const unsigned Num_Elements) {
+class Element* Simulation::Process_Element_List(class list<Array<unsigned, 8>> & Element_Node_Lists, const unsigned Num_Elements) {
   /* Function description:
   This function uses the Elemnet_Node_Lists list to create the Element array. */
 
@@ -202,6 +233,6 @@ class Element* Process_Element_List(class list<Array<unsigned, 8>> & Element_Nod
   } // catch (const Element_Exception & Er) {
 
   return Elements;
-} // class Element* Process_Element_List(class list<Array<unsigned, 8>> & Element_Node_Lists,...
-  
+} // class Element* Simulation::Process_Element_List(class list<Array<unsigned, 8>> & Element_Node_Lists,...
+
 #endif

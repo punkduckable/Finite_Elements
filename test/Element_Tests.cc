@@ -232,8 +232,13 @@ void Test::Element_Error_Tests(void) {
   printf("Done!\n");
 
   // In theory, K and F should now be set. Let's check. Print K, F to a file
-  Test::Print_K_To_File(K, Test::Printing_Mode::INTEGER);
-  Test::Print_F_To_File(F, Num_Global_Eq);
+  try {
+    IO::Write::K_To_File(K, IO::Write::Printing_Mode::INTEGER);
+    IO::Write::F_To_File(F, Num_Global_Eq);
+    IO::Write::x_To_File(F, Num_Global_Eq);
+  } // try {
+  catch(const Cant_Open_File & Er) { printf("%s\n",Er.what()); }
+
 } // void Test::Element_Error_Tests(void) {
 
 
@@ -411,6 +416,7 @@ void Test::Element(void) {
 
   //////////////////////////////////////////////////////////////////////////////
   /* Now, add in the point force contributions to F. */
+
   for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
     for(unsigned component = 0; component < 3; component++) {
       /* Check if this node's component has a force applied to it and is free
@@ -425,19 +431,16 @@ void Test::Element(void) {
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Print F and K to file
-  Test::Print_K_To_File(K);
-  Test::Print_F_To_File(F, Num_Global_Eq);
+  // Solve for x in Kx = F. Write results to files.
 
-
-  //////////////////////////////////////////////////////////////////////////////
-  // Solve for x in Kx = F.
   Pardiso_Solve(K, x, F);
 
-  printf("x = [");
-  for(unsigned i = 0; i < Num_Global_Eq; i++) { printf(" %lf", x[i]); }
-  printf(" ]\n");
-
+  try {
+    IO::Write::K_To_File(K);
+    IO::Write::F_To_File(F, Num_Global_Eq);
+    IO::Write::x_To_File(x, Num_Global_Eq);
+  } // try {
+  catch(const Cant_Open_File & Er) { printf("%s\n",Er.what()); }
 
   //////////////////////////////////////////////////////////////////////////////
   // Report final node positions
@@ -457,52 +460,5 @@ void Test::Element(void) {
     printf("]\n");
   } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
 } // void Test::Element(void) {
-
-
-
-
-
-void Test::Print_K_To_File(const Matrix<double> & K, const Printing_Mode Mode) {
-  // First, open a new file
-  FILE * File = fopen("./IO/K.txt","w");
-
-  // Get the number of Rows, Columns for K
-  const unsigned Num_Rows = K.Get_Num_Rows();
-  const unsigned Num_Cols = K.Get_Num_Cols();
-
-  /* Note, this is not a very fast way to print K, since K is a column major
-  matrix and we're printing it it in row major order. Oh well, this only runs
-  once anyway */
-  for(unsigned i = 0; i < Num_Rows; i++) {
-    fprintf(File,"| ");
-    for(unsigned j = 0; j < Num_Cols; j++) {
-      if(Mode == Printing_Mode::INTEGER)
-        fprintf(File,"%1.0lf ", K(i,j));
-      else
-        fprintf(File,"%8.1e ", K(i,j));
-    } // for(unsigned j = 0; j < Num_Cols; j++) {
-
-    fprintf(File,"|\n");
-  } // for(unsigned i = 0; i < Num_Rows; i++) {
-
-  // All done. Close the file
-  fclose(File);
-} // void Test::Print_K_To_File(const Matrix<double> & K) {
-
-
-
-void Test::Print_F_To_File(const double * F, const unsigned Num_Global_Eq) {
-  // First, open a new file.
-  FILE * File = fopen("./IO/F.txt","w");
-
-  // Now, print the contents of F to the file.
-  fprintf(File, "| ");
-  for(unsigned i = 0; i < Num_Global_Eq; i++)
-    fprintf(File, "%10.3e ", F[i]);
-  fprintf(File, "|");
-
-  // All done, close the file
-  fclose(File);
-} // void Test::Print_F_To_File(const double * F, const unsigned Num_Global_Eq) {
 
 #endif
