@@ -1,28 +1,52 @@
 #!/bin/bash
 
-# Initialize total to 0
+# Initialize totals to 0
 total=0
+source_subtotal=0
+test_subtotal=0
+
 
 
 ################################################################################
-# Count lines in all source files (.cc and .h)
+# Find source subtotal
 
-# First, get all the .cc and .h files as a list.
-FILE_LIST=$(find {./source,./test,} | grep -E  "((.h$)|(.cc$))")
+# First, put all .cc and .h files from the source directory in a list.
+SOURCE_FILE_LIST=$(find ./source | grep  -E "(.h$|.cc$)")
 
-# Now loop through tie files, adding the length of each one to total
-for File in $FILE_LIST
+# Now loop through the files, adding the length of each one to the subtotal
+for File in $SOURCE_FILE_LIST
 do
-  count=$(grep -c ^ $File)
-  let total=total+count
+  # Get length of file by counting the number of new lines (^)
+  line_count=$(grep -c ^ $File)
+
+  # Add number of lines to subtotal
+  let source_subtotal=source_subtotal+line_count
 done
 
 
 ################################################################################
-# Add in makefile
-let total=total+$(grep -c ^ ./Makefile)
+# Find test subtotal
+
+# First, put all .cc and .h files from the test directory in a list
+TEST_FILE_LIST=$(find ./test | grep -E "(.h$|.cc$)")
+
+# Now loop through the files, adding the length of each one to  the subtotal
+for File in $TEST_FILE_LIST
+do
+  # Get length of file by counting the number of new lines (^)
+  line_count=$(grep -c ^ $File)
+
+  # Add number of lines to subtotal
+  let test_subtotal=test_subtotal+line_count
+done
 
 
 ################################################################################
-# Report total.
-echo $total
+# Report totals
+
+Makefile_subtotal=$(grep -c ^ ./Makefile)
+let total=source_subtotal+test_subtotal+Makefile_subtotal
+
+printf "lines in Source:             %s\n" $source_subtotal
+printf "lines in Test:               %d\n" $test_subtotal
+printf "Total (including Makefile):  %d\n" $total
