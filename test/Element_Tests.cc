@@ -442,23 +442,27 @@ void Test::Element(void) {
   } // try {
   catch(const Cant_Open_File & Er) { printf("%s\n",Er.what()); }
 
+
   //////////////////////////////////////////////////////////////////////////////
-  // Report final node positions
+  // Assign final displacements to the Nodes.
 
+  /* Loop through the nodes. For each componet that is free (doesn't have a BC),
+  set the node's displacement to the corresponding component of the solution x. */
   for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
-    printf("Node %d: [ ", Node_Index);
     for(unsigned Comp = 0; Comp < 3; Comp++) {
-      /* If the current position is fixed (has a BC) then display the Node's
-      position. Otherwise, display the result from the Pardiso solve. */
       int I = ID(Node_Index, Comp);
-      double Final_Position =  Nodes[Node_Index].Get_Position_Component(Comp);
-      if(I == -1) { Final_Position += Nodes[Node_Index].Get_Displacement_Component(Comp); }
-      else { Final_Position += x[I];  }
 
-      printf("%6.3lf ", Final_Position);
+      /* If this Node's component was free (I != -1) then we assign this
+      componnet of this node's displacement to the corresponding component of x */
+      if(I != -1) { Nodes[Node_Index].Set_Displacement_Component(Comp, x[I]); }
     } // for(unsigned Comp = 0; Comp < 3; Comp++) {
-    printf("]\n");
   } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Finally, print the results to a .vtk file.
+
+  IO::Write::vtk(Nodes, Num_Nodes, Elements, Num_Elements);
 } // void Test::Element(void) {
 
 #endif

@@ -5,6 +5,7 @@
 #include "Element/Element.h"
 #include "Pardiso/Pardiso_Solve.h"
 #include "IO/KFX_Writer.h"
+#include "IO/vtk_Writer.h"
 
 namespace Test {
   void Element_Error_Tests(void);

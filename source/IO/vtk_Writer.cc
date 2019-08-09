@@ -9,7 +9,7 @@ void IO::Write::vtk(const Node* Nodes, const unsigned Num_Nodes, const Element* 
   used by paraview. */
 
   /* First, create the file to be printed to. */
-  std::string File_Path = "../../IO/Out.vtk";
+  std::string File_Path = "./IO/Out.vtk";
   std::ofstream File{};
   File.open(File_Path.c_str());
 
@@ -36,7 +36,7 @@ void IO::Write::vtk_header(std::ofstream & File) {
   File << "# vtk DataFile Version 3.0\n";
   File << "FEM output file\n";
   File << "ASCII\n";
-  File << "DATASET UNSTRUCTURED_GRID";
+  File << "DATASET UNSTRUCTURED_GRID\n";
 } // void IO::Write::vtk_header(std::ofstream & File) {
 
 
