@@ -209,6 +209,36 @@ void Element::Set_Nodes(const unsigned Node0_ID,
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Getters, setters
+
+unsigned Element::Get_Node_ID(const unsigned Index) const {
+  /* Function description:
+  This function, as the name implies, is used to get the index of one of the
+  nodes in this element's node list. */
+
+  /* Assumption 1:
+  This function assumes that Index is 0-7. If this is not the case, then we
+  thrown an Array exception. */
+  if(Index > 7) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Array Index Out Of Bounds Exception: Thrown by Element::Get_Node_ID\n"
+            "Each element only has 8 nodes in its node list. Valid indicies are therefore 0-7\n"
+            "You requested index %d.\n",
+            Index);
+    throw Array_Index_Out_Of_Bounds(Error_Message_Buffer);
+  } // if(Index > 7) {
+
+  /* Return the requested node index. */
+  return Element_Nodes[Index].ID;
+} // unsigned Element::Get_Node_ID(const unsigned Index) const {
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Other methods
 
 void Print_Matrix_Of_Doubles(const Matrix<double> & M, unsigned width, unsigned precision) {

@@ -10,7 +10,7 @@
 #include "Matrix.h"
 #include "Node/Node.h"
 #include "Element/Element.h"
-#include "IO/inp_reader.h"
+#include "IO/inp_Reader.h"
 #include "IO/KFX_Writer.h"
 #include "Pardiso/Pardiso_Solve.h"
 

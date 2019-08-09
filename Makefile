@@ -19,7 +19,7 @@ OBJS :=        Main.o \
                Node.o Node_Tests.o \
 					     Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
 	             Compress_K.o Pardiso_Solve.o Pardiso_Tests.o Pardiso_Error.o \
-							 inp_reader.o KFX_Writer.o \
+							 inp_Reader.o KFX_Writer.o vtk_Writer.o \
 							 Simulation.o
 PATH_OBJS := $(patsubst %,obj/%,$(OBJS))
 VPATH :=     ./bin ./obj ./source \
@@ -91,15 +91,19 @@ obj/Pardiso_Error.o: Pardiso_Error.cc Pardiso.h
 
 
 # Rules for IO
-obj/inp_reader.o: inp_reader.cc inp_reader.h Errors.h
+obj/inp_Reader.o: inp_Reader.cc inp_Reader.h Errors.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 obj/KFX_Writer.o: KFX_Writer.cc KFX_Writer.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
+obj/vtk_Writer.o: vtk_Writer.cc vtk_Writer.h Errors.h Node.h Element.h
+	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
+
+
 
 # Rules for SIMULATION_HEADER
-obj/Simulation.o: Simulation.cc Simulation.h Errors.h Matrix.h Array.h Node.h Element.h inp_reader.h
+obj/Simulation.o: Simulation.cc Simulation.h Errors.h Matrix.h Array.h Node.h Element.h inp_Reader.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 

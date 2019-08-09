@@ -1,7 +1,7 @@
 #if !defined(INP_READER_SOURCE)
 #define INP_READER_SOURCE
 
-#include "inp_reader.h"
+#include "inp_Reader.h"
 
 void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions, class std::list<Array<unsigned,8>> & Element_Node_Lists, class std::list<inp_boundary_data> & Boundary_List) {
   /* File description:
@@ -24,7 +24,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
             "You tried to open the file %s (%s.inp).\n"
             "However, no such file could be found in the IO directory.\n",
             File_Name.c_str(), File_Name.c_str());
-    throw File_Not_Found(Error_Message_Buffer);
+    throw File_Not_Open(Error_Message_Buffer);
   } // if(File.is_open() == false) {
 
 

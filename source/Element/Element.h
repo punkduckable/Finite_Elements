@@ -89,28 +89,11 @@ public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor
 
-  // Default do nothing constructor
-  Element(void) { };
-
-  // Destructor
-  ~Element(void);
+  Element(void) {};                   // Default do nothing constructor
+  ~Element(void);                      // Destructor
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Class methods
-
-  /* Set nodes.
-
-  This function sets Num_Local_Eq, Local_Eq_Num_To_Global_Eq_Num, and the
-  node position arrays (Xa, Ya, Za). */
-  void Set_Nodes( const unsigned Node0_ID,                                     // Intent: Read
-                  const unsigned Node1_ID,                                     // Intent: Read
-                  const unsigned Node2_ID,                                     // Intent: Read
-                  const unsigned Node3_ID,                                     // Intent: Read
-                  const unsigned Node4_ID,                                     // Intent: Read
-                  const unsigned Node5_ID,                                     // Intent: Read
-                  const unsigned Node6_ID,                                     // Intent: Read
-                  const unsigned Node7_ID);                                    // Intent: Read
 
   /* Populate Ke.
   This function populates the Ke matrix for this Element */
@@ -126,15 +109,6 @@ public:
   /* Move Fe into F */
   void Move_Fe_To_F(void) const;
 
-
-
-  friend void Set_Element_Static_Members(Matrix<int> * ID_Ptr,            // Intent: Read
-                                         Matrix<double> * K_Ptr,               // Intend: Read
-                                         double * F_Ptr,                       // Intent: Read
-                                         Node * Node_Array_Ptr);               // Intent: Read
-
-  friend void Set_Element_Material(const double E,                             // Intent : Read
-                                   const double v);                            // Intent : Read
 
   //////////////////////////////////////////////////////////////////////////////
   // Disable Implicit methods
@@ -154,6 +128,39 @@ public:
   Element(const Element & El) = delete;
 
   Element & operator=(const Element & El) = delete;
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Getters, setters.
+
+  unsigned Get_Node_ID(const unsigned Index) const;
+
+
+  /* Set nodes.
+  This function sets Num_Local_Eq, Local_Eq_Num_To_Global_Eq_Num, and the
+  node position arrays (Xa, Ya, Za). */
+  void Set_Nodes( const unsigned Node0_ID,                                     // Intent: Read
+                  const unsigned Node1_ID,                                     // Intent: Read
+                  const unsigned Node2_ID,                                     // Intent: Read
+                  const unsigned Node3_ID,                                     // Intent: Read
+                  const unsigned Node4_ID,                                     // Intent: Read
+                  const unsigned Node5_ID,                                     // Intent: Read
+                  const unsigned Node6_ID,                                     // Intent: Read
+                  const unsigned Node7_ID);                                    // Intent: Read
+
+
+  /* Friend setters. */
+  friend void Set_Element_Static_Members(Matrix<int> * ID_Ptr,                 // Intent: Read
+                                         Matrix<double> * K_Ptr,               // Intend: Read
+                                         double * F_Ptr,                       // Intent: Read
+                                         Node * Node_Array_Ptr);               // Intent: Read
+
+  friend void Set_Element_Material(const double E,                             // Intent : Read
+                                   const double v);                            // Intent : Read
+
+
+
+  /* Friend setters. */
 }; // class Element {
 
 void Set_Element_Static_Members(Matrix<int> * ID_Ptr,                          // Intent: Read

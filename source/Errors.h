@@ -218,10 +218,10 @@ class IO_Exception {
 
 
 
-class File_Not_Found: public IO_Exception {
+class File_Not_Open: public IO_Exception {
   public:
-    File_Not_Found(const char* Error_Message) : IO_Exception(Error_Message) {}
-}; // class File_Not_Found: public IO_Exception {
+    File_Not_Open(const char* Error_Message) : IO_Exception(Error_Message) {}
+}; // class File_Not_Open: public IO_Exception {
 
 
 
