@@ -77,7 +77,7 @@ void IO::Write::vtk_elements(std::ofstream & File, const Element* Elements, cons
   } // for(unsigned i = 0; i < Num_Elements; i++) {
 
   /* Now print the Cell_Type statement */
-  File << "CELL_TYPE " << Num_Elements << "\n";
+  File << "CELL_TYPES " << Num_Elements << "\n";
 
   /* Now print the cell types. In our case, every cell is a hexahedral element,
   which corresponds to cell type 12. */
