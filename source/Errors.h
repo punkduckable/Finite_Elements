@@ -218,13 +218,6 @@ class IO_Exception {
 
 
 
-class File_Not_Open: public IO_Exception {
-  public:
-    File_Not_Open(const char* Error_Message) : IO_Exception(Error_Message) {}
-}; // class File_Not_Open: public IO_Exception {
-
-
-
 class Cant_Open_File : public IO_Exception {
   public:
     Cant_Open_File(const char* Error_Message) : IO_Exception(Error_Message) {}

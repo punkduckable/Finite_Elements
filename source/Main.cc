@@ -1,8 +1,8 @@
 // Needed to run the tests.
-#include "Element_Tests.h"
+#include "Simulation/Simulation.h"
 
 int main() {
-  Test::Element();
+  Simulation::From_File("Cylinder");
 
   return 0;
 } // int main() {

@@ -4,7 +4,7 @@
 #include "Matrix.h"
 #include <assert.h>
 
-#define COMPRESS_K_MONITOR
+//#define COMPRESS_K_MONITOR
 
 /* Compressed matrix class.
 This class is used to convert a regular matrix into a compressed matrix that

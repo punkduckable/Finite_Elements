@@ -54,15 +54,15 @@ int Pardiso_Solve(const Matrix<double> & K, double* x, double* F) {
       return 1;
     } // if (error != 0) {
     #if defined(PARDISO_MONITOR)
-    else { printf("[PARDISO]: License check was successful ... \n"); }
+      else { printf("[PARDISO]: License check was successful ... \n"); }
     #endif
 
     /* Numbers of processors, value of OMP_NUM_THREADS */
     var = getenv("OMP_NUM_THREADS");
     if(var != NULL) { sscanf( var, "%d", &num_procs ); }
     else {
-        printf("Couldn't find OMP_NUM_THREADS environment variable. Try setting it to 1.\n");
-        exit(1);
+      printf("Couldn't find OMP_NUM_THREADS environment variable. Try setting it to 1.\n");
+      exit(1);
     } // else {
     iparm[2]  = num_procs;
 
@@ -83,19 +83,19 @@ int Pardiso_Solve(const Matrix<double> & K, double* x, double* F) {
     phase = 11;
 
     pardiso (pt, &maxfct, &mnum, &mtype, &phase,
-	           &n_eqs, A, IA, JA, &idum, &nrhs,
+	          &n_eqs, A, IA, JA, &idum, &nrhs,
              iparm, &msglvl, &ddum, &ddum, &error, dparm);
 
     if (error != 0) {
-        printf("ERROR during symbolic factorization\n");
-        Report_Pardiso_Error(error);
-        exit(1);
+      printf("ERROR during symbolic factorization\n");
+      Report_Pardiso_Error(error);
+      exit(1);
     } // if (error != 0) {
 
     #if defined(PARDISO_MONITOR)
-    printf("\nReordering completed ... \n");
-    printf("Number of nonzeros in factors  = %d\n", iparm[17]);
-    printf("Number of factorization MFLOPS = %d\n", iparm[18]);
+      printf("\nReordering completed ... \n");
+      printf("Number of nonzeros in factors  = %d\n", iparm[17]);
+      printf("Number of factorization MFLOPS = %d\n", iparm[18]);
     #endif
 
 
@@ -106,17 +106,17 @@ int Pardiso_Solve(const Matrix<double> & K, double* x, double* F) {
     iparm[32] = 1; /* compute determinant */
 
     pardiso (pt, &maxfct, &mnum, &mtype, &phase,
-             &n_eqs, A, IA, JA, &idum, &nrhs,
+            &n_eqs, A, IA, JA, &idum, &nrhs,
              iparm, &msglvl, &ddum, &ddum, &error,  dparm);
 
     if (error != 0) {
-        printf("ERROR during numerical factorization\n");
-        Report_Pardiso_Error(error);
-        exit(2);
+      printf("ERROR during numerical factorization\n");
+      Report_Pardiso_Error(error);
+      exit(2);
     } // if (error != 0) {
 
     #if defined(PARDISO_MONITOR)
-    printf("\nFactorization completed ...\n");
+      printf("\nFactorization completed ...\n");
     #endif
 
     ////////////////////////////////////////////////////////////////////////////
@@ -126,19 +126,19 @@ int Pardiso_Solve(const Matrix<double> & K, double* x, double* F) {
     iparm[7] = 1;       /* Max numbers of iterative refinement steps. */
 
     pardiso (pt, &maxfct, &mnum, &mtype, &phase,
-             &n_eqs, A, IA, JA, &idum, &nrhs,
+            &n_eqs, A, IA, JA, &idum, &nrhs,
              iparm, &msglvl, F, x, &error,  dparm);
 
     if (error != 0) {
-        printf("ERROR during solution\n");
-        Report_Pardiso_Error(error);
-        exit(3);
+      printf("ERROR during solution\n");
+      Report_Pardiso_Error(error);
+      exit(3);
     } // if (error != 0) {
 
     #if defined(PARDISO_MONITOR)
-    printf("\nSolve completed ... \n");
-    printf("The solution of the system is: \n");
-    for (int i = 0; i < n_eqs; i++) { printf("x [%d] = % f\n", i, x[i] ); }
+      printf("\nSolve completed ... \n");
+      printf("The solution of the system is: \n");
+      for (int i = 0; i < n_eqs; i++) { printf("x [%d] = % f\n", i, x[i] ); }
     #endif
 
 
@@ -148,7 +148,7 @@ int Pardiso_Solve(const Matrix<double> & K, double* x, double* F) {
     phase = -1;         /* Release internal memory. */
 
     pardiso (pt, &maxfct, &mnum, &mtype, &phase,
-             &n_eqs, &ddum, IA, JA, &idum, &nrhs,
+            &n_eqs, &ddum, IA, JA, &idum, &nrhs,
              iparm, &msglvl, &ddum, &ddum, &error,  dparm);
 
     return 0;

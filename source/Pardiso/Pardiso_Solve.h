@@ -1,7 +1,7 @@
 #if !defined(PARDISO_SOLVE_HEADER)
 #define PARDISO_SOLVE_HEADER
 
-#define PARDISO_MONITOR
+//#define PARDISO_MONITOR
 
 #include <stdio.h>
 #include "Matrix.h"

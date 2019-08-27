@@ -8,15 +8,21 @@ void Simulation::From_File(const std::string & File_Name) {
   std::list<Array<double, 3>> Node_Positions;
   std::list<Array<unsigned, 8>> Element_Node_Lists;
   std::list<IO::Read::inp_boundary_data> Boundary_List;
+  std::list<unsigned> Node_Set_List;
 
-  IO::Read::inp(File_Name, Node_Positions, Element_Node_Lists, Boundary_List);
+  IO::Read::inp(File_Name, Node_Positions, Element_Node_Lists, Boundary_List, Node_Set_List);
+
+  #ifdef INPUT_MONITOR
+    printf("Read in %u nodes\n",    (unsigned)Node_Positions.size());
+    printf("Read in %u elements\n", (unsigned)Element_Node_Lists.size());
+  #endif
 
 
   //////////////////////////////////////////////////////////////////////////////
   /* Next, let's process the Node_Positions and Boundary lists into a Nodes
   array */
   const unsigned Num_Nodes = (unsigned)Node_Positions.size();
-  class Node* Nodes = Process_Node_Lists(Node_Positions, Boundary_List, Num_Nodes);
+  class Node* Nodes = Process_Node_Lists(Node_Positions, Boundary_List, Node_Set_List, Num_Nodes);
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -54,8 +60,8 @@ void Simulation::From_File(const std::string & File_Name) {
   /* Allocate the elements Array.
   Note: This will populate Ke and Fe for each element */
 
-  const unsigned Num_Elements = Element_Node_Lists.size();
-  class Element* Elements = Process_Element_List(Element_Node_Lists, Num_Nodes);
+  const unsigned Num_Elements = (unsigned)Element_Node_Lists.size();
+  class Element* Elements = Process_Element_List(Element_Node_Lists, Num_Elements);
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -110,7 +116,7 @@ void Simulation::From_File(const std::string & File_Name) {
 
 
 
-class Node* Simulation::Process_Node_Lists(class std::list<Array<double,3>> & Node_Positions, class std::list<IO::Read::inp_boundary_data> & Boundary_List, const unsigned Num_Nodes) {
+class Node* Simulation::Process_Node_Lists(class std::list<Array<double,3>> & Node_Positions, class std::list<IO::Read::inp_boundary_data> & Boundary_List, class std::list<unsigned> & Node_Set_List, const unsigned Num_Nodes) {
   /* Function description:
   This function uses the Node_Positions and Boundary_List lists to create the
   Nodes array. */
@@ -151,6 +157,22 @@ class Node* Simulation::Process_Node_Lists(class std::list<Array<double,3>> & No
     /* Pop the front element of the Boundary List. */
     Boundary_List.pop_front();
   } // for(unsigned i = 0; i < Num_BC; i++) {
+
+
+  /* Now, let's fix the nodes in the Node Set. */
+  unsigned Num_Nset = Node_Set_List.size();
+  for(unsigned i = 0; i < Num_Nset; i++) {
+    /* Get the front element of Node_Set_List. */
+    unsigned Current_Node = Node_Set_List.front();
+
+    /* Fix the position of this Node.  */
+    Nodes[Current_Node].Set_BC_Component(0, 0);
+    Nodes[Current_Node].Set_BC_Component(1, 0);
+    Nodes[Current_Node].Set_BC_Component(2, 0);
+
+    /* Pop the front element off of the Node_Set_List */
+    Node_Set_List.pop_front();
+  } // for(unsigned i = 0; i < Num_Nset; i++) {
 
   return Nodes;
 } // class Node* Process_Node_Lists(class std::list<Array<double,3>> & Node_Positions,...
@@ -218,6 +240,7 @@ class Element* Simulation::Process_Element_List(class list<Array<unsigned, 8>> &
                                         Current_Element_Node_List[5],
                                         Current_Element_Node_List[6],
                                         Current_Element_Node_List[7]);
+
 
       // Populate Ke and Fe.
       Elements[Element_Index].Populate_Ke();

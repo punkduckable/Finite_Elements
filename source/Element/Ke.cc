@@ -15,6 +15,154 @@ the functions requried to move Ke to K. */
 
 
 
+void Element::Populate_Ke(void) {
+  /* Function description:
+  This method is used to populate Ke, the element stiffness matrix. Once
+  this method has run, Ke can be mapped to K (and Fe can be calculated). */
+
+
+  /* Assumption 1:
+  This function assumes that the nodes in the Node_List are in a particular
+  order. Specifically, we assume that the passed nodes are in the same order
+  as the figure on page 123 of Hughes' book.
+
+  We have no way of testing and/or verrifying this assumption. Therefore, we
+  simply assume that the user set up the node list in the correct order. */
+
+
+  /* Assumption 2:
+  This function assumes that this Element has been set up. More specificially,
+  this function assumes that the node list and node positions have been set.*/
+  if(Element_Set_Up == false) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Exception: Thrown by Element::Populate_Ke\n"
+            "it is impossible to calculate Ke if the element's node list has\n"
+            "not been set. Set_Nodes must be run BEFORE Populate_Ke.\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
+  } // if(Element_Set_Up == false) {
+
+
+  /* Assumption 3:
+  This function assumes that D has been set. This can be tested with the
+  "Material_Set" flag. */
+  if(Material_Set == false) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Exception: Thrown by Element::Populate_Ke\n"
+            "Ke depends on D. Thus, the element material must be set before\n"
+            "calculating Ke.\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
+  } // if(Material_Set == false) {
+
+
+  /* Assumption 4:
+  Finally, This function assumes that Ke has not been set already. */
+  if(Ke_Set_Up == true) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Already Set Exception: Thrown by Element::Populate_Ke\n"
+            "Once Ke has been calculated, it can not be recalculated.\n");
+    throw Element_Already_Set_Up(Error_Message_Buffer);
+  } // if(Ke_Set_Up == true) {
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // First, zero out KE
+  Ke.Zero();
+
+  // Now, cycle through the 8 Integration points
+
+  // First, declare J, Coeff, JD, and JD_B (which will store (jD)*B)
+  double J;
+  class Matrix<double> Coeff{3, 3, Memory::ROW_MAJOR};
+  class Matrix<double> JD{6, 6, Memory::ROW_MAJOR};
+  class Matrix<double> JD_B{6, 24, Memory::COLUMN_MAJOR};
+
+  for(int Point = 0; Point < 8; Point++) {
+    // Find coefficient matrix, J.
+    Calculate_Coefficient_Matrix(Point, Coeff, J);
+
+    // Make sure that J is not zero. If it is then throw an exception.
+    if(J <= 0) {
+      char Error_Message_Buffer[500];
+      sprintf(Error_Message_Buffer,
+              "Element Bad Determinant Exception: Thrown in Element::Populate_Ke\n"
+              "The Jacobian determinant, J, must be a strictly positive quantity. However,\n"
+              "when calculating J for integration point %d, we got J = %lf.\n",
+              Point, J);
+      throw Element_Bad_Determinant(Error_Message_Buffer);
+    } // if(J == 0) {
+
+    // Declare, Construct B
+    class Matrix<double> B{6, 24, Memory::COLUMN_MAJOR};
+    for(int Node = 0; Node < 8; Node++)
+      Add_Ba_To_B(Node, Point, Coeff, J, B);
+
+    /* Calculate JD*B
+    Note: D is a row-major matrix, so the product J*D will be Row-major as well.
+    Thus, the product JD*B is the product of a Row and Column major matrix. As
+    such, my code will save this as a column major matrix. */
+    JD = J*D;
+    JD_B = JD*B;
+
+    /* Now compute B^T*JD*B (this will be added into Ke).
+    We expect this matrix to be symmetric. Therefore to minimuze computations,
+    we first populate the main diagional of BT_JD_B, and then the off diagional
+    parts (by computing the (i,j) cell of BT_JD_B and then moving it into
+    the (j,i) cell. */
+    class Matrix<double> BT_JD_B{24, 24, Memory::COLUMN_MAJOR};
+
+    // Populate diagional cells of BT_JD_B
+    for(int j = 0; j < 24; j++) {
+      BT_JD_B(j,j) = 0;
+      for(int k = 0; k < 6; k++)
+        BT_JD_B(j,j) += B(k,j)*JD_B(k,j);
+    } // for(int j = 0; j < 24; j++) {
+
+    // Populate the off diagional cells of BT_JD_B (accounting for symmetry)
+    for(int j = 0; j < 24; j++) {
+      for(int i = j+1; i < 24; i++) {
+        // Calculate the i,j cell.
+        BT_JD_B(i,j) = 0;
+        for(int k = 0; k < 6; k++)
+          BT_JD_B(i,j) += B(k,i)*JD_B(k,j);
+
+        // Now set (j,i) cell using symmetry
+        BT_JD_B(j,i) = BT_JD_B(i,j);
+      } // for(int i = 0; i < 24; i++) {
+    } // for(int j = 0; j < 6; j++) {
+
+    // Now add BT_JD_B to KE.
+    Ke += BT_JD_B;
+
+    // Ke has now been set
+    Ke_Set_Up = true;
+
+
+  #if defined(POPULATE_KE_MONITOR)
+      printf("JD:\n");
+      Print_Matrix_Of_Doubles(JD);
+
+      printf("B:\n");
+      Print_Matrix_Of_Doubles(B);
+
+      printf("JD_B:\n");
+      Print_Matrix_Of_Doubles(JD_B);
+
+      printf("BT_JD_B:\n");
+      Print_Matrix_Of_Doubles(BT_JD_B);
+    #endif
+  } // for(int Point = 0; Point < 8; Point++) {
+
+  #if defined(KE_MONITOR)
+    printf("Element stiffness matrix:\n");
+    Print_Matrix_Of_Doubles(Ke);
+  #endif
+} // void Element::Populate_Ke(void) {
+
+
+
 void Element::Calculate_Coefficient_Matrix(const unsigned Point, Matrix<double> & Coeff, double & J) {
   /* Function description:
     This function calculates the coefficient matrix and jacobian determinant
@@ -208,152 +356,6 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point,
 
 
 
-void Element::Populate_Ke(void) {
-  /* Function description:
-  This method is used to populate Ke, the element stiffness matrix. Once
-  this method has run, Ke can be mapped to K (and Fe can be calculated). */
-
-
-  /* Assumption 1:
-  This function assumes that the nodes in the Node_List are in a particular
-  order. Specifically, we assume that the passed nodes are in the same order
-  as the figure on page 123 of Hughes' book.
-
-  We have no way of testing and/or verrifying this assumption. Therefore, we
-  simply assume that the user set up the node list in the correct order. */
-
-
-  /* Assumption 2:
-  This function assumes that this Element has been set up. More specificially,
-  this function assumes that the node list and node positions have been set.*/
-  if(Element_Set_Up == false) {
-    char Error_Message_Buffer[500];
-    sprintf(Error_Message_Buffer,
-            "Element Not Set Up Exception: Thrown by Element::Populate_Ke\n"
-            "it is impossible to calculate Ke if the element's node list has\n"
-            "not been set. Set_Nodes must be run BEFORE Populate_Ke.\n");
-    throw Element_Not_Set_Up(Error_Message_Buffer);
-  } // if(Element_Set_Up == false) {
-
-
-  /* Assumption 3:
-  This function assumes that D has been set. This can be tested with the
-  "Material_Set" flag. */
-  if(Material_Set == false) {
-    char Error_Message_Buffer[500];
-    sprintf(Error_Message_Buffer,
-            "Element Not Set Up Exception: Thrown by Element::Populate_Ke\n"
-            "Ke depends on D. Thus, the element material must be set before\n"
-            "calculating Ke.\n");
-    throw Element_Not_Set_Up(Error_Message_Buffer);
-  } // if(Material_Set == false) {
-
-
-  /* Assumption 4:
-  Finally, This function assumes that Ke has not been set already. */
-  if(Ke_Set_Up == true) {
-    char Error_Message_Buffer[500];
-    sprintf(Error_Message_Buffer,
-            "Element Already Set Exception: Thrown by Element::Populate_Ke\n"
-            "Once Ke has been calculated, it can not be recalculated.\n");
-    throw Element_Already_Set_Up(Error_Message_Buffer);
-  } // if(Ke_Set_Up == true) {
-
-
-  //////////////////////////////////////////////////////////////////////////////
-  // First, zero out KE
-  Ke.Zero();
-
-  // Now, cycle through the 8 Integration points
-
-  // First, declare J, Coeff, and JD_B (which will store (jD)*B)
-  double J;
-  class Matrix<double> Coeff{3, 3, Memory::ROW_MAJOR};
-  class Matrix<double> JD{6, 6, Memory::ROW_MAJOR};
-  class Matrix<double> JD_B{6, 24, Memory::COLUMN_MAJOR};
-
-  for(int Point = 0; Point < 8; Point++) {
-    // Find coefficient matrix, J.
-    Calculate_Coefficient_Matrix(Point, Coeff, J);
-
-    // Make sure that J is not zero. If it is then throw an exception.
-    if(J <= 0) {
-      char Error_Message_Buffer[500];
-      sprintf(Error_Message_Buffer,
-              "Element Bad Determinant Exception: Thrown in Element::Populate_Ke\n"
-              "The Jacobian determinant, J, must be a strictly positive quantity. However,\n"
-              "when calculating J for integration point %d, we got J = %lf.\n",
-              Point, J);
-      throw Element_Bad_Determinant(Error_Message_Buffer);
-    } // if(J == 0) {
-
-    // Declare, Construct B
-    class Matrix<double> B{6, 24, Memory::COLUMN_MAJOR};
-    for(int Node = 0; Node < 8; Node++)
-      Add_Ba_To_B(Node, Point, Coeff, J, B);
-
-    /* Calculate JD*B
-    Note: D is a row-major matrix, so the product J*D will be Row-major as well.
-    Thus, the product JD*B is the product of a Row and Column major matrix. As
-    such, my code will save this as a column major matrix. */
-    JD = J*D;
-    JD_B = JD*B;
-
-    /* Now compute B^T*JD*B (this will be added into Ke).
-    We expect this matrix to be symmetric. Therefore to minimuze computations,
-    we first populate the main diagional of BT_JD_B, and then the off diagional
-    parts (by computing the (i,j) cell of BT_JD_B and then moving it into
-    the (j,i) cell. */
-    class Matrix<double> BT_JD_B{24, 24, Memory::COLUMN_MAJOR};
-
-    // Populate diagional cells of BT_JD_B
-    for(int j = 0; j < 24; j++) {
-      BT_JD_B(j,j) = 0;
-      for(int k = 0; k < 6; k++)
-        BT_JD_B(j,j) += B(k,j)*JD_B(k,j);
-    } // for(int j = 0; j < 24; j++) {
-
-    // Populate the off diagional cells of BT_JD_B (accounting for symmetry)
-    for(int j = 0; j < 24; j++) {
-      for(int i = j+1; i < 24; i++) {
-        // Calculate the i,j cell.
-        BT_JD_B(i,j) = 0;
-        for(int k = 0; k < 6; k++)
-          BT_JD_B(i,j) += B(k,i)*JD_B(k,j);
-
-        // Now set (j,i) cell using symmetry
-        BT_JD_B(j,i) = BT_JD_B(i,j);
-      } // for(int i = 0; i < 24; i++) {
-    } // for(int j = 0; j < 6; j++) {
-
-    // Now add BT_JD_B to KE.
-    Ke += BT_JD_B;
-
-    // Ke has now been set
-    Ke_Set_Up = true;
-
-
-  #if defined(POPULATE_KE_MONITOR)
-      printf("JD:\n");
-      Print_Matrix_Of_Doubles(JD);
-
-      printf("B:\n");
-      Print_Matrix_Of_Doubles(B);
-
-      printf("JD_B:\n");
-      Print_Matrix_Of_Doubles(JD_B);
-
-      printf("BT_JD_B:\n");
-      Print_Matrix_Of_Doubles(BT_JD_B);
-    #endif
-  } // for(int Point = 0; Point < 8; Point++) {
-
-  #if defined(KE_MONITOR)
-    printf("Element stiffness matrix:\n");
-    Print_Matrix_Of_Doubles(Ke);
-  #endif
-} // void Element::Populate_Ke(void) {
-
 
 
 void Element::Fill_Ke_With_1s(void) {
@@ -402,6 +404,8 @@ void Element::Fill_Ke_With_1s(void) {
     Print_Matrix_Of_Doubles(Ke);
   #endif
 } // void Element::Fill_Ke_With_1s(void) {
+
+
 
 
 

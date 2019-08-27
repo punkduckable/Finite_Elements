@@ -22,7 +22,8 @@ namespace IO {
     void inp(const std::string & File_Name,                                    // Intent: Read
              class std::list<Array<double,3>> & Node_Positions,                // Intent: Write
              class std::list<Array<unsigned,8>> & Element_Node_Lists,          // Intent: Write
-             class std::list<inp_boundary_data> & Boundary_List);              // Intent: Write
+             class std::list<inp_boundary_data> & Boundary_List,               // Intent: Write
+             class std::list<unsigned> & Node_Set_List);                       // Intent: Write
   } // namespace Read {
 } // namespace IO {
 
