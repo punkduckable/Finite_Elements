@@ -41,20 +41,22 @@ Element::~Element(void) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// Other Element methods
+// Set up element (Set_Nodes + Set_Up)
 
-void Element::Set_Nodes(const unsigned Node0_ID,
-                        const unsigned Node1_ID,
-                        const unsigned Node2_ID,
-                        const unsigned Node3_ID,
-                        const unsigned Node4_ID,
-                        const unsigned Node5_ID,
-                        const unsigned Node6_ID,
-                        const unsigned Node7_ID) {
+void Element::Set_Up(const unsigned Node0_ID,
+                     const unsigned Node1_ID,
+                     const unsigned Node2_ID,
+                     const unsigned Node3_ID,
+                     const unsigned Node4_ID,
+                     const unsigned Node5_ID,
+                     const unsigned Node6_ID,
+                     const unsigned Node7_ID) {
   /* Function description:
   This function is used to set set up the Element. The passed Node ID's are
   moved into the Node_List, which then uses the ID array to populate the
-  Local_Eq_Num_To_Global_Eq_Num array (which is used for mapping Ke to K) */
+  Local_Eq_Num_To_Global_Eq_Num array (which is used for mapping Ke to K). This
+  function is private and should ONLY be called by one of the two public
+  "Set_Node" functions. */
 
   /* Assumption 1:
   This function assumes that the passed nodes are in a particular order.
@@ -202,9 +204,43 @@ void Element::Set_Nodes(const unsigned Node0_ID,
       printf("%5.2lf ", Prescribed_Displacements[i]);
     printf("\n");
   #endif
-} // void Element::Set_Nodes(const unsigned Node1_ID,
+} // void Element::Set_Up(const unsigned Node1_ID,
 
 
+
+// Brick element set nodes.
+void Element::Set_Nodes( const unsigned Node0_ID,
+                         const unsigned Node1_ID,
+                         const unsigned Node2_ID,
+                         const unsigned Node3_ID,
+                         const unsigned Node4_ID,
+                         const unsigned Node5_ID,
+                         const unsigned Node6_ID,
+                         const unsigned Node7_ID) {
+  /* Function description:
+  This function is used to set up Brick type elements. Brick elements have
+  8 distinct nodal positions. Each passed node should therefore have a distinct
+  position. */
+  (*this).Type = Element_Types::BRICK;
+  Set_Up(Node0_ID, Node1_ID, Node2_ID, Node3_ID, Node4_ID, Node5_ID, Node6_ID, Node7_ID);
+} // void Element::Set_Nodes( const unsigned Node0_ID,
+
+
+
+// Wedge element set nodes.
+void Element::Set_Nodes( const unsigned Node0_ID,
+                         const unsigned Node1_ID,
+                         const unsigned Node2_ID,
+                         const unsigned Node4_ID,
+                         const unsigned Node5_ID,
+                         const unsigned Node6_ID) {
+  /* Function description:
+  This function is used to set up Wedge type elements. Wedge elements have
+  have 6 distinct nodal positions. They are formed from brick elements by
+  degenerating Nodes 2 and 3 as well as 6 and 7 (0 index). */
+  (*this).Type = Element_Types::WEDGE;
+  Set_Up(Node0_ID, Node1_ID, Node2_ID, Node2_ID, Node4_ID, Node5_ID, Node6_ID, Node6_ID);
+} // void Element::Set_Nodes( const unsigned Node0_ID,
 
 
 

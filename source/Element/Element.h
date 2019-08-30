@@ -6,6 +6,9 @@
 #include "Array.h"
 #include "Matrix.h"
 
+// Element type enumerator.
+enum class Element_Types { BRICK, WEDGE };
+
 class Element {
 private:
   //////////////////////////////////////////////////////////////////////////////
@@ -43,7 +46,19 @@ private:
                      double Ya;                 // Y spatial coordinate (original) of the node
                      double Za; };              // Z spatial coordinate (original) of the node
   Array<Node_Data, 8> Element_Nodes;
+  Element_Types Type;
 
+  /*  Node set up:
+  This function actually performs the node set up. Both versions of the Set_Node
+  function call this function once they have set their node type. */
+  void Set_Up( const unsigned Node0_ID,                                        // Intent: Read
+               const unsigned Node1_ID,                                        // Intent: Read
+               const unsigned Node2_ID,                                        // Intent: Read
+               const unsigned Node3_ID,                                        // Intent: Read
+               const unsigned Node4_ID,                                        // Intent: Read
+               const unsigned Node5_ID,                                        // Intent: Read
+               const unsigned Node6_ID,                                        // Intent: Read
+               const unsigned Node7_ID);                                       // Intent: Read
 
   /* Assembly arrays
   Local_Eq_Num_To_Global_Eq_Num is used to map Ke into K.
@@ -85,6 +100,9 @@ private:
                    const Matrix<double> & Coeff,                               // Intent: Read
                    const double J,                                             // Intent: Read
                    Matrix<double> & B);                                        // Intent: Write
+
+
+
 public:
   //////////////////////////////////////////////////////////////////////////////
   // Constructors, Destructor
@@ -137,8 +155,8 @@ public:
 
 
   /* Set nodes.
-  This function sets Num_Local_Eq, Local_Eq_Num_To_Global_Eq_Num, and the
-  node position arrays (Xa, Ya, Za). */
+  Brick variant (8 nodal positions): This function sets Num_Local_Eq,
+  Local_Eq_Num_To_Global_Eq_Num, and the node position arrays (Xa, Ya, Za). */
   void Set_Nodes( const unsigned Node0_ID,                                     // Intent: Read
                   const unsigned Node1_ID,                                     // Intent: Read
                   const unsigned Node2_ID,                                     // Intent: Read
@@ -147,6 +165,17 @@ public:
                   const unsigned Node5_ID,                                     // Intent: Read
                   const unsigned Node6_ID,                                     // Intent: Read
                   const unsigned Node7_ID);                                    // Intent: Read
+
+  /* Wedge variant (6 nodal positions): This function does the same thing as the
+  8-node variant above, except it assumes that nodes 2 and 3 as well as 6 and 7
+  have the same spatial position (to make a wedge shaped element). */
+  void Set_Nodes( const unsigned Node0_ID,                                     // Intent: Read
+                  const unsigned Node1_ID,                                     // Intent: Read
+                  const unsigned Node2_ID,                                     // Intent: Read
+                  const unsigned Node4_ID,                                     // Intent: Read
+                  const unsigned Node5_ID,                                     // Intent: Read
+                  const unsigned Node6_ID);                                    // Intent: Read
+
 
 
   /* Friend setters. */
