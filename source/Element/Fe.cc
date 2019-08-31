@@ -98,10 +98,8 @@ void Element::Move_Fe_To_F(void) const {
 
   for(int i = 0; i < 24; i++) {
     const unsigned I = Local_Eq_Num_To_Global_Eq_Num[i];
-    if(I == FIXED_COMPONENT)
-      continue;
-    else
-      F[I] += Fe[i];
+    if(I == FIXED_COMPONENT) { continue; }
+    else { F[I] += Fe[i]; }
   } // for(int i = 0; i < 24; i++) {
 } // void Element::Move_Fe_To_F(void) const {
 

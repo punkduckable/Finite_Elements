@@ -1,8 +1,8 @@
 // Needed to run the tests.
-#include "Simulation/Simulation.h"
+#include "Element_Tests.h"
 
 int main() {
-  Simulation::From_File("Cylinder");
+  Test::Wedge_Element();
 
   return 0;
 } // int main() {
