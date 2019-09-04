@@ -4,9 +4,12 @@
 #include "inp_Reader.h"
 
 
-bool IO::Read::Contains(const char* Buffer, const char* Word) {
+bool IO::Read::Contains(const char* Buffer, const char* Word, unsigned Start_At) {
   /* Function description:
-  This function determines if Word is contained in Buffer.
+  This function determines if Word is contained in Buffer. The optional Start_At
+  argument can be used to only search through part of the string. If, for
+  example, Start_At = 5, then this function will only search for matches that
+  begin at index 5 (or later) of Buffer.
 
   My inp reader frequently checks if a particular word is in a string. Thus, I
   wrote this function to automate that process. */
@@ -15,8 +18,15 @@ bool IO::Read::Contains(const char* Buffer, const char* Word) {
   This function assumes that both Buffer and Word are NULL TERMINATED strings.
   That is, I assume that both end with the \0 character. */
 
+  /* First, check if Buffer has fewer than Start_At characters (which happens
+  if there is a \0 in a index whose value is less than Start_At). If not, return
+  false */
+  for(unsigned i = 0; i < Start_At; i++) {
+    if(Buffer[i] == '\0') { return false; }
+  } // for(unsigned i = 0; i < Start_At; i++) {
+
   // Loop through the characters of Buffer.
-  unsigned i = 0;
+  unsigned i = Start_At;
   while(Buffer[i] != '\0') {
     // At each one, see if Word starts at that character.
     unsigned j = 0;
@@ -38,7 +48,7 @@ bool IO::Read::Contains(const char* Buffer, const char* Word) {
   /* If we get here then we cycled through Buffer without finding a match.
   Thus, buffer does not contain Word. */
   return false;
-} // bool IO::Read::Contains(const char* Buffer, const char* Word) {
+} // bool IO::Read::Contains(const char* Buffer, const char* Word, unsigned Start_At) {
 
 
 void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions, class std::list<Array<unsigned,8>> & Element_Node_Lists, class std::list<inp_boundary_data> & Boundary_List, class std::list<unsigned> & Node_Set_List) {

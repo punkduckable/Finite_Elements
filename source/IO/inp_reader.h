@@ -25,7 +25,9 @@ namespace IO {
              class std::list<inp_boundary_data> & Boundary_List,               // Intent: Write
              class std::list<unsigned> & Node_Set_List);                       // Intent: Write
 
-    bool Contains(const char* Buffer, const char* Word);
+    bool Contains(const char* Buffer,                                          // Intent: Read
+                  const char* Word,                                            // Intent: Read
+                  unsigned Search_At = 0);                                     // Intent: Read
   } // namespace Read {
 } // namespace IO {
 
