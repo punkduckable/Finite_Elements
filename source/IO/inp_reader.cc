@@ -61,7 +61,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
   //////////////////////////////////////////////////////////////////////////////
   /* First, we need to open the file. To do this, we first need to get the file
   path */
-  std::string File_Path = "./IO/" + File_Name + ".inp";
+  std::string File_Path = "./IO/" + File_Name;
   std::ifstream File{};
   File.open(File_Path.c_str());
 
@@ -91,10 +91,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
 
     if(buffer[0] == '*') {
       /* Check if current line starts with "*Node" */
-      if( buffer[1] == 'N' &&
-          buffer[2] == 'o' &&
-          buffer[3] == 'd' &&
-          buffer[4] == 'e' ) {
+      if(Contains(buffer, "*Node") ) {
 
         /* If so then we have found the start of the node listing. Begin
         reading them in. */
@@ -118,17 +115,11 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
         line yet. Thus, continue onto the next iteration (skipping the "read in
         next line" instruction at the end of the while loop) */
         continue;
-      } // if( buffer[1] == 'N' &&
+      } // if(Contains(bufffer, "*Node") {
 
 
       /* Check if current line starts with "*Element" */
-      if( buffer[1] == 'E' &&
-          buffer[2] == 'l' &&
-          buffer[3] == 'e' &&
-          buffer[4] == 'm' &&
-          buffer[5] == 'e' &&
-          buffer[6] == 'n' &&
-          buffer[7] == 't' ) {
+      if( Contains(buffer, "*Element") ) {
 
         /* If so then we have found the start of the element node listings. Begin
         reading them in. */
@@ -156,18 +147,11 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
         line yet. Thus, continue onto the next iteration (skipping the "read in
         next line" instruction at the end of the while loop) */
         continue;
-      }  // if( buffer[1] == 'E' &&
+      }  // if( Contains(buffer, "*Element") ) {
 
 
       /* Check if current line starts with "*Boundary" */
-      if( buffer[1] == 'B' &&
-          buffer[2] == 'o' &&
-          buffer[3] == 'u' &&
-          buffer[4] == 'n' &&
-          buffer[5] == 'd' &&
-          buffer[6] == 'a' &&
-          buffer[7] == 'r' &&
-          buffer[8] == 'y' ) {
+      if( Contains(buffer, "*Boundary") ) {
 
         /* If so then we have found a boundary section. Let's read in the Boundary
         conditions. */
@@ -197,14 +181,11 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
         We therefore continue onto the next iteration (skipping the "read in
         next line" instruction at the end of the while loop) */
         continue;
-      } // if( buffer[1] == 'B' &&
+      } // if( Contains(buffer, "*Boundary") ) {
 
 
       /* Check if the current line starts with "*Nset" */
-      if( buffer[1] == 'N' &&
-          buffer[2] == 's' &&
-          buffer[3] == 'e' &&
-          buffer[4] == 't' ) {
+      if( Contains(buffer, "*Nset") ) {
 
         /* If so then we have found a node set. Let's read it in and add the
         associated nodes to the Node_Set_List. */
@@ -240,7 +221,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
         (skipping the "read in next line" instruction at the end of the while
         loop) */
         continue;
-      } // if( buffer[1] == 'N' &&
+      } // if( Contains(buffer, "*Nset") ) {
     } // if(buffer[0] == '*') {
 
     File.getline(buffer, 256);                         // Read in next line (or up to 256 characters)
