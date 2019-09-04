@@ -270,6 +270,26 @@ unsigned Element::Get_Node_ID(const unsigned Index) const {
 } // unsigned Element::Get_Node_ID(const unsigned Index) const {
 
 
+Element_Types Element::Get_Element_Type(void) const {
+  /* Function description:
+  This function, as the name implies, returns the Element Type */
+
+  /* Assumption 1:
+  This function assumes that the element has been set up. This is because the
+  element type is actually specified during set up. */
+  if((*this).Element_Set_Up == false) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Element Not Set Up Exception: Thrown by Element::Get_Element_Type\n"
+            "The element type is set when the elemetn is set up. Since this element\n"
+            "has not been set up, it has no type!\n");
+    throw Element_Not_Set_Up(Error_Message_Buffer);
+  } // if((*this).Element_Set_Up == false) {
+
+  return (*this).Type;
+} // Element_Types Element::Get_Element_Type(void) const {
+
+
 
 
 

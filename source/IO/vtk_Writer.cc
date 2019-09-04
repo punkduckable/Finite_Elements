@@ -64,24 +64,61 @@ void IO::Write::vtk_elements(std::ofstream & File, const Element* Elements, cons
   /* Function description:
   This function prints cell data (elements) to the File. */
 
-  /* First print the CELLS statement. Here, the size parameter is simply 9 times
-  the number of elements. */
-  File << "CELLS " << Num_Elements << " " << 9*Num_Elements << "\n";
+  /* First print the CELLS statement. To do that, we need to know how many Wedge
+  and Brick elements are in the Elements array.
+
+  Further, the code below accesses the element types several times. In order to
+  reduce redundant checks, we write down the element types into an Array as
+  we determine the number of brick and wedge elements. This should (in theory)
+  improve performance. */
+  Element_Types Element_Type_Array[Num_Elements];
+  unsigned Num_Brick = 0;
+  unsigned Num_Wedge = 0;
+
+  for(unsigned i = 0; i < Num_Elements; i++) {
+    if(Elements[i].Get_Element_Type() == Element_Types::BRICK) {
+      Num_Brick++;
+      Element_Type_Array[i] = Element_Types::BRICK;
+    } // if(Elements[i].Get_Element_Type() == Element_Types::BRICK) {
+    else { // if(Elements[i].Get_Element_Type() == Element_Types::WEDGE) {
+      Num_Wedge++;
+      Element_Type_Array[i] = Element_Types::WEDGE;
+    } // else {
+  } // for(unsigned i = 0; i < Num_Elements; i++) {
+
+  unsigned n = (8+1)*Num_Brick + (6+1)*Num_Wedge;
+
+  File << "CELLS " << Num_Elements << " " << n << "\n";
 
   /* Next, cycle through the Elements, printing each one's node list to the
   file. */
   for(unsigned i = 0; i < Num_Elements; i++) {
-    File << "8";
-    for(unsigned j = 0; j < 8; j++) { File << " " << Elements[i].Get_Node_ID(j); }
-    File << "\n";
+    if(Element_Type_Array[i] == Element_Types::BRICK) {
+      File << "8";
+      for(unsigned j = 0; j < 8; j++) { File << " " << Elements[i].Get_Node_ID(j); }
+      File << "\n";
+    } // if(Element_Type_Array[i] == Element_Types::BRICK) {
+    else { // (Element_Type_Array[i] == Element_Types::WEDGE)
+      File << "6";
+
+      /* Nodes 2, 3 and 6, 7 are identical for wedge elements. Thus,
+      we only want to print nodes 0, 1, 2 and 4, 5, 6 to file */
+      for(unsigned j = 0; j < 3; j++) { File << " " << Elements[i].Get_Node_ID(j); }
+      for(unsigned j = 4; j < 7; j++) { File << " " << Elements[i].Get_Node_ID(j); }
+      File << "\n";
+    } // else {
   } // for(unsigned i = 0; i < Num_Elements; i++) {
 
   /* Now print the Cell_Type statement */
   File << "CELL_TYPES " << Num_Elements << "\n";
 
-  /* Now print the cell types. In our case, every cell is a hexahedral element,
-  which corresponds to cell type 12. */
-  for(unsigned i = 0; i < Num_Elements; i++) { File << "12\n"; }
+  /* Now print the cell types. In our case, every cell is either a hexahedral
+  or wedge element. hexahedral elements correspond to id 12. Wedge elements
+  correspond to id 13 */
+  for(unsigned i = 0; i < Num_Elements; i++) {
+    if(Element_Type_Array[i] == Element_Types::BRICK) { File << "12\n"; }
+    else { File << "13\n"; }
+  } // for(unsigned i = 0; i < Num_Elements; i++) {
 } // void IO::Write::vtk_elements(std::ofstream & File, const Element* Elements, const unsigned Num_Elements) {
 
 #endif

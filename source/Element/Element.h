@@ -153,6 +153,8 @@ public:
 
   unsigned Get_Node_ID(const unsigned Index) const;
 
+  Element_Types Get_Element_Type() const;
+
 
   /* Set nodes.
   Brick variant (8 nodal positions): This function sets Num_Local_Eq,
@@ -188,8 +190,6 @@ public:
                                    const double v);                            // Intent : Read
 
 
-
-  /* Friend setters. */
 }; // class Element {
 
 void Set_Element_Static_Members(Matrix<int> * ID_Ptr,                          // Intent: Read
