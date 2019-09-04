@@ -24,6 +24,8 @@ namespace IO {
              class std::list<Array<unsigned,8>> & Element_Node_Lists,          // Intent: Write
              class std::list<inp_boundary_data> & Boundary_List,               // Intent: Write
              class std::list<unsigned> & Node_Set_List);                       // Intent: Write
+
+    bool Contains(const char* Buffer, const char* Word);
   } // namespace Read {
 } // namespace IO {
 

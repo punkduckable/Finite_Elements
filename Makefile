@@ -19,7 +19,7 @@ OBJS :=        Main.o \
                Node.o Node_Tests.o \
 					     Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
 	             Compress_K.o Pardiso_Solve.o Pardiso_Tests.o Pardiso_Error.o \
-							 inp_Reader.o KFX_Writer.o vtk_Writer.o \
+							 inp_Reader.o KFX_Writer.o vtk_Writer.o IO_Tests.o \
 							 Simulation.o
 PATH_OBJS := $(patsubst %,obj/%,$(OBJS))
 VPATH :=     ./bin ./obj ./source \
@@ -37,7 +37,7 @@ All: $(PATH_OBJS) bin/FEM
 bin/FEM: $(PATH_OBJS)
 	$(COMPILER) $(PATH_OBJS) $(R_PATH) $(LIBS) -o $@
 
-obj/Main.o: Main.cc Element_Tests.h Matrix_Tests.h Node_Tests.h
+obj/Main.o: Main.cc Element_Tests.h Matrix_Tests.h Node_Tests.h IO_Tests.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 
@@ -98,6 +98,9 @@ obj/KFX_Writer.o: KFX_Writer.cc KFX_Writer.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 obj/vtk_Writer.o: vtk_Writer.cc vtk_Writer.h Errors.h Node.h Element.h
+	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
+
+obj/IO_Tests.o: IO_Tests.cc IO_Tests.h inp_Reader.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 

@@ -3,6 +3,44 @@
 
 #include "inp_Reader.h"
 
+
+bool IO::Read::Contains(const char* Buffer, const char* Word) {
+  /* Function description:
+  This function determines if Word is contained in Buffer.
+
+  My inp reader frequently checks if a particular word is in a string. Thus, I
+  wrote this function to automate that process. */
+
+  /* Assumptions:
+  This function assumes that both Buffer and Word are NULL TERMINATED strings.
+  That is, I assume that both end with the \0 character. */
+
+  // Loop through the characters of Buffer.
+  unsigned i = 0;
+  while(Buffer[i] != '\0') {
+    // At each one, see if Word starts at that character.
+    unsigned j = 0;
+    while(Buffer[i+j] == Word[j]) {
+      j++;
+
+      /* If we're still in here and we've reached the end of "Word" then
+      we've found a match! */
+      if(Word[j] == '\0') { return true; }
+
+      /* If we haven't reached the end of Word but we have reached the end of
+      Buffer then Buffer does not contain Word. */
+      if(Buffer[i+j] == '\0') { return false; }
+    } // while(Buffer[i+j] == Word[j]) {
+
+    i++;
+  } // while(Buffer[i] != '\0') {
+
+  /* If we get here then we cycled through Buffer without finding a match.
+  Thus, buffer does not contain Word. */
+  return false;
+} // bool IO::Read::Contains(const char* Buffer, const char* Word) {
+
+
 void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions, class std::list<Array<unsigned,8>> & Element_Node_Lists, class std::list<inp_boundary_data> & Boundary_List, class std::list<unsigned> & Node_Set_List) {
   /* File description:
   This function is designed to read in node positions, node boundary data,
@@ -203,6 +241,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
   // All done! Close the file.
   File.close();
 } // void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions...
+
 
 
 #endif

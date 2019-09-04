@@ -1,8 +1,8 @@
 // Needed to run the tests.
-#include "Element_Tests.h"
+#include "IO_Tests.h"
 
 int main() {
-  Test::Wedge_Element();
+  Test::Contains();
 
   return 0;
 } // int main() {
