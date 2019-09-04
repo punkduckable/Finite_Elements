@@ -121,8 +121,13 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
       /* Check if current line starts with "*Element" */
       if( Contains(buffer, "*Element") ) {
 
-        /* If so then we have found the start of the element node listings. Begin
-        reading them in. */
+        /* If so then we have found the start of the element node listings.
+        Before we can read the elements in, we need to identify which type of
+        element we're dealing with */
+        Element_Types Type;
+        if( Contains(buffer, "type=C3D8", 8) ) { Type = Element_Types::BRICK; }
+        else { Type = Element_Types::WEDGE; } // if( Contains(buffer, "type=C3D6", 8) )
+
         while(File.eof() == false && File.fail() == false) {
           File.getline(buffer, 256);
 
@@ -132,9 +137,21 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
           /* Otherwise, read in element node lists from the buffer and push it
           onto the Element_Node_Lists list. */
           Array<unsigned,8> Node_List;      // Hold the current element position
-          sscanf(buffer,
-                 "%*d, %u, %u, %u, %u, %u, %u, %u, %u",
-                 &Node_List[0], &Node_List[1], &Node_List[2], &Node_List[3], &Node_List[4], &Node_List[5], &Node_List[6], &Node_List[7]);
+
+          if(Type == Element_Types::BRICK) {
+            sscanf(buffer,
+                   "%*d, %u, %u, %u, %u, %u, %u, %u, %u",
+                   &Node_List[0], &Node_List[1], &Node_List[2], &Node_List[3], &Node_List[4], &Node_List[5], &Node_List[6], &Node_List[7]);
+          } // if(Type == Element_Types::BRICK) {
+          else { // if(Type == Element_Types::WEDGE)
+            sscanf(buffer,
+                   "%*d, %u, %u, %u, %u, %u, %u",
+                   &Node_List[0], &Node_List[1], &Node_List[2], &Node_List[4], &Node_List[5], &Node_List[6]);
+
+             // Nodes 2 and 3, as well as 6 and 7 are identical
+             Node_List[3] = Node_List[2];
+             Node_List[7] = Node_List[6];
+          } // else {
 
           /* Convert from 1 index to 0 index */
           for(unsigned i = 0; i < 8; i++) { Node_List[i]--; }

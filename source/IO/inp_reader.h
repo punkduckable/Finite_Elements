@@ -2,6 +2,7 @@
 #define INP_READER_HEADER
 
 #include "Errors.h"
+#include "Element/Element.h"                     // For Element_Types type
 #include "Array.h"
 #include <string.h>
 #include <fstream>
