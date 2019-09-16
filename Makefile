@@ -19,7 +19,7 @@ OBJS :=        Main.o \
                Node.o Node_Tests.o \
 					     Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
 	             Compress_K.o Pardiso_Solve.o Pardiso_Tests.o Pardiso_Error.o \
-							 inp_Reader.o KFX_Writer.o vtk_Writer.o IO_Tests.o \
+							 inp_Reader.o KFX_Writer.o vtk_Writer.o IO_Tests.o String_Ops.o \
 							 Simulation.o
 PATH_OBJS := $(patsubst %,obj/%,$(OBJS))
 VPATH :=     ./bin ./obj ./source \
@@ -91,7 +91,7 @@ obj/Pardiso_Error.o: Pardiso_Error.cc Pardiso.h
 
 
 # Rules for IO
-obj/inp_Reader.o: inp_Reader.cc inp_Reader.h Errors.h
+obj/inp_Reader.o: inp_Reader.cc inp_Reader.h Errors.h String_Ops.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 obj/KFX_Writer.o: KFX_Writer.cc KFX_Writer.h
@@ -101,6 +101,9 @@ obj/vtk_Writer.o: vtk_Writer.cc vtk_Writer.h Errors.h Node.h Element.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 obj/IO_Tests.o: IO_Tests.cc IO_Tests.h inp_Reader.h
+	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
+
+obj/String_Ops.o: String_Ops.cc String_Ops.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 

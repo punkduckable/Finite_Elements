@@ -3,93 +3,6 @@
 
 #include "inp_Reader.h"
 
-
-bool IO::Read::Contains(const char* Buffer, const char* Word, unsigned Start_At) {
-  /* Function description:
-  This function determines if Word is contained in Buffer. The optional Start_At
-  argument can be used to only search through part of the string. If, for
-  example, Start_At = 5, then this function will only search for matches that
-  begin at index 5 (or later) of Buffer.
-
-  My inp reader frequently checks if a particular word is in a string. Thus, I
-  wrote this function to automate that process. */
-
-  /* Assumptions:
-  This function assumes that both Buffer and Word are NULL TERMINATED strings.
-  That is, I assume that both end with the \0 character. */
-
-  /* First, check if Buffer has fewer than Start_At characters (which happens
-  if there is a \0 in a index whose value is less than Start_At). If not, return
-  false */
-  for(unsigned i = 0; i < Start_At; i++) {
-    if(Buffer[i] == '\0') { return false; }
-  } // for(unsigned i = 0; i < Start_At; i++) {
-
-  // Loop through the characters of Buffer.
-  unsigned i = Start_At;
-  while(Buffer[i] != '\0') {
-    // At each one, see if Word starts at that character.
-    unsigned j = 0;
-    while(Buffer[i+j] == Word[j]) {
-      j++;
-
-      /* If we're still in here and we've reached the end of "Word" then
-      we've found a match! */
-      if(Word[j] == '\0') { return true; }
-
-      /* If we haven't reached the end of Word but we have reached the end of
-      Buffer then Buffer does not contain Word. */
-      if(Buffer[i+j] == '\0') { return false; }
-    } // while(Buffer[i+j] == Word[j]) {
-
-    i++;
-  } // while(Buffer[i] != '\0') {
-
-  /* If we get here then we cycled through Buffer without finding a match.
-  Thus, buffer does not contain Word. */
-  return false;
-} // bool IO::Read::Contains(const char* Buffer, const char* Word, unsigned Start_At) {
-
-
-
-std::vector<std::string> IO::Read::Split(std::string & S, const char delim) {
-  /* Function description:
-  This function is designed to read in a string and split it using a delimeter.
-  The characters between any two instances of delim (as well as any characters
-  before the first instance of delim and the characters after the last instance
-  of delim) are packaged together as a substring and added to the substring
-  vector (which is what get's returned).
-
-  Delim is a defaulted argument. By default, delim = ','. */
-
-  std::vector<std::string> Sub_Strings;
-
-  unsigned len = S.length();
-  unsigned Index_Start = 0;                      // Index of the start of the current substring.
-  unsigned N_Chars_Since_Delim = 0;              // Number of characters after the start of the substring that are not Delim
-  for(unsigned i = 0; i < len; i++) {
-    if(S[i] == delim) {
-      // Add a new substring to the Sub String vector.
-      Sub_Strings.push_back(S.substr(Index_Start, N_Chars_Since_Delim));
-
-      // Update Index_Start (to just 1 character after the delim index)
-      Index_Start = i+1;
-
-      // We're starting a new substring, so N_Chars_Since_Delim = 0;
-      N_Chars_Since_Delim = 0;
-    } // if(S[i] == delim) {
-    else { N_Chars_Since_Delim++; }
-  } // for(unsigned i = 0; i < len; i++) {
-
-  /* Finally, make a substring from the charcters after the last instance of
-  delim. Note that this only happens if Index_Start < len. */
-  if(Index_Start < len) { Sub_Strings.push_back(S.substr(Index_Start, N_Chars_Since_Delim)); }
-
-  return Sub_Strings;
-} // std::vector<std::string> IO::Read::Split(std::string & S, const char delim) {
-
-
-
 void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions, class std::list<Array<unsigned,8>> & Element_Node_Lists, class std::list<inp_boundary_data> & Boundary_List) {
   /* Function description:
   This function is designed to read in node positions, node boundary data,
@@ -130,7 +43,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
 
     if(buffer[0] == '*') {
       /* Check if current line starts with "*Node" */
-      if(Contains(buffer, "*Node") ) {
+      if(String_Ops::Contains(buffer, "*Node") ) {
 
         /* If so then we have found the start of the node listing. Begin
         reading them in. */
@@ -154,18 +67,18 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
         line yet. Thus, continue onto the next iteration (skipping the "read in
         next line" instruction at the end of the while loop) */
         continue;
-      } // if(Contains(bufffer, "*Node") {
+      } // if(String_Ops::Contains(bufffer, "*Node") {
 
 
       /* Check if current line starts with "*Element" */
-      if( Contains(buffer, "*Element") ) {
+      if( String_Ops::Contains(buffer, "*Element") ) {
 
         /* If so then we have found the start of the element node listings.
         Before we can read the elements in, we need to identify which type of
         element we're dealing with */
         Element_Types Type;
-        if( Contains(buffer, "type=C3D8", 8) ) { Type = Element_Types::BRICK; }
-        else { Type = Element_Types::WEDGE; } // if( Contains(buffer, "type=C3D6", 8) )
+        if( String_Ops::Contains(buffer, "type=C3D8", 8) ) { Type = Element_Types::BRICK; }
+        else { Type = Element_Types::WEDGE; } // if( String_Ops::Contains(buffer, "type=C3D6", 8) )
 
         while(File.eof() == false && File.fail() == false) {
           File.getline(buffer, 256);
@@ -203,11 +116,11 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
         line yet. Thus, continue onto the next iteration (skipping the "read in
         next line" instruction at the end of the while loop) */
         continue;
-      }  // if( Contains(buffer, "*Element") ) {
+      }  // if( String_Ops::Contains(buffer, "*Element") ) {
 
 
       /* Check if current line starts with "*Boundary" */
-      if( Contains(buffer, "*Boundary") ) {
+      if( String_Ops::Contains(buffer, "*Boundary") ) {
 
         /* If so then we have found a boundary section. Let's read in the Boundary
         conditions. */
@@ -237,7 +150,7 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
         We therefore continue onto the next iteration (skipping the "read in
         next line" instruction at the end of the while loop) */
         continue;
-      } // if( Contains(buffer, "*Boundary") ) {
+      } // if( String_Ops::Contains(buffer, "*Boundary") ) {
     } // if(buffer[0] == '*') {
 
     File.getline(buffer, 256);                         // Read in next line (or up to 256 characters)
@@ -300,7 +213,7 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
   /* Read in the requested Node Set.  */
   while(File.eof() == false && File.fail() == false) {
     /* Check if the current line contains "*Nset" */
-    if( Contains(buffer, "*Nset") ) {
+    if( String_Ops::Contains(buffer, "*Nset") ) {
       /* If the user passed a Node_Set_Name then check if the current Node Set's
       name matches it. */
       if( Passed_Node_Set_Name == true) {
@@ -310,7 +223,7 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
         std::string Name_with_nset = "nset=" + Node_Set_Name;
 
         /* Now, check for a match */
-        if( Contains(buffer, Name_with_nset.c_str() ) ) {}
+        if( String_Ops::Contains(buffer, Name_with_nset.c_str() ) ) {}
         else { continue; }
       } // if( Passed_Node_Set_Name == true) {
 
@@ -340,7 +253,7 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
 
       Because of the difference, we need to check if we're reading in a
       generator or list type node set */
-      if( Contains(buffer, "generate") ) {
+      if( String_Ops::Contains(buffer, "generate") ) {
         /* Read in successive lines until we reach the end of the node set. */
         while(File.eof() == false && File.fail() == false) {
           File.getline(buffer, 256);
@@ -358,7 +271,7 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
 
           for(unsigned i = N_Start; i <= N_End; i += Inc) { Node_Set_List.push_back(i); }
         } // while(File.eof() == false && File.fail() == false) {
-      } // if( Contains(buffer, "generate") ) {
+      } // if( String_Ops::Contains(buffer, "generate") ) {
       else { // list node set
         /* Finish me! */
       } // else {
@@ -369,7 +282,7 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
       (skipping the "read in next line" instruction at the end of the while
       loop) */
       continue;
-    } // if( Contains(buffer, "*Nset") ) {
+    } // if( String_Ops::Contains(buffer, "*Nset") ) {
 
     File.getline(buffer, 256);                         // Read in next line (or up to 256 characters)
   } // while(File.eof() == false && File.fail() == false) {

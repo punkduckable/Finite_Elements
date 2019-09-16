@@ -20,20 +20,20 @@ void Test::Contains(void) {
   unsigned Tests_Passed = 0;
   unsigned Tests_Failed = 0;
 
-  if(IO::Read::Contains(Buffer1, Word1) == true) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer1, Word1) == true) { Tests_Passed++; }
   else { Tests_Failed++; }
 
-  if(IO::Read::Contains(Buffer2, Word2) == true) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer2, Word2) == true) { Tests_Passed++; }
   else { Tests_Failed++; }
 
 
   /* Now check that Contains can not identify BadWord1 and BadWord2 in Buffer1
   and Buffer2, respectivly. */
 
-  if(IO::Read::Contains(Buffer1, BadWord1) == false) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer1, BadWord1) == false) { Tests_Passed++; }
   else { Tests_Failed++; }
 
-  if(IO::Read::Contains(Buffer2, BadWord2) == false) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer2, BadWord2) == false) { Tests_Passed++; }
   else { Tests_Failed++; }
 
 
@@ -41,26 +41,26 @@ void Test::Contains(void) {
   Buffer2, respectivly, but that it can't identify them with a sufficiently
   large offset. */
 
-  if(IO::Read::Contains(Buffer1, Word3) == true) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer1, Word3) == true) { Tests_Passed++; }
   else { Tests_Failed++; }
 
-  if(IO::Read::Contains(Buffer1, Word3, 0) == true) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer1, Word3, 0) == true) { Tests_Passed++; }
   else { Tests_Failed++; }
 
-  if(IO::Read::Contains(Buffer1, Word3, 3) == false) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer1, Word3, 3) == false) { Tests_Passed++; }
   else { Tests_Failed++; }
 
-  if(IO::Read::Contains(Buffer1, Word3, 25) == false) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer1, Word3, 25) == false) { Tests_Passed++; }
   else { Tests_Failed++; }
 
 
-  if(IO::Read::Contains(Buffer2, Word4, 5) == true) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer2, Word4, 5) == true) { Tests_Passed++; }
   else { Tests_Failed++; }
 
-  if(IO::Read::Contains(Buffer2, Word4, 10) == true) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer2, Word4, 10) == true) { Tests_Passed++; }
   else { Tests_Failed++; }
 
-  if(IO::Read::Contains(Buffer2, Word4, 15) == false) { Tests_Passed++; }
+  if(String_Ops::Contains(Buffer2, Word4, 15) == false) { Tests_Passed++; }
   else { Tests_Failed++; }
 
 
@@ -81,9 +81,9 @@ void Test::Split(void) {
   std::vector<std::string> Sub_S2;
   std::vector<std::string> Sub_S3;
 
-  Sub_S1 = IO::Read::Split(S1);
-  Sub_S2 = IO::Read::Split(S2);
-  Sub_S3 = IO::Read::Split(S3);
+  Sub_S1 = String_Ops::Split(S1);
+  Sub_S2 = String_Ops::Split(S2);
+  Sub_S3 = String_Ops::Split(S3);
 
   /* Print results */
   unsigned len_Sub_S1 = Sub_S1.size();
