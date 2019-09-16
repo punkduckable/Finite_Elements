@@ -4,3 +4,4 @@ pardiso.lic
 *.txt
 IO/F.txt
 IO/X.txt
+IO/Out.vtk

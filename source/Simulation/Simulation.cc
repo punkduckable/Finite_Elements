@@ -10,7 +10,8 @@ void Simulation::From_File(const std::string & File_Name) {
   std::list<IO::Read::inp_boundary_data> Boundary_List;
   std::list<unsigned> Node_Set_List;
 
-  IO::Read::inp(File_Name, Node_Positions, Element_Node_Lists, Boundary_List, Node_Set_List);
+  IO::Read::inp(File_Name, Node_Positions, Element_Node_Lists, Boundary_List);
+  IO::Read::node_set(File_Name, Node_Set_List);
 
   #ifdef INPUT_MONITOR
     printf("Read in %u nodes\n",    (unsigned)Node_Positions.size());
@@ -85,6 +86,28 @@ void Simulation::From_File(const std::string & File_Name) {
   /* Solve for x in Kx = F. */
   Pardiso_Solve(K, x, F);
 
+  //////////////////////////////////////////////////////////////////////////////
+  // Assign final displacements to the Nodes.
+
+  /* Loop through the nodes. For each componet that is free (doesn't have a BC),
+  set the node's displacement to the corresponding component of the solution x. */
+  for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
+    for(unsigned Comp = 0; Comp < 3; Comp++) {
+      int I = ID(Node_Index, Comp);
+
+      /* If this Node's component was free (I != -1) then we assign this
+      componnet of this node's displacement to the corresponding component of x */
+      if(I != -1) { Nodes[Node_Index].Set_Displacement_Component(Comp, x[I]); }
+    } // for(unsigned Comp = 0; Comp < 3; Comp++) {
+  } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  /* Output/display results. */
+
+  IO::Write::vtk(Nodes, Num_Nodes, Elements, Num_Elements);
+
+
   #if defined(SIMULATION_MONITOR)
     // Print K, F, x to file
     try {
@@ -96,17 +119,7 @@ void Simulation::From_File(const std::string & File_Name) {
 
     for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
       printf("Node %d: [ ", Node_Index);
-      for(unsigned Comp = 0; Comp < 3; Comp++) {
-        /* If the current position is fixed (has a BC) then display the Node's
-        position. Otherwise, display the result from the Pardiso solve. */
-        int I = ID(Node_Index, Comp);
-        double Final_Position =  Nodes[Node_Index].Get_Position_Component(Comp);
-
-        if(I == -1) { Final_Position += Nodes[Node_Index].Get_Displacement_Component(Comp); }
-        else { Final_Position += x[I];  }
-
-        printf("%6.3lf ", Final_Position);
-      } // for(unsigned Comp = 0; Comp < 3; Comp++) {
+      for(unsigned Comp = 0; Comp < 3; Comp++) { printf("%6.3lf ", Nodes[Node_Index].Get_Position_Component(Comp)); }
       printf("]\n");
     } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
   #endif

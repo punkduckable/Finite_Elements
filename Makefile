@@ -106,7 +106,7 @@ obj/IO_Tests.o: IO_Tests.cc IO_Tests.h inp_Reader.h
 
 
 # Rules for SIMULATION_HEADER
-obj/Simulation.o: Simulation.cc Simulation.h Errors.h Matrix.h Array.h Node.h Element.h inp_Reader.h
+obj/Simulation.o: Simulation.cc Simulation.h Errors.h Matrix.h Array.h Node.h Element.h inp_Reader.h vtk_Writer.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 

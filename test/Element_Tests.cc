@@ -555,7 +555,11 @@ void Test::Wedge_Element(void) {
         } // if(layer == 0) {
 
         /* Apply a force to the top of the prism. */
-        if(layer == (N_Base-1)) { Nodes[Node_Index].Set_BC_Component(1, .2); }
+        if(layer == (N_Base-1)) {
+          double Force = .05;
+          if(depth == N_Depth - 1 || depth == 0) { Nodes[Node_Index].Set_Force_Component(1, Force/2.);}
+          else { Nodes[Node_Index].Set_Force_Component(1, .05); }
+        } // if(layer == (N_Base-1)) {
 
         Node_Index++;
       } // for(unsigned i = 0; i < (N_Base-layer); i++) {

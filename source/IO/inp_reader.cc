@@ -51,12 +51,12 @@ bool IO::Read::Contains(const char* Buffer, const char* Word, unsigned Start_At)
 } // bool IO::Read::Contains(const char* Buffer, const char* Word, unsigned Start_At) {
 
 
-void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions, class std::list<Array<unsigned,8>> & Element_Node_Lists, class std::list<inp_boundary_data> & Boundary_List, class std::list<unsigned> & Node_Set_List) {
+void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions, class std::list<Array<unsigned,8>> & Element_Node_Lists, class std::list<inp_boundary_data> & Boundary_List) {
   /* File description:
   This function is designed to read in node positions, node boundary data,
   and element connectivity from an .inp file. This information is turn returned
-  through the Node_Positions, Element_Node_Lists, Boundary_List, and
-  Node_Set_List Lists. */
+  through the Node_Positions, Element_Node_Lists, and Boundary_List lists. The
+  requested file should be in the IO directory (Note: this is not source/IO). */
 
   //////////////////////////////////////////////////////////////////////////////
   /* First, we need to open the file. To do this, we first need to get the file
@@ -78,10 +78,10 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
 
 
   //////////////////////////////////////////////////////////////////////////////
-  // Read in Node and Element data.
+  // Read in Node, Element, and Boundary data.
 
   char buffer[256];                              // buffer to hold data read in from File
-  File.getline(buffer, 256);                         // Read up to 256 characters (or end of line)
+  File.getline(buffer, 256);                     // Read up to 256 characters (or end of line)
 
   /* Read in all nodes positions, element connectivity, and boundary information
   from the file  */
@@ -199,46 +199,6 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
         next line" instruction at the end of the while loop) */
         continue;
       } // if( Contains(buffer, "*Boundary") ) {
-
-
-      /* Check if the current line starts with "*Nset" */
-      if( Contains(buffer, "*Nset") ) {
-
-        /* If so then we have found a node set. Let's read it in and add the
-        associated nodes to the Node_Set_List. */
-        while(File.eof() == false && File.fail() == false) {
-          File.getline(buffer, 256);
-
-          /* Check if the current line begins with a *. If so, then we've reached
-          the end of the boundary section. */
-          if(strcmp(&buffer[0], "*") == 0) { break; }
-
-          /* In inp files, a node set consists of a sequence of lines, each one of
-          which explains which nodes belong to the specified set. Each line is
-          formatted as follows:
-                   N_start, N_end, Inc
-          Which states that node number N_start and every Inc'th node after that
-          has node number less than or equal to N_end belongs to the set. In
-          other words, start by adding node N_start, repeatedly increment by Inc
-          and add the resulting node number to the set. Continue this until you
-          reach a node whose number is greater than N_end. */
-          unsigned N_Start, N_End, Inc;
-          sscanf(buffer, "%u, %u, %u\n", &N_Start, &N_End, &Inc);
-
-          /* Convert from 1 index to 0 index */
-          N_Start--;
-          N_End--;
-
-          for(unsigned i = N_Start; i <= N_End; i += Inc) { Node_Set_List.push_back(i); }
-        } // while(File.eof() == false && File.fail() == false) {
-
-        /* If we're here then we've finished reading in the node set. We may have
-        found the start of another type of listing. Thus, we don't want to read
-        in the next line yet. We therefore continue onto the next iteration
-        (skipping the "read in next line" instruction at the end of the while
-        loop) */
-        continue;
-      } // if( Contains(buffer, "*Nset") ) {
     } // if(buffer[0] == '*') {
 
     File.getline(buffer, 256);                         // Read in next line (or up to 256 characters)
@@ -251,5 +211,134 @@ void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 
 } // void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions...
 
 
+
+void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned> & Node_Set_List, const std::string & Node_Set_Name) {
+  /* Function description:
+  This function is designed to read in a node set from the specified file.
+  The defaulted "Node_Set_Name" argument can be used to specify which node set
+  you want to read in. The requested file should be in the IO directory (Note:
+  this is not source/IO).
+
+  If a Node_Set_Name is explicitly passed then this function will search for a
+  node set with the specified name in the specified file. If found, all node
+  ID's in that node set will be appended to the Node_Set_List. If the requested
+  node set can't be found then nothing will be appened to Node_Set_List.
+
+  If no Node_Set_Name is specified, then the function will append the contents
+  of every node set that it finds in File_Name to the Node_Set_List. */
+
+  //////////////////////////////////////////////////////////////////////////////
+  /* First, we need to open the file. To do this, we first need to get the file
+  path */
+  std::string File_Path = "./IO/" + File_Name;
+  std::ifstream File{};
+  File.open(File_Path.c_str());
+
+  /* Check if the file could be opened. If not then throw an exception */
+  if(File.is_open() == false) {
+    char Error_Message_Buffer[500];
+    sprintf(Error_Message_Buffer,
+            "Can't Open File Exception: Thrown by IO::Read::node_set\n"
+            "You tried to open the file %s (%s.inp).\n"
+            "However, no such file could be found in the IO directory.\n",
+            File_Name.c_str(), File_Name.c_str());
+    throw Cant_Open_File(Error_Message_Buffer);
+  } // if(File.is_open() == false) {
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Read in Node Set data.
+
+  char buffer[256];                              // buffer to hold data read in from File
+  File.getline(buffer, 256);                     // Read up to 256 characters (or end of line)
+
+  /* First, check if the user passed a Node_Set_Name. If not, then Node_Set_Name
+  will be set to the character '\0'. */
+  bool Passed_Node_Set_Name;
+  if( Node_Set_Name.c_str()[0] == '\0') { Passed_Node_Set_Name = false; }
+  else { Passed_Node_Set_Name = true; }
+
+  /* Read in the requested Node Set.  */
+  while(File.eof() == false && File.fail() == false) {
+    /* Check if the current line contains "*Nset" */
+    if( Contains(buffer, "*Nset") ) {
+      /* If the user passed a Node_Set_Name then check if the current Node Set's
+      name matches it. */
+      if( Passed_Node_Set_Name == true) {
+        /* in general, the node set's name may match something in the current
+        line other than the node set name. Thus, insead of just searching for
+        the Node_Set_Name, we search for "nset=Node_Set_Name". */
+        std::string Name_with_nset = "nset=" + Node_Set_Name;
+
+        /* Now, check for a match */
+        if( Contains(buffer, Name_with_nset.c_str() ) ) {}
+        else { continue; }
+      } // if( Passed_Node_Set_Name == true) {
+
+      /* In inp files, node sets can be formatted in one of two ways:
+      generate form or list form.
+
+
+      Generate:
+      In generate form, the node set consists of a sequence of lines, each one
+      of which is formatted as follows:
+               N_start, N_end, Inc
+      This states that node number N_start and every Inc'th node after that
+      whose node number is less than or equal to N_End belongs to the set. In
+      other words, start by adding node N_start, repeatedly increment by Inc
+      and add the resulting node number to the set. Continue this until you
+      reach a node whose number is greater than N_end.
+
+      Node sets that use generate form will have the keyword "generate"
+      in the node set header (the line that starts with *Nset).
+
+
+      List:
+      In list form, the nodes that belong to the node set are simply listed
+      in a comma separated list. Any node set whose header does not contain the
+      "generate" keyword is a list node set.
+
+
+      Because of the difference, we need to check if we're reading in a
+      generator or list type node set */
+      if( Contains(buffer, "generate") ) {
+        /* Read in successive lines until we reach the end of the node set. */
+        while(File.eof() == false && File.fail() == false) {
+          File.getline(buffer, 256);
+
+          /* Check if the current line begins with a *. If so, then we've reached
+          the end of the current node set section. */
+          if(strcmp(&buffer[0], "*") == 0) { break; }
+
+          unsigned N_Start, N_End, Inc;
+          sscanf(buffer, "%u, %u, %u\n", &N_Start, &N_End, &Inc);
+
+          /* Convert from 1 index to 0 index */
+          N_Start--;
+          N_End--;
+
+          for(unsigned i = N_Start; i <= N_End; i += Inc) { Node_Set_List.push_back(i); }
+        } // while(File.eof() == false && File.fail() == false) {
+      } // if( Contains(buffer, "generate") ) {
+      else { // list node set
+        /* Finish me! */
+      } // else {
+
+      /* If we're here then we've finished reading in the node set. We may have
+      found the start of another type of listing. Thus, we don't want to read
+      in the next line yet. We therefore continue onto the next iteration
+      (skipping the "read in next line" instruction at the end of the while
+      loop) */
+      continue;
+    } // if( Contains(buffer, "*Nset") ) {
+
+    File.getline(buffer, 256);                         // Read in next line (or up to 256 characters)
+  } // while(File.eof() == false && File.fail() == false) {
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  // All done! Close the file.
+  File.close();
+} // void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned> & Node_Set_List, const std::string & Node_Set_Name) {
 
 #endif

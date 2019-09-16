@@ -12,6 +12,7 @@
 #include "Element/Element.h"
 #include "IO/inp_Reader.h"
 #include "IO/KFX_Writer.h"
+#include "IO/vtk_Writer.h"
 #include "Pardiso/Pardiso_Solve.h"
 
 //#define ID_MONITOR
