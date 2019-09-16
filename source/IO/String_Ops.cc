@@ -54,22 +54,39 @@ bool String_Ops::Contains(const char* Buffer, const char* Word, unsigned Start_A
 std::vector<std::string> String_Ops::Split(std::string & S, const char delim) {
   /* Function description:
   This function is designed to read in a string and split it using a delimeter.
-  The characters between any two instances of delim (as well as any characters
-  before the first instance of delim and the characters after the last instance
-  of delim) are packaged together as a substring and added to the substring
-  vector (which is what get's returned).
+  This works using the char array version of Split (see below).
+
+  Delim is a defaulted argument. By default, delim = ','. */
+
+  return String_Ops::Split(S.c_str(), delim);
+} // std::vector<std::string> String_Ops:Split(std::string & S, const char delim) {
+
+
+
+std::vector<std::string> String_Ops::Split(const char* S, const char delim) {
+  /* Function description:
+  This function is designed to read in a nul terminated char array and split it
+  into a set of substrings. The splits occur whenever a delim character is found
+
+  The characters between any two instances of delim (as well as any
+  characters before the first instance of delim and the characters after the
+  last instance of delim) are packaged together as a substring and added to the
+  substring vector (which is what get's returned).
 
   Delim is a defaulted argument. By default, delim = ','. */
 
   std::vector<std::string> Sub_Strings;
 
-  unsigned len = S.length();
   unsigned Index_Start = 0;                      // Index of the start of the current substring.
   unsigned N_Chars_Since_Delim = 0;              // Number of characters after the start of the substring that are not Delim
-  for(unsigned i = 0; i < len; i++) {
+
+  unsigned i = 0;
+  while(S[i] != '\0') {
     if(S[i] == delim) {
-      // Add a new substring to the Sub String vector.
-      Sub_Strings.push_back(S.substr(Index_Start, N_Chars_Since_Delim));
+      // Make the new substring.
+      std::string Sub_Str;
+      for(unsigned i = 0; i < N_Chars_Since_Delim; i++) { Sub_Str += S[Index_Start + i]; }
+      Sub_Strings.push_back(Sub_Str);
 
       // Update Index_Start (to just 1 character after the delim index)
       Index_Start = i+1;
@@ -78,13 +95,20 @@ std::vector<std::string> String_Ops::Split(std::string & S, const char delim) {
       N_Chars_Since_Delim = 0;
     } // if(S[i] == delim) {
     else { N_Chars_Since_Delim++; }
-  } // for(unsigned i = 0; i < len; i++) {
+
+    i++;
+  } // while(i != '\0') {
 
   /* Finally, make a substring from the charcters after the last instance of
-  delim. Note that this only happens if Index_Start < len. */
-  if(Index_Start < len) { Sub_Strings.push_back(S.substr(Index_Start, N_Chars_Since_Delim)); }
+  delim. Note that this only happens if Index_Start < i. (since, at this point,
+  i is the index of the \0 character for the string) */
+  if(Index_Start < i) {
+    std::string Sub_Str;
+    for(unsigned i = 0; i < N_Chars_Since_Delim; i++) { Sub_Str += S[Index_Start + i]; }
+    Sub_Strings.push_back(Sub_Str);
+  } // if(Index_Start < i) {
 
   return Sub_Strings;
-} // std::vector<std::string> String_Ops:Split(std::string & S, const char delim) {
+} // std::vector<std::string> String_Ops:Split(const char* S, const char delim) {
 
 #endif

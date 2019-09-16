@@ -8,6 +8,7 @@
 #include <string.h>
 #include <fstream>
 #include <list>
+#include <vector>
 #include <stdio.h>
 
 namespace IO {

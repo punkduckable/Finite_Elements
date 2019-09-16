@@ -273,7 +273,27 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
         } // while(File.eof() == false && File.fail() == false) {
       } // if( String_Ops::Contains(buffer, "generate") ) {
       else { // list node set
-        /* Finish me! */
+        /* Read in and process successive lines until we reach the end of the
+        node set. */
+        while(File.eof() == false && File.fail() == false) {
+          File.getline(buffer, 256);
+
+          /* Check if the current line begins with a *. If so, then we've reached
+          the end of the current node set section. */
+          if(strcmp(&buffer[0], "*") == 0) { break; }
+
+          /* If not, then split the current line using ',' as the delimeter.
+          Then read in the node index from each substring and add them to the
+          Node_Set_List. */
+          std::vector<std::string> Sub_Strs = String_Ops::Split(buffer);
+
+          unsigned N_Sub_Strs = Sub_Strs.size();
+          for(unsigned i = 0; i < N_Sub_Strs; i++) {
+            unsigned Node_Number;
+            sscanf(Sub_Strs[i].c_str(), " %u", &Node_Number);
+            Node_Set_List.push_back(Node_Number);
+          } // for(unsigned i = 0; i < N_Sub_Strs; i++) {
+        } // // while(File.eof() == false && File.fail() == false) {
       } // else {
 
       /* If we're here then we've finished reading in the node set. We may have

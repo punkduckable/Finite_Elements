@@ -11,6 +11,10 @@ namespace String_Ops {
 
   std::vector<std::string> Split(std::string & S,                              // Intent: Read
                                  const char Delim = ',');                      // Intent: Read
+
+  std::vector<std::string> Split(const char* S,                                // Intent: Read
+                                 const char Delim = ',');                      // Intent: Read
+
 } // namespace String_Ops {
 
 #endif
