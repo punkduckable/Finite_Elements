@@ -1,8 +1,9 @@
 // Needed to run the tests.
-#include "Simulation/Simulation.h"
+#include "IO_Tests.h"
 
 int main() {
-  Simulation::From_File("Cylinder.inp");
+  //Simulation::From_File("Cylinder.inp");
+  Test::Split();
 
   return 0;
 } // int main() {

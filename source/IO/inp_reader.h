@@ -7,6 +7,7 @@
 #include <string.h>
 #include <fstream>
 #include <list>
+#include <vector>
 #include <stdio.h>
 
 namespace IO {
@@ -27,11 +28,14 @@ namespace IO {
 
     void node_set(const std::string & File_Name,                               // Intent: Read
                   class std::list<unsigned> & Node_Set_List,                   // Intent: Read
-                  const std::string & Node_Set_Name = std::string("\0"));                   // Intent: Read
+                  const std::string & Node_Set_Name = std::string("\0"));      // Intent: Read
 
     bool Contains(const char* Buffer,                                          // Intent: Read
                   const char* Word,                                            // Intent: Read
                   unsigned Search_At = 0);                                     // Intent: Read
+
+    std::vector<std::string> Split(std::string & S,                            // Intent: Read
+                                   const char Delim = ',');                    // Intent: Read
   } // namespace Read {
 } // namespace IO {
 

@@ -51,8 +51,47 @@ bool IO::Read::Contains(const char* Buffer, const char* Word, unsigned Start_At)
 } // bool IO::Read::Contains(const char* Buffer, const char* Word, unsigned Start_At) {
 
 
+
+std::vector<std::string> IO::Read::Split(std::string & S, const char delim) {
+  /* Function description:
+  This function is designed to read in a string and split it using a delimeter.
+  The characters between any two instances of delim (as well as any characters
+  before the first instance of delim and the characters after the last instance
+  of delim) are packaged together as a substring and added to the substring
+  vector (which is what get's returned).
+
+  Delim is a defaulted argument. By default, delim = ','. */
+
+  std::vector<std::string> Sub_Strings;
+
+  unsigned len = S.length();
+  unsigned Index_Start = 0;                      // Index of the start of the current substring.
+  unsigned N_Chars_Since_Delim = 0;              // Number of characters after the start of the substring that are not Delim
+  for(unsigned i = 0; i < len; i++) {
+    if(S[i] == delim) {
+      // Add a new substring to the Sub String vector.
+      Sub_Strings.push_back(S.substr(Index_Start, N_Chars_Since_Delim));
+
+      // Update Index_Start (to just 1 character after the delim index)
+      Index_Start = i+1;
+
+      // We're starting a new substring, so N_Chars_Since_Delim = 0;
+      N_Chars_Since_Delim = 0;
+    } // if(S[i] == delim) {
+    else { N_Chars_Since_Delim++; }
+  } // for(unsigned i = 0; i < len; i++) {
+
+  /* Finally, make a substring from the charcters after the last instance of
+  delim. Note that this only happens if Index_Start < len. */
+  if(Index_Start < len) { Sub_Strings.push_back(S.substr(Index_Start, N_Chars_Since_Delim)); }
+
+  return Sub_Strings;
+} // std::vector<std::string> IO::Read::Split(std::string & S, const char delim) {
+
+
+
 void IO::Read::inp(const std::string & File_Name, class std::list<Array<double, 3>> & Node_Positions, class std::list<Array<unsigned,8>> & Element_Node_Lists, class std::list<inp_boundary_data> & Boundary_List) {
-  /* File description:
+  /* Function description:
   This function is designed to read in node positions, node boundary data,
   and element connectivity from an .inp file. This information is turn returned
   through the Node_Positions, Element_Node_Lists, and Boundary_List lists. The

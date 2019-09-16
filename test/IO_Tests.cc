@@ -67,3 +67,30 @@ void Test::Contains(void) {
   printf("Tests Passed: %u\n", Tests_Passed);
   printf("Tests Failed: %u\n", Tests_Failed);
 } // void Test::Contains(void) {
+
+
+
+void Test::Split(void) {
+  /* First, create some test strigs */
+  std::string S1{"  10,  12,  75,  76,  77,  78,  79,  80,  81,  82,  83,  84,  85,  86,  89,  90\n"};
+  std::string S2{" 21,\n"};
+  std::string S3{"  17,,,  18, 188\n"};
+
+  /* Check that Split can split each string using the default ',' delimeter. */
+  std::vector<std::string> Sub_S1;
+  std::vector<std::string> Sub_S2;
+  std::vector<std::string> Sub_S3;
+
+  Sub_S1 = IO::Read::Split(S1);
+  Sub_S2 = IO::Read::Split(S2);
+  Sub_S3 = IO::Read::Split(S3);
+
+  /* Print results */
+  unsigned len_Sub_S1 = Sub_S1.size();
+  unsigned len_Sub_S2 = Sub_S2.size();
+  unsigned len_Sub_S3 = Sub_S3.size();
+
+  for(unsigned i = 0; i < len_Sub_S1; i++) { std::cout << '\"' << Sub_S1[i] << '\"' << std::endl; }
+  for(unsigned i = 0; i < len_Sub_S2; i++) { std::cout << '\"' << Sub_S2[i] << '\"' << std::endl; }
+  for(unsigned i = 0; i < len_Sub_S3; i++) { std::cout << '\"' << Sub_S3[i] << '\"' << std::endl; }
+} // void Test::Split(void) {
