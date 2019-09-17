@@ -11,13 +11,29 @@ void Simulation::From_File(const std::string & File_Name) {
   std::list<unsigned> Node_Set_List;
 
   IO::Read::inp(File_Name, Node_Positions, Element_Node_Lists, Boundary_List);
-  IO::Read::node_set(File_Name, Node_Set_List);
+  IO::Read::node_set(File_Name, Node_Set_List, "NSET4");
+
 
   #ifdef INPUT_MONITOR
     printf("Read in %u nodes\n",    (unsigned)Node_Positions.size());
     printf("Read in %u elements\n", (unsigned)Element_Node_Lists.size());
   #endif
 
+  unsigned counter = 0;
+  while(Node_Set_List.empty() == false) {
+    printf("%3d", Node_Set_List.front());
+    Node_Set_List.pop_front();
+    if(counter == 15) {
+      printf("\n");
+      counter = 0;
+    } // if(counter == 16) {
+    else {
+      printf(", ");
+      counter++;
+    } // else {
+  } // while(Node_Set_List.empty() == false) {
+
+  return;
 
   //////////////////////////////////////////////////////////////////////////////
   /* Next, let's process the Node_Positions and Boundary lists into a Nodes

@@ -224,7 +224,11 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
 
         /* Now, check for a match */
         if( String_Ops::Contains(buffer, Name_with_nset.c_str() ) ) {}
-        else { continue; }
+        else {
+          // If no match, then we're at thw wrong node set. Read in the next line .
+          File.getline(buffer, 256);                         // Read in next line (or up to 256 characters)
+          continue;
+        } // else {
       } // if( Passed_Node_Set_Name == true) {
 
       /* In inp files, node sets can be formatted in one of two ways:
@@ -260,7 +264,7 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
 
           /* Check if the current line begins with a *. If so, then we've reached
           the end of the current node set section. */
-          if(strcmp(&buffer[0], "*") == 0) { break; }
+          if(buffer[0] == '*') { break; }
 
           unsigned N_Start, N_End, Inc;
           sscanf(buffer, "%u, %u, %u\n", &N_Start, &N_End, &Inc);
@@ -280,15 +284,19 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
 
           /* Check if the current line begins with a *. If so, then we've reached
           the end of the current node set section. */
-          if(strcmp(&buffer[0], "*") == 0) { break; }
+          if(buffer[0] == '*') { break; }
 
           /* If not, then split the current line using ',' as the delimeter.
           Then read in the node index from each substring and add them to the
           Node_Set_List. */
           std::vector<std::string> Sub_Strs = String_Ops::Split(buffer);
 
+
           unsigned N_Sub_Strs = Sub_Strs.size();
           for(unsigned i = 0; i < N_Sub_Strs; i++) {
+            // Check for empty sub string
+            if(Sub_Strs[i].size() == 0) { continue; }
+
             unsigned Node_Number;
             sscanf(Sub_Strs[i].c_str(), " %u", &Node_Number);
             Node_Set_List.push_back(Node_Number);

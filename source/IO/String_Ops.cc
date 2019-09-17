@@ -81,11 +81,11 @@ std::vector<std::string> String_Ops::Split(const char* S, const char delim) {
   unsigned N_Chars_Since_Delim = 0;              // Number of characters after the start of the substring that are not Delim
 
   unsigned i = 0;
-  while(S[i] != '\0') {
+  while(S[i] != '\0' && S[i] != '\n' && S[i] != '\r') {
     if(S[i] == delim) {
       // Make the new substring.
       std::string Sub_Str;
-      for(unsigned i = 0; i < N_Chars_Since_Delim; i++) { Sub_Str += S[Index_Start + i]; }
+      for(unsigned j = 0; j < N_Chars_Since_Delim; j++) { Sub_Str += S[Index_Start + j]; }
       Sub_Strings.push_back(Sub_Str);
 
       // Update Index_Start (to just 1 character after the delim index)
@@ -97,14 +97,14 @@ std::vector<std::string> String_Ops::Split(const char* S, const char delim) {
     else { N_Chars_Since_Delim++; }
 
     i++;
-  } // while(i != '\0') {
+  } // while(S[i] != '\0' && S[i] != '\n' && S[i] != '\r') {
 
   /* Finally, make a substring from the charcters after the last instance of
   delim. Note that this only happens if Index_Start < i. (since, at this point,
   i is the index of the \0 character for the string) */
   if(Index_Start < i) {
     std::string Sub_Str;
-    for(unsigned i = 0; i < N_Chars_Since_Delim; i++) { Sub_Str += S[Index_Start + i]; }
+    for(unsigned j = 0; j < N_Chars_Since_Delim; j++) { Sub_Str += S[Index_Start + j]; }
     Sub_Strings.push_back(Sub_Str);
   } // if(Index_Start < i) {
 
