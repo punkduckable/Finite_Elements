@@ -2,7 +2,7 @@
 #include "Simulation/Simulation.h"
 
 int main() {
-  Simulation::From_File("Job-1.inp");
+  Simulation::From_File("Cylinder.inp");
 
   return 0;
 } // int main() {

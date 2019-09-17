@@ -20,7 +20,7 @@ OBJS :=        Main.o \
 					     Core.o Ke.o Fe.o Setup_Class.o Element_Tests.o \
 	             Compress_K.o Pardiso_Solve.o Pardiso_Tests.o Pardiso_Error.o \
 							 inp_Reader.o KFX_Writer.o vtk_Writer.o IO_Tests.o String_Ops.o \
-							 Simulation.o
+							 Simulation.o Simulation_Tests.o
 PATH_OBJS := $(patsubst %,obj/%,$(OBJS))
 VPATH :=     ./bin ./obj ./source \
              ./source/Node ./source/Element ./source/Pardiso ./source/IO ./source/Simulation \
@@ -108,8 +108,11 @@ obj/String_Ops.o: String_Ops.cc String_Ops.h
 
 
 
-# Rules for SIMULATION_HEADER
+# Rules for Simulation
 obj/Simulation.o: Simulation.cc Simulation.h Errors.h Matrix.h Array.h Node.h Element.h inp_Reader.h vtk_Writer.h
+	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
+
+obj/Simulation_Tests.o: Simulation_Tests.cc Simulation_Tests.h Simulation.h
 	$(COMPILER) $(CFLAGS) $(INC_PATH) $< -o $@
 
 

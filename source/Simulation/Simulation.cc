@@ -11,7 +11,7 @@ void Simulation::From_File(const std::string & File_Name) {
   std::list<unsigned> Node_Set_List;
 
   IO::Read::inp(File_Name, Node_Positions, Element_Node_Lists, Boundary_List);
-  IO::Read::node_set(File_Name, Node_Set_List, "NSET4");
+  IO::Read::node_set(File_Name, Node_Set_List);
 
 
   #ifdef INPUT_MONITOR
@@ -19,27 +19,22 @@ void Simulation::From_File(const std::string & File_Name) {
     printf("Read in %u elements\n", (unsigned)Element_Node_Lists.size());
   #endif
 
-  unsigned counter = 0;
-  while(Node_Set_List.empty() == false) {
-    printf("%3d", Node_Set_List.front());
-    Node_Set_List.pop_front();
-    if(counter == 15) {
-      printf("\n");
-      counter = 0;
-    } // if(counter == 16) {
-    else {
-      printf(", ");
-      counter++;
-    } // else {
-  } // while(Node_Set_List.empty() == false) {
-
-  return;
-
   //////////////////////////////////////////////////////////////////////////////
   /* Next, let's process the Node_Positions and Boundary lists into a Nodes
   array */
   const unsigned Num_Nodes = (unsigned)Node_Positions.size();
-  class Node* Nodes = Process_Node_Lists(Node_Positions, Boundary_List, Node_Set_List, Num_Nodes);
+  class Node* Nodes = Process_Node_Lists(Node_Positions, Boundary_List, Num_Nodes);
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  /* Next, apply BC's to the node set (if present) */
+
+  class IO::Read::nset_BC node_set_BCs;
+  node_set_BCs.Set_x_BC(0);
+  node_set_BCs.Set_y_BC(0);
+  node_set_BCs.Set_z_BC(0);
+
+  Set_nset_BCs(Nodes, Node_Set_List, node_set_BCs);
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -145,7 +140,7 @@ void Simulation::From_File(const std::string & File_Name) {
 
 
 
-class Node* Simulation::Process_Node_Lists(class std::list<Array<double,3>> & Node_Positions, class std::list<IO::Read::inp_boundary_data> & Boundary_List, class std::list<unsigned> & Node_Set_List, const unsigned Num_Nodes) {
+class Node* Simulation::Process_Node_Lists(class std::list<Array<double,3>> & Node_Positions, class std::list<IO::Read::inp_boundary_data> & Boundary_List, const unsigned Num_Nodes) {
   /* Function description:
   This function uses the Node_Positions and Boundary_List lists to create the
   Nodes array. */
@@ -187,24 +182,48 @@ class Node* Simulation::Process_Node_Lists(class std::list<Array<double,3>> & No
     Boundary_List.pop_front();
   } // for(unsigned i = 0; i < Num_BC; i++) {
 
+  return Nodes;
+} // class Node* Process_Node_Lists(class std::list<Array<double,3>> & Node_Positions,...
 
-  /* Now, let's fix the nodes in the Node Set. */
+
+
+
+
+void Simulation::Set_nset_BCs(class Node* Nodes, class std::list<unsigned> & Node_Set_List, const class IO::Read::nset_BC & BC_Data) {
+  /* Function description:
+  This function is designed to set the BC's of each node in the Node_Set using
+  the information in the nset_BC object. The nset_BC object basically keeps
+  track of which components (for the nodes in the node set) have BC's as well
+  as what the BC is. */
+
+  /* Cycle through the nodes in the node set. For each one, apply the
+  corresponding BC's. */
   unsigned Num_Nset = Node_Set_List.size();
   for(unsigned i = 0; i < Num_Nset; i++) {
     /* Get the front element of Node_Set_List. */
     unsigned Current_Node = Node_Set_List.front();
 
-    /* Fix the position of this Node.  */
-    Nodes[Current_Node].Set_BC_Component(0, 0);
-    Nodes[Current_Node].Set_BC_Component(1, 0);
-    Nodes[Current_Node].Set_BC_Component(2, 0);
+    /* Now set the BC's */
+    if(BC_Data.Has_x_BC() == true) {
+      double x_BC = BC_Data.Get_x_BC();
+      Nodes[Current_Node].Set_BC_Component(0, x_BC);
+    } // if(BC_Data.Has_x_BC() == true) {
 
-    /* Pop the front element off of the Node_Set_List */
+    if(BC_Data.Has_y_BC() == true) {
+      double y_BC = BC_Data.Get_y_BC();
+      Nodes[Current_Node].Set_BC_Component(1, y_BC);
+    } // if(BC_Data.Has_y_BC() == true) {
+
+    if(BC_Data.Has_z_BC() == true) {
+      double z_BC = BC_Data.Get_z_BC();
+      Nodes[Current_Node].Set_BC_Component(2, z_BC);
+    } // if(BC_Data.Has_z_BC() == true) {
+
+
+    /* Finally, Pop the front element off of the Node_Set_List */
     Node_Set_List.pop_front();
   } // for(unsigned i = 0; i < Num_Nset; i++) {
-
-  return Nodes;
-} // class Node* Process_Node_Lists(class std::list<Array<double,3>> & Node_Positions,...
+} // void Simulation::Set_nset_BCs(class Node* Nodes, class std::list<unsigned> & Node_Set_List, const class IO::Read::nset_BC & BC_Data) {
 
 
 

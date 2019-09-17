@@ -29,8 +29,11 @@ namespace Simulation {
 
   class Node* Process_Node_Lists(class list<Array<double,3>> & Node_Positions,           // Intent: Read/Write
                                  class list<IO::Read::inp_boundary_data> & Boundary_List,// Intent: Read/Write
-                                 class list<unsigned> & Node_Set_List,                   // Intent: Read/Write
                                  const unsigned Num_Nodes);                              // Intent: Read
+
+  void Set_nset_BCs(class Node * Nodes,                                        // Intent: Write
+                    class list<unsigned> & Node_Set_List,                      // Intent: Read/Write
+                    const class IO::Read::nset_BC & BC_data);                  // Intent: Read
 
   unsigned SetUp_ID_Num_Global_Eq(class Matrix<int> & ID,                      // Intent: Write
                                   const Node * Nodes,                          // Intent: Read
