@@ -194,7 +194,9 @@ void Simulation::Set_nset_BCs(class Node* Nodes, class std::list<unsigned> & Nod
   This function is designed to set the BC's of each node in the Node_Set using
   the information in the nset_BC object. The nset_BC object basically keeps
   track of which components (for the nodes in the node set) have BC's as well
-  as what the BC is. */
+  as what the BC is.
+
+  When this function is finished, the Node_Set_List will be empty. */
 
   /* Cycle through the nodes in the node set. For each one, apply the
   corresponding BC's. */

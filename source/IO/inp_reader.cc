@@ -220,7 +220,7 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
         /* in general, the node set's name may match something in the current
         line other than the node set name. Thus, insead of just searching for
         the Node_Set_Name, we search for "nset=Node_Set_Name". */
-        std::string Name_with_nset = "nset=" + Node_Set_Name;
+        std::string Name_with_nset = "nset=" + Node_Set_Name + ",";
 
         /* Now, check for a match */
         if( String_Ops::Contains(buffer, Name_with_nset.c_str() ) ) {}
@@ -299,6 +299,11 @@ void IO::Read::node_set(const std::string & File_Name, class std::list<unsigned>
 
             unsigned Node_Number;
             sscanf(Sub_Strs[i].c_str(), " %u", &Node_Number);
+
+            // Convert from 1 index to 0 index
+            Node_Number--;
+
+            // Add node number to list. 
             Node_Set_List.push_back(Node_Number);
           } // for(unsigned i = 0; i < N_Sub_Strs; i++) {
         } // // while(File.eof() == false && File.fail() == false) {

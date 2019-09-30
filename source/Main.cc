@@ -1,8 +1,8 @@
 // Needed to run the tests.
-#include "Simulation/Simulation.h"
+#include "Simulation_Tests.h"
 
 int main() {
-  Simulation::From_File("Cylinder.inp");
+  Test::Mrudang_Test();
 
   return 0;
 } // int main() {
