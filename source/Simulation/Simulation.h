@@ -22,8 +22,8 @@
 using std::list;
 
 namespace Simulation {
-  const double E = 10;                        // Young's modulus               : Units GPA
-  const double v = .3;                        // Poisson's ratio               : Unitless
+  const double E = 100;                        // Young's modulus               : Units GPA
+  const double v = .45;                        // Poisson's ratio               : Unitless
 
   void From_File(const std::string & File_Name);                               // Intent: Read
 

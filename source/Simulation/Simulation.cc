@@ -92,7 +92,6 @@ void Simulation::From_File(const std::string & File_Name) {
     throw;
   } // catch (const Element_Exception & Er) {
 
-
   //////////////////////////////////////////////////////////////////////////////
   /* Solve for x in Kx = F. */
   Pardiso_Solve(K, x, F);

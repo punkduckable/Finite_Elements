@@ -107,7 +107,7 @@ void Element::Populate_Ke(void) {
     JD_B = JD*B;
 
     /* Now compute B^T*JD*B (this will be added into Ke).
-    We expect this matrix to be symmetric. Therefore to minimuze computations,
+    We expect this matrix to be symmetric. Therefore to minimize computations,
     we first populate the main diagional of BT_JD_B, and then the off diagional
     parts (by computing the (i,j) cell of BT_JD_B and then moving it into
     the (j,i) cell. */

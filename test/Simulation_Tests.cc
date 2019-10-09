@@ -209,6 +209,11 @@ void Test::Mrudang_Test(void) {
       componnet of this node's displacement to the corresponding component of x */
       if(I != -1) { Nodes[Node_Index].Set_Displacement_Component(Comp, x[I]); }
     } // for(unsigned Comp = 0; Comp < 3; Comp++) {
+    printf("%3d: [%9.6lf, %9.6lf, %9.6lf]\n",
+           Node_Index,
+           Nodes[Node_Index].Get_Displacement_Component(0),
+           Nodes[Node_Index].Get_Displacement_Component(1),
+           Nodes[Node_Index].Get_Displacement_Component(2)); 
   } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
 
 
