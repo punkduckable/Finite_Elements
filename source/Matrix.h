@@ -82,7 +82,7 @@ public:
   //////////////////////////////////////////////////////////////////////////////
   // Other methods
 
-  void Zero(void);
+  void Fill(double Val);
 }; // class Matrix {
 
 
@@ -281,7 +281,7 @@ Matrix<Type> Matrix<Type>::operator*(const Matrix<Type> & Other) const {
       Matrix<Type> Product{Product_Num_Rows, Product_Num_Cols, Memory::ROW_MAJOR};
 
       /* First, zero the Product */
-      Product.Zero();
+      Product.Fill(0);
 
       /* Next, compute the product. In this situation, memory usage is
       optimized if order of the loops is i-k-j.*/
@@ -301,7 +301,7 @@ Matrix<Type> Matrix<Type>::operator*(const Matrix<Type> & Other) const {
       Matrix<Type> Product{Product_Num_Rows, Product_Num_Cols, Memory::COLUMN_MAJOR};
 
       /* First, zero the Product */
-      Product.Zero();
+      Product.Fill(0);
 
       /* Next, compute the product. In this situation, memory usage is optimized
       if order of the loops is j-i-k.*/
@@ -323,7 +323,7 @@ Matrix<Type> Matrix<Type>::operator*(const Matrix<Type> & Other) const {
       Matrix<Type> Product{Product_Num_Rows, Product_Num_Cols, Memory::COLUMN_MAJOR};
 
       /* First, zero the Product */
-      Product.Zero();
+      Product.Fill(0);
 
       /* Next, compute the product. In this situation, memory usage is optimized
       if order of the loops is k-j-i.*/
@@ -343,7 +343,7 @@ Matrix<Type> Matrix<Type>::operator*(const Matrix<Type> & Other) const {
       Matrix<Type> Product{Product_Num_Rows, Product_Num_Cols, Memory::COLUMN_MAJOR};
 
       /* First, zero the Product */
-      Product.Zero();
+      Product.Fill(0);
 
       /* Next, compute the product. In this situation, memory usage is optimized
       if order of the loops is k-j-i.*/
@@ -453,9 +453,9 @@ Matrix<Type> & Matrix<Type>::operator+=(const Matrix<Type> & Other) {
 
 // Zeros out the matrix
 template <typename Type>
-void Matrix<Type>::Zero(void) {
+void Matrix<Type>::Fill(double Val) {
   /* Function Description:
-  This function is designed to "zero out" the elements of a Matrix.
+  This function is designed to fill the Matrix with a particular value.
 
   This function was originally created to promote code reuse in the
   Matrix-Matrix multiplication method. I decided to make it a part of the public
@@ -467,13 +467,13 @@ void Matrix<Type>::Zero(void) {
   if(Memory_Layout == Memory::ROW_MAJOR) {
     for(unsigned i = 0; i < Num_Rows; i++)
       for(unsigned j = 0; j < Num_Cols; j++)
-        Ar[i*Num_Cols + j] = 0;
+        Ar[i*Num_Cols + j] = Val;
   } // if(Memory_Layout == Memory::ROW_MAJOR) {
   else { // if(Memory_Layout == Memory::COLUMN_MAJOR)
     for(unsigned j = 0; j < Num_Cols; j++)
       for(unsigned i = 0; i < Num_Rows; i++)
-        Ar[i + j*Num_Rows] = 0;
+        Ar[i + j*Num_Rows] = Val;
   } // else {
-} // void Matrix<Type>::Zero(void) {
+} // void Matrix<Type>::Fill(double Val) {
 
 #endif

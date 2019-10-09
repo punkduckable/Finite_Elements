@@ -148,7 +148,7 @@ void Test::Matrix_Correctness_Tests(void) {
 
   // Initialize and populate M9
   Matrix<double> M9{5, 4, Memory::COLUMN_MAJOR};
-  M9.Zero();
+  M9.Fill(0);
   for(int i = 0; i < 4; i++)
     M9(i,i) = 1;
 
@@ -158,7 +158,7 @@ void Test::Matrix_Correctness_Tests(void) {
 
   // Initialize and populate M10
   Matrix<double> M10{5, 4, Memory::COLUMN_MAJOR};
-  M10.Zero();
+  M10.Fill(0);
   for(int i = 0; i < 4; i++)
     M10(i,i) = i;
 

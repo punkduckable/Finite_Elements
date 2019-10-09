@@ -50,7 +50,7 @@ void Simulation::From_File(const std::string & File_Name) {
   double* x = new double[Num_Global_Eq];
 
   // Zero initialize K and F
-  K.Zero();
+  K.Fill(0);
   for(unsigned i = 0; i < Num_Global_Eq; i++) { F[i] = 0; }
 
 

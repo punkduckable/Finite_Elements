@@ -149,7 +149,7 @@ void Test::Mrudang_Test(void) {
   double* x = new double[Num_Global_Eq];
 
   // Zero initialize K and F
-  K.Zero();
+  K.Fill(0);
   for(unsigned i = 0; i < Num_Global_Eq; i++) { F[i] = 0; }
 
 
@@ -213,7 +213,7 @@ void Test::Mrudang_Test(void) {
            Node_Index,
            Nodes[Node_Index].Get_Displacement_Component(0),
            Nodes[Node_Index].Get_Displacement_Component(1),
-           Nodes[Node_Index].Get_Displacement_Component(2)); 
+           Nodes[Node_Index].Get_Displacement_Component(2));
   } // for(unsigned Node_Index = 0; Node_Index < Num_Nodes; Node_Index++) {
 
 

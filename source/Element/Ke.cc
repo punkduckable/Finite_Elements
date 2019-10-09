@@ -69,7 +69,7 @@ void Element::Populate_Ke(void) {
 
   //////////////////////////////////////////////////////////////////////////////
   // First, zero out KE
-  Ke.Zero();
+  Ke.Fill(0);
 
   // Now, cycle through the 8 Integration points
 
@@ -319,9 +319,14 @@ void Element::Add_Ba_To_B(const unsigned Node, const unsigned Integration_Point,
   //////////////////////////////////////////////////////////////////////////////
   /* First, calculate Na_x, Na_y, Na_z. This is done using the equations on page
   150 of Hughes' book */
-  double Na_x = (Na_Xi(Node, Integration_Point)*Coeff(0,0) + Na_Eta(Node, Integration_Point)*Coeff(0,1) + Na_Zeta(Node, Integration_Point)*Coeff(0,2))/J;
-  double Na_y = (Na_Xi(Node, Integration_Point)*Coeff(1,0) + Na_Eta(Node, Integration_Point)*Coeff(1,1) + Na_Zeta(Node, Integration_Point)*Coeff(1,2))/J;
-  double Na_z = (Na_Xi(Node, Integration_Point)*Coeff(2,0) + Na_Eta(Node, Integration_Point)*Coeff(2,1) + Na_Zeta(Node, Integration_Point)*Coeff(2,2))/J;
+  double Na_Xi_Current   = Na_Xi(Node, Integration_Point);
+  double Na_Eta_Current  = Na_Eta(Node, Integration_Point);
+  double Na_Zeta_Current = Na_Zeta(Node, Integration_Point);
+  double Recip_J = 1./J;
+
+  double Na_x = (Na_Xi_Current*Coeff(0,0) + Na_Eta_Current*Coeff(0,1) + Na_Zeta_Current*Coeff(0,2))*Recip_J;
+  double Na_y = (Na_Xi_Current*Coeff(1,0) + Na_Eta_Current*Coeff(1,1) + Na_Zeta_Current*Coeff(1,2))*Recip_J;
+  double Na_z = (Na_Xi_Current*Coeff(2,0) + Na_Eta_Current*Coeff(2,1) + Na_Zeta_Current*Coeff(2,2))*Recip_J;
 
   /* Now, use these to make Ba_T
   We construct Ba_T rather than Ba because B is stored in Column major order.
@@ -391,9 +396,7 @@ void Element::Fill_Ke_With_1s(void) {
 
   //////////////////////////////////////////////////////////////////////////////
   // Fill Ke's with 1's (note: Ke is column major)
-  for(int j = 0; j < 24; j++)
-    for(int i = 0; i < 24; i++)
-      Ke(i,j) = 1;
+  Ke.Fill(1);
 
   // Ke has now been set
   Ke_Set_Up = true;
